@@ -1,0 +1,18 @@
+{
+  "$id": "ModuleDefinition",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "title": { "type": "string" },
+    "description": { "type": "string" },
+    "berechtigungen": { "type": "string" },
+    "todos": { "type": "array", "items": { "type": "string"}},
+    "operationen": {"type": "object"},
+    "links": {"type": "array", "items": { "type": "object", "properties": {
+      "text": { "type": "string"},
+      "href": { "type": "string"},
+    }}}
+  },
+  "required": ["title", "description"],
+  "additionalProperties": false
+}
