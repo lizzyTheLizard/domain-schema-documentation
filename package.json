@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "tsx --watch --watch-path=./input src/main.ts",
+    "generate": "tsx --watch --watch-path=./input src/main.ts",
     "lint": "eslint --fix src/**/*.ts",
     "test": "jest --watch",
-    "build:ci": "tsx src/main.ts",
-    "lint:ci": "eslint src/**/*.ts",
-    "test:ci": "jest"
+    "generate:ci": "tsx src/main.ts",
+    "check": "npm run check:types && npm run check:lint && npm run check:test",
+    "check:types": "tsc --noEmit --skipLibCheck",
+    "check:lint": "eslint --fix src/**/*.ts",
+    "check:test": "jest"
   },
   "author": "Matthias Graf <matthias.graf@zuehlke.com>",
   "license": "MIT",
