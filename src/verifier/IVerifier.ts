@@ -1,4 +1,4 @@
-import { type Application, type Module, type Schema } from '../reader/IReader'
+import { type Application, type Module, type Schema } from '../reader/IReader.ts'
 
 export interface IVerifier {
   verify: () => Promise<void>

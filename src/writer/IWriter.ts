@@ -1,4 +1,4 @@
-import { type Application, type Module, type Schema } from '../reader/IReader'
+import { type Application, type Module, type Schema } from '../reader/IReader.js'
 
 export interface IWriter {
   writer: () => Promise<void>

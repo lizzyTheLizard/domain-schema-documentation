@@ -19,5 +19,15 @@ export interface Module {
 
 export interface Schema {
   $id: string
+  type: string
+  properties?: Schema[]
+  allOf?: Schema[]
+  oneOf?: Schema[]
+  anyOf?: Schema[]
+  items?: Schema
+  additionalProperties?: boolean
+  examples?: unknown[]
+  required?: string[]
   'x-schema-typ': SchemaTyp
+  'x-references': undefined | string | string[]
 }
