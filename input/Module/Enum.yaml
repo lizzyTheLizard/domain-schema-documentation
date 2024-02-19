@@ -1,0 +1,13 @@
+$id: /Module/Enum.yaml
+title: Enum
+description: An example for an enum
+type: string
+x-schema-type: ValueObject
+x-enum-description:
+  A: The first value
+  B: |
+    The second value
+    Multiple lines
+enum:
+  - A
+  - B

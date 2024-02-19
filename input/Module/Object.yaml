@@ -1,0 +1,15 @@
+$id: /Module/Object.yaml
+title: Object
+description: An example for an object
+type: object
+x-schema-type: ValueObject
+properties:
+  firstP:
+    type: string
+    description: The first property
+  secondP:
+    type: integer
+    description: The second property
+  thirdP:
+    $ref: ./Enum.yaml
+

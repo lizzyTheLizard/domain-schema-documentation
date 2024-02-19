@@ -2,9 +2,9 @@
   "compilerOptions": {
     "target": "ES2015",
     "strict": true,
-    "esModuleInterop": true,
     "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "moduleResolution": "node",
+    "noImplicitAny": true
   }
 }

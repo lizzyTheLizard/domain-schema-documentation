@@ -1,0 +1,8 @@
+public enum {{javaClassName this}} {
+{{#each enum}}
+{{#if ../x-enum-description}}
+{{javaComment (javaEnumDoc .. this) 2}}
+{{/if}}
+  {{this}},
+{{/each}}
+}

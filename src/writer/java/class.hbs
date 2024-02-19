@@ -1,0 +1,13 @@
+{{#each imports}}
+import {{this}};
+{{/each}}
+
+{{javaComment description 0}}
+public class {{javaClassName this}} {
+{{#each properties}}
+{{#if description}}
+{{javaComment description 2}}
+{{/if}}
+  private {{javaPropertyType this}} {{@key}};
+{{/each}}
+}
