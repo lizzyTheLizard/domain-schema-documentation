@@ -11,3 +11,5 @@ export interface VerificationError {
 }
 
 export type VerificationErrorType = 'NOT_IN_DOMAIN_MODEL' | 'MISSING_IN_IMPLEMENTATION' | 'WRONG'
+
+// TODO Implement verification
