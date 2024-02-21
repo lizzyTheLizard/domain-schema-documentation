@@ -22,7 +22,7 @@ describe('DefaultReader', () => {
 
   beforeEach(() => {
     tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    target = defaultReader(tmpDir.name, inputValidator, readYamlFile)
+    target = defaultReader(tmpDir.name, [], inputValidator, readYamlFile)
   })
 
   afterEach(() => {

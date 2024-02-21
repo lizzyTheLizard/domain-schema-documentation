@@ -2,14 +2,21 @@ import { type Application, Input, type Module, type Reader, type Schema } from '
 import { promises as fs } from 'fs'
 import path from 'path'
 import * as yaml from 'yaml'
-import { type InputValidator } from './inputValidator/InputValidator.ts'
+import { InputValidator } from './inputValidator/InputValidator.ts'
+import { type Plugin } from '../plugin/Plugin.ts'
 
-export function defaultReader (inputFolder: string, inputValidator: InputValidator, readFile: (filePath: string) => Promise<unknown>): Reader {
+export function defaultReader (
+  inputFolder: string,
+  plugins: Plugin[] = [],
+  inputValidator: InputValidator = new InputValidator({}),
+  readFile: (filePath: string) => Promise<unknown> = async (filePath) => await readYamlFile(filePath)
+): Reader {
   return async function (): Promise<Input> {
     const result = await readFolderRecursive(inputFolder, inputFolder, inputValidator, 0, readFile)
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const input = new Input(result.application!, result.modules, result.schemas)
     inputValidator.finishValidation()
+    plugins.forEach(plugin => { plugin.validateInput(input) })
     return input
   }
 }

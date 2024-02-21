@@ -11,11 +11,13 @@ export class Input {
   }
 }
 
+export interface Link { text: string, href: string }
+
 export interface Application {
   title: string
   description: string
   todos?: string[]
-  links?: Array<{ text: string, href: string }>
+  links?: Link[]
 }
 
 export interface Module {
@@ -24,7 +26,7 @@ export interface Module {
   description: string
   todos?: string[]
   operations?: unknown
-  links?: Array<{ text: string, href: string }>
+  links?: Link[]
 }
 
 export type Schema = EnumSchema | ObjectSchema | InterfaceSchema

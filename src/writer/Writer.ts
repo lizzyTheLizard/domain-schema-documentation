@@ -1,4 +1,18 @@
 import { type Input } from '../reader/Reader.ts'
-import { type VerificationError } from '../verifier/Verifier.ts'
+import path from 'path'
+import fs from 'fs'
+import Handlebars from 'handlebars'
 
-export type Writer = (input: Input, errors: VerificationError[]) => Promise<void>
+export type Writer = (input: Input) => Promise<void>
+
+export async function writeOutput (output: string, relativeFilename: string, outputFolder: string): Promise<void> {
+  const outputFileName = path.join(outputFolder, relativeFilename)
+  const outputDir = path.dirname(outputFileName)
+  await fs.promises.mkdir(outputDir, { recursive: true })
+  await fs.promises.writeFile(outputFileName, output, 'utf8')
+}
+
+export function loadTemplate (path: string): HandlebarsTemplateDelegate {
+  const templateString = fs.readFileSync(path).toString()
+  return Handlebars.compile(templateString)
+}
