@@ -6,7 +6,7 @@ export function inputNormalizer (schema: SchemaCommon): Schema {
     case 'Interface':
       return oneOfNormalizer(schema)
     case 'Enum':
-      return enumNormalizer(schema)
+      return schema as Schema
     case 'Object':
       return objectNormalizer(schema)
   }
@@ -41,28 +41,22 @@ function oneOfNormalizer (schema: SchemaCommon): Schema {
   const name = capitalize(getName(schema))
   const cleaned = cleanOneOf(schema, name)
   const oneOf = cleaned.result
-  const definitions = schema.definitions !== undefined || Object.keys(cleaned.definitions).length > 0
-    ? cleanDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions })
-    : undefined
-  return { ...schema, type: 'object', oneOf, definitions }
-}
-
-function enumNormalizer (schema: SchemaCommon): Schema {
-  const enums = (schema as any).enum as string[]
-  const definitions = schema.definitions !== undefined
-    ? cleanDefinitions(schema.definitions)
-    : undefined
-  return { ...schema, type: 'string', enum: enums, definitions }
+  const result: Schema = { ...schema, type: 'object', oneOf }
+  if (schema.definitions !== undefined || Object.keys(cleaned.definitions).length > 0) {
+    result.definitions = cleanDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions })
+  }
+  return result
 }
 
 function objectNormalizer (schema: SchemaCommon): Schema {
   const name = capitalize(getName(schema))
   const cleaned = cleanProperties(schema, name)
   const properties = cleaned.result
-  const definitions = schema.definitions !== undefined || Object.keys(cleaned.definitions).length > 0
-    ? cleanDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions })
-    : undefined
-  return { ...schema, type: 'object', properties, definitions }
+  const result: Schema = { ...schema, type: 'object', properties }
+  if (schema.definitions !== undefined || Object.keys(cleaned.definitions).length > 0) {
+    result.definitions = cleanDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions })
+  }
+  return result
 }
 
 function cleanDefinitions (definitions: Record<string, unknown>): Record<string, Definition> {
@@ -98,7 +92,7 @@ function cleanOneOf (parent: unknown, name: string): { result: Property[], defin
     if ('$ref' in oneOf) {
       result.push({ type: 'object', ...oneOf })
     } else {
-      const definitionName = `OneOf${name}${index}`
+      const definitionName = `OneOf${name}${index + 1}`
       result.push({ type: 'object', $ref: `#/definitions/${definitionName}` })
       definitions[definitionName] = oneOf
     }
@@ -127,7 +121,7 @@ function cleanProperty (propertyIn: unknown, name: string): { result: Property, 
     const result: ArrayProperty = { ...property, type: 'array', items: cleanItem.result }
     return { result, definitions: cleanItem.definitions }
   }
-  if ('properties' in property || 'oneOf' in property) {
+  if ('properties' in property || 'oneOf' in property || 'enum' in property) {
     const result: ObjectProperty = { type: 'object', $ref: `#/definitions/${name}` }
     return { result, definitions: { [name]: property } }
   }
