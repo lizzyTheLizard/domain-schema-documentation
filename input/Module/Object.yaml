@@ -3,6 +3,18 @@ title: Object
 description: An example for an object
 type: object
 x-schema-type: ValueObject
+definitions:
+  InnerObject:
+    type: object
+    properties:
+      key:
+        type: string
+        description: The key
+      value:
+        type: string
+        description: The value
+examples:
+  - firstP: 'test'
 properties:
   firstP:
     type: string
@@ -10,6 +22,31 @@ properties:
   secondP:
     type: integer
     description: The second property
+  date:
+    type: string
+    format: date
+    description: The date
   thirdP:
     $ref: ./Enum.yaml
+  parent:
+    $ref: '#'
+  innerObject:
+    type: array
+    items:
+      $ref: '#/definitions/InnerObject'
+  recursiveObject:
+    type: object
+    properties:
+      p1:
+        type: string
+        description: The value
+      p2:
+        oneOf:
+          - $ref: '#'
+          - type: object
+            properties:
+              p1:
+                type: string
+                enum:
+                  - test
 

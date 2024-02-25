@@ -1,11 +1,11 @@
 import { InputValidator } from './InputValidator.ts'
-import { type Module } from '../Reader.ts'
+import { type Module } from '../input/Input.ts'
 
 describe('InputValidator.Module', () => {
   let inputValidator: InputValidator
 
   beforeEach(() => {
-    inputValidator = new InputValidator()
+    inputValidator = new InputValidator({ noAdditionalPropertiesInExamples: true, ajvOptions: {}, formats: [] })
   })
 
   test('valid module file', () => {

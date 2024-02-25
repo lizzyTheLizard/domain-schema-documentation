@@ -1,0 +1,22 @@
+$id: _Keywords.yaml
+$schema: http://json-schema.org/draft-07/schema#
+title: Keywods Definition
+type: object
+properties:
+  x-tags:
+    type: object
+    additionalProperties:
+      type: string
+  x-todos:
+    type: array
+    items:
+      type: string
+  x-links:
+    type: array
+    items:
+      type: object
+      properties:
+        text:
+          type: string
+        href:
+          type: string

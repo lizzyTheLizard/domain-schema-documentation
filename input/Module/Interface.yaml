@@ -1,0 +1,8 @@
+$id: /Module/Interface.yaml
+title: Interface
+description: An example for an interface
+type: object
+x-schema-type: Other
+oneOf:
+  - $ref: ./Object.yaml
+  - $ref: ./Enum.yaml

@@ -1,91 +1,106 @@
-import { type Application, type Module, type ObjectSchema, type Schema } from '../Reader.ts'
-import Ajv, { type AnySchema, type Options } from 'ajv'
+import Ajv, { type AnySchema, type Format, type Options } from 'ajv'
 import path from 'path'
 import * as fs from 'fs'
 import * as yaml from 'yaml'
+import { type SchemaType } from '../input/Schema.ts'
 
 export interface InputValidatorOptions {
-  ajvOptions?: Options
-  noAdditionalPropertiesInExamples?: boolean
+  ajvOptions: Options
+  noAdditionalPropertiesInExamples: boolean
+  formats: Array<{ name: string, avjFormat: Format }>
+}
+
+export interface WithId {
+  $id: string
 }
 
 export class InputValidator {
   readonly #ajv: Ajv
-  #application?: Application
-  readonly #modules: Module[] = []
-  readonly #schemas: Schema[] = []
+  readonly #modules: WithId[] = []
+  readonly #schemas: WithId[] = []
 
-  constructor (private readonly options?: InputValidatorOptions) {
-    this.#ajv = new Ajv(options?.ajvOptions ?? { allErrors: true })
-    this.#ajv.addKeyword('x-schema-type')
-    this.#ajv.addKeyword('x-references')
-    this.#ajv.addKeyword('x-enum-description')
-    // Used for openapi
-    this.#ajv.addKeyword('discriminator')
+  constructor (private readonly options: InputValidatorOptions) {
+    this.#ajv = new Ajv(options.ajvOptions)
     this.#ajv.addSchema(this.readYamlFile('src/reader/inputDefinition/_Application.yaml'))
     this.#ajv.addSchema(this.readYamlFile('src/reader/inputDefinition/_Module.yaml'))
     this.#ajv.addSchema(this.readYamlFile('src/reader/inputDefinition/_Schema.yaml'))
-    this.#ajv.addSchema(this.readYamlFile('src/reader/inputDefinition/_Property.yaml'))
+    this.#ajv.addSchema(this.readYamlFile('src/reader/inputDefinition/_Keywords.yaml'))
+    this.options.formats?.forEach(f => this.#ajv.addFormat(f.name, f.avjFormat))
+    this.#ajv.addKeyword('x-schema-type')
+    this.#ajv.addKeyword('x-references')
+    this.#ajv.addKeyword('x-enum-description')
+    this.#ajv.addKeyword('x-todos')
+    this.#ajv.addKeyword('x-tags')
+    this.#ajv.addKeyword('x-links')
+    // Used for openapi
+    this.#ajv.addKeyword('discriminator')
   }
 
   private readYamlFile (filePath: string): AnySchema {
     return yaml.parse(fs.readFileSync(filePath).toString())
   }
 
-  public validateApplicationFile (parsed: Application): void {
+  public validateApplicationFile (parsed: unknown): void {
     if (!this.#ajv.validate('_Application.yaml', parsed)) {
       throw new Error(`Invalid application file: ${this.#ajv.errorsText(this.#ajv.errors)}`)
     }
-    this.#application = parsed
   }
 
-  public validateModuleFile (parsed: Module): void {
+  public validateModuleFile (parsed: WithId): void {
     if (!this.#ajv.validate('_Module.yaml', parsed)) {
       throw new Error(`Invalid module ${parsed.$id}: ${this.#ajv.errorsText(this.#ajv.errors)}`)
     }
     this.#modules.push(parsed)
   }
 
-  public validateSchemaFile (parsed: Schema): void {
+  public validateSchemaFile (parsed: WithId): void {
     if (!this.#ajv.validate('_Schema.yaml', parsed)) {
       throw new Error(`Invalid schema ${parsed.$id}: ${this.#ajv.errorsText(this.#ajv.errors)}`)
     }
-    this.validateEnumDocumentation(parsed)
-    this.validateRequired(parsed)
+    this.validateEnumDocumentationRecursive(parsed, parsed)
+    this.validateRequiredRecursive(parsed, parsed)
     this.#schemas.push(parsed)
   }
 
-  private validateEnumDocumentation (m: Schema): void {
-    if (m.type !== 'string' || m.enum === undefined) {
+  private validateEnumDocumentationRecursive (parentSchema: WithId, subSchema: unknown): void {
+    if (subSchema == null || typeof subSchema !== 'object') {
       return
     }
-    if (!m['x-enum-description']) {
-      console.log(`Schema ${m.$id} is an enum and should have an 'x-enum-description'`)
+    Object.entries(subSchema).forEach(([_, value]) => { this.validateEnumDocumentationRecursive(parentSchema, value) })
+
+    if (!('enum' in subSchema)) {
+      if (('x-enum-description' in subSchema)) {
+        console.error(`Schema in ${parentSchema.$id} has an 'x-enum-description' but is not an enum`)
+      }
       return
     }
-    const enumValues = m.enum
-    const documentedValues = Object.keys(m['x-enum-description'])
-    documentedValues.filter(k => !enumValues.includes(k)).forEach(k => { throw new Error(`Schema ${m.$id} has an 'x-enum-description' for enum value '${k}' that does not exist`) })
-    enumValues.filter(k => !documentedValues.includes(k)).forEach(k => { throw new Error(`Schema ${m.$id} has an 'x-enum-description' but is missing documentation for enum value '${k}'`) })
+    if (!('x-enum-description' in subSchema)) {
+      console.error(`Schema in ${parentSchema.$id} is an enum and should have an 'x-enum-description'`)
+      return
+    }
+    const enumValues = subSchema.enum as string[]
+    const enumDescriptions = subSchema['x-enum-description'] as Record<string, string>
+    const documentedValues = Object.keys(enumDescriptions)
+    documentedValues.filter(k => !enumValues.includes(k)).forEach(k => { throw new Error(`Schema in ${parentSchema.$id} has an 'x-enum-description' for enum value '${k}' that does not exist`) })
+    enumValues.filter(k => !documentedValues.includes(k)).forEach(k => { throw new Error(`Schema in ${parentSchema.$id} has an 'x-enum-description' but is missing documentation for enum value '${k}'`) })
   }
 
-  private validateRequired (m: Schema): void {
-    m = m as ObjectSchema
-    if (m.type !== 'object' || m.properties === undefined) {
+  private validateRequiredRecursive (parentSchema: WithId, subSchema: unknown): void {
+    if (subSchema == null || typeof subSchema !== 'object') {
       return
     }
-    if (!m.required) return
-    const properties = Object.keys(m.properties ?? {})
-    m.required
+    Object.entries(subSchema).forEach(([_, value]) => { this.validateRequiredRecursive(parentSchema, value) })
+    if (!('required' in subSchema)) {
+      return
+    }
+    const required = subSchema.required as string[]
+    const properties = 'properties' in subSchema ? Object.keys(subSchema.properties as Record<string, unknown>) : []
+    required
       .filter(r => !properties.includes(r))
-      .forEach(r => { throw new Error(`Schema ${m.$id} has a required property '${r}' that is not defined`) })
+      .forEach(r => { throw new Error(`Schema in ${parentSchema.$id} has a required property '${r}' that is not defined`) })
   }
 
   public finishValidation (): void {
-    // Verify application
-    if (this.#application === undefined) {
-      throw new Error('No application file found')
-    }
     // Verify references
     this.#modules.forEach(m => {
       this.verifyReferencesRecursive(this.#schemas, m.$id, 'Module ' + m.$id, m)
@@ -95,7 +110,7 @@ export class InputValidator {
     })
     // Verify examples
     this.#schemas.forEach(m => {
-      if ((this.options?.noAdditionalPropertiesInExamples ?? true) && (m.type === 'object')) {
+      if ((this.options.noAdditionalPropertiesInExamples) && ('type' in m) && (m.type === 'object')) {
         const m2 = structuredClone(m) as any
         m2.additionalProperties = false
         this.#ajv.addSchema(m2 as AnySchema, m.$id)
@@ -108,7 +123,7 @@ export class InputValidator {
     })
   }
 
-  private verifyReferencesRecursive (allSchemas: Schema[], baseDir: string, name: string, m: unknown): void {
+  private verifyReferencesRecursive (allSchemas: WithId[], baseDir: string, name: string, m: unknown): void {
     if (Array.isArray(m)) {
       m.forEach(v => { this.verifyReferencesRecursive(allSchemas, baseDir, name, v) })
     }
@@ -127,26 +142,30 @@ export class InputValidator {
           this.verifyReferencesRecursive(allSchemas, baseDir, name, value)
         }
         references
+          .filter(r => !r.startsWith('#'))
           .filter((r: string) => !allSchemas.find(m => m.$id === path.join(baseDir, r)))
           .forEach((r: string) => { throw new Error(`Invalid Reference '${r}' in ${name}`) })
       })
     }
   }
 
-  private verifyExamples (m: Schema): void {
-    switch (m['x-schema-type']) {
+  private verifyExamples (m: WithId): void {
+    const hasExamples = 'examples' in m
+    const schemaType = 'x-schema-type' in m ? m['x-schema-type'] as SchemaType : 'Entity'
+    switch (schemaType) {
       case 'Aggregate':
       case 'ReferenceData':
-        if (!m.examples) console.log(`Schema ${m.$id} is an ${m['x-schema-type']} and should have at least one example.`)
+        if (hasExamples) console.error(`Schema ${m.$id} is an ${schemaType} and should have at least one example.`)
         break
       case 'Entity':
       case 'ValueObject':
-        if (m.examples) console.log(`Schema ${m.$id} is an ${m['x-schema-type']} and should not have an example.`)
+        if (hasExamples) console.error(`Schema ${m.$id} is an ${schemaType} and should not have an example.`)
     }
-    if (!m.examples) {
+    if (!hasExamples) {
       return
     }
-    m.examples.forEach((e, i) => {
+    const examples = m.examples as unknown[]
+    examples.forEach((e, i) => {
       if (!this.#ajv.validate(m.$id, e)) {
         throw new Error(`Invalid example [${i}] in Schema ${m.$id}: ${this.#ajv.errorsText(this.#ajv.errors)}`)
       }

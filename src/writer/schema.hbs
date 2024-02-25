@@ -1,0 +1,67 @@
+# {{{title}}}
+{{#if x-todos.length}}
+> ### Todos
+{{#each x-todos}}
+> 1. {{this}}
+{{/each}}
+
+{{/if}}
+{{#if x-tags}}
+| Key | Value |
+|-----|-------|
+{{#each x-tags}}
+| {{@key}} | {{this}} |
+{{/each}}
+
+{{/if}}
+{{#if description}}
+{{{mdMultiline description}}}
+
+{{/if}}
+{{#if oneOf}}
+## One of
+{{#each oneOf}}
+1. {{mdGetType .. this}}
+{{/each}}
+
+{{/if}}
+{{#if enum}}
+## Enum-Values
+| Name | Description |
+|------|-------------|
+{{#each enum}}
+| {{this}} | {{{mdMultiline (mdGetEnumDocu .. this)}}} |
+{{/each}}
+
+{{/if}}
+{{#if properties}}
+## Properties
+| Name | Type | Description |
+|------|-----|-------------|
+{{#each properties}}
+| {{@key}} | {{mdGetType .. this}} | {{{mdMultiline description}}} |
+{{/each}}
+
+{{/if}}
+{{#if subSchemas}}
+## Subschemas
+{{#each subSchemas}}
+{{> mdSubSchema .. subSchema=this name=@key}}
+
+{{/each}}
+{{/if}}
+{{#if examples}}
+## Examples
+{{#each examples}}
+```json
+{{{mdJson this}}}
+```
+{{/each}}
+
+{{/if}}
+{{#if x-links}}
+## Links
+{{#each x-links}}
+1. [{{{text}}}]({{href}})
+{{/each}}
+{{/if}}

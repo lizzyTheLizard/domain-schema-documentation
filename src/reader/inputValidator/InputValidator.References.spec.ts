@@ -1,5 +1,6 @@
 import { InputValidator } from './InputValidator.ts'
-import { type Application, type Module, type Schema } from '../Reader.ts'
+import { type Application, type Module } from '../input/Input.ts'
+import { type Schema } from '../input/Schema.ts'
 
 describe('InputValidator.References', () => {
   let inputValidator: InputValidator
@@ -8,7 +9,7 @@ describe('InputValidator.References', () => {
   const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } } }
 
   beforeEach(() => {
-    inputValidator = new InputValidator()
+    inputValidator = new InputValidator({ ajvOptions: { allErrors: true }, noAdditionalPropertiesInExamples: true, formats: [] })
   })
 
   test('valid reference in schema', () => {

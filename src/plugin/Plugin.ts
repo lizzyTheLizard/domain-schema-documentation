@@ -1,4 +1,5 @@
-import { type Application, type Input, type Link, type Module, type Schema } from '../reader/Reader.ts'
+import { type Application, type Input, type Link, type Module } from '../reader/input/Input.ts'
+import { type Schema } from '../reader/input/Schema.ts'
 
 export type VerificationError = ApplicationVerificationError | ModuleVerificationError | SchemaVerificationError
 
@@ -28,5 +29,5 @@ export interface Plugin {
   generateOutput: (outputFolder: string, input: Input) => Promise<void>
   getApplicationLinks: (application: Application) => Link[]
   getModuleLinks: (module: Module) => Link[]
-  getSchemaLink: (schema: Schema) => Link[]
+  getSchemaLinks: (schema: Schema) => Link[]
 }

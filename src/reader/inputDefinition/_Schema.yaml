@@ -2,72 +2,59 @@ $id: _Schema.yaml
 $schema: http://json-schema.org/draft-07/schema#
 title: Schema Definition
 type: object
-properties:
-  $id:
-    type: string
-  title:
-    type: string
-  description:
-    type: string
-  x-schema-type:
-    type: string
-    enum:
-    - 'Aggregate'
-    - 'Entity'
-    - 'ValueObject'
-    - 'ReferenceData'
-oneOf:
-  # A top-level enum
-  - type: object
-    properties:
-      type:
-        type: string
-        enum: [string]
-      enum:
-        type: array
-        items:
-          type: string
-      x-enum-description:
-        type: object
-        additionalProperties:
-          type: string
-    required:
-      - enum
-  # A top-level object
-  - type: object
-    properties:
-      type:
-        type: string
-        enum: [object]
-      properties:
-        type: object
-        additionalProperties:
-          $ref: _Property.yaml
-      required:
-        type: array
-        items:
-          type: string
-    required:
-      - properties
-  # An interface
-  - type: object
-    properties:
-      type:
-        type: string
-        enum: [object]
-      oneOf:
-        type: array
-        items:
-          type: object
-          properties:
-            $ref:
+definitions:
+  SubSchema:
+    type: object
+    allOf:
+      - $ref: http://json-schema.org/draft-07/schema#
+      - type: object
+        properties:
+          x-enum-description:
+            type: object
+            additionalProperties:
               type: string
-          required:
-            - $ref
-    required:
-      - oneOf
+          x-references:
+            oneOf:
+              - type: string
+              - type: array
+                items:
+                  type: string
+      - type: object
+        properties:
+          definitions:
+            type: object
+            additionalProperties:
+              $ref: '#/definitions/SubSchema'
+          properties:
+            type: object
+            additionalProperties:
+              $ref: '#/definitions/SubSchema'
+          oneOf:
+            type: array
+            items:
+              $ref: '#/definitions/SubSchema'
+          items:
+            $ref: '#/definitions/SubSchema'
+      - type: object
+        properties:
+          additionalProperties: false
+          additionalItems: false
+          maxProperties: false
+          minProperties: false
+          patternProperties: false
+          propertyNames: false
+          allOf: false
+          anyOf: false
+          type:
+            type: string
+          items:
+            $ref: "#/definitions/SubSchema"
+          enum:
+            type: array
+            items:
+              type: string
+allOf:
+  - $ref: _Keywords.yaml
+  - $ref: "#/definitions/SubSchema"
 required:
   - $id
-  - title
-  - type
-  - x-schema-type

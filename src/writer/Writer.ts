@@ -1,7 +1,7 @@
-import { type Input } from '../reader/Reader.ts'
 import path from 'path'
 import fs from 'fs'
 import Handlebars from 'handlebars'
+import { type Input } from '../reader/input/Input.ts'
 
 export type Writer = (input: Input) => Promise<void>
 

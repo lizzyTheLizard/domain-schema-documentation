@@ -1,11 +1,11 @@
 import { InputValidator } from './InputValidator.ts'
-import { type Application } from '../Reader.ts'
+import { type Application } from '../input/Input.ts'
 
 describe('InputValidator.Application', () => {
   let inputValidator: InputValidator
 
   beforeEach(() => {
-    inputValidator = new InputValidator()
+    inputValidator = new InputValidator({ noAdditionalPropertiesInExamples: true, ajvOptions: {}, formats: [] })
   })
 
   test('valid application file', () => {
@@ -16,10 +16,6 @@ describe('InputValidator.Application', () => {
   test('application file with invalid schema', () => {
     const applicationFile = { wrong: 'field' } as unknown as Application
     expect(() => { inputValidator.validateApplicationFile(applicationFile) })
-      .toThrow(new Error('Invalid application file: data must have required property \'title\', data must have required property \'description\''))
-  })
-
-  test('missing application file', () => {
-    expect(() => { inputValidator.finishValidation() }).toThrow(new Error('No application file found'))
+      .toThrow(new Error('Invalid application file: data must have required property \'title\''))
   })
 })

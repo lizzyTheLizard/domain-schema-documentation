@@ -1,5 +1,6 @@
 import { InputValidator } from './InputValidator.ts'
-import { type Application, type Schema } from '../Reader.ts'
+import { type Application } from '../input/Input.ts'
+import { type Schema } from '../input/Schema.ts'
 
 const applicationFile: Application = { title: 'Title', description: 'Description' }
 
@@ -7,7 +8,7 @@ describe('InputValidator.Examples', () => {
   let inputValidator: InputValidator
 
   beforeEach(() => {
-    inputValidator = new InputValidator()
+    inputValidator = new InputValidator({ noAdditionalPropertiesInExamples: true, ajvOptions: {}, formats: [] })
     inputValidator.validateApplicationFile(applicationFile)
   })
 
@@ -32,7 +33,7 @@ describe('InputValidator.Examples', () => {
   })
 
   test('valid additional properties in example', () => {
-    inputValidator = new InputValidator({ noAdditionalPropertiesInExamples: false })
+    inputValidator = new InputValidator({ noAdditionalPropertiesInExamples: false, ajvOptions: {}, formats: [] })
     inputValidator.validateApplicationFile(applicationFile)
     const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, examples: [{ key: 2, key2: 'value' }] }
     inputValidator.validateSchemaFile(schemaFile)

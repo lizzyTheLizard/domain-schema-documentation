@@ -1,21 +1,37 @@
-import { type Application, Input, type Module, type Reader, type Schema } from './Reader.ts'
+import { type Application, type Input, type Module } from './input/Input.ts'
 import { promises as fs } from 'fs'
 import path from 'path'
 import * as yaml from 'yaml'
-import { InputValidator } from './inputValidator/InputValidator.ts'
+import { InputValidator, type WithId } from './inputValidator/InputValidator.ts'
 import { type Plugin } from '../plugin/Plugin.ts'
+import { type Reader } from './Reader.ts'
+import { inputNormalizer } from './inputNormalizer/InputNormalizer.ts'
+import { type Schema, type SchemaCommon } from './input/Schema.ts'
+import { type FormatName } from 'ajv-formats'
+import { fullFormats } from 'ajv-formats/dist/formats'
+import { type Format as avjFormat } from 'ajv'
+
+export interface Format {
+  name: string
+  avjFormat: avjFormat
+}
+
+export const defaultFormats: Format[] = Object.keys(fullFormats).map(name => ({ name, avjFormat: fullFormats[name as FormatName] }))
 
 export function defaultReader (
   inputFolder: string,
   plugins: Plugin[] = [],
-  inputValidator: InputValidator = new InputValidator({}),
+  formats: Format[] = defaultFormats,
+  inputValidator: InputValidator = new InputValidator({ ajvOptions: { allErrors: true }, noAdditionalPropertiesInExamples: true, formats }),
   readFile: (filePath: string) => Promise<unknown> = async (filePath) => await readYamlFile(filePath)
 ): Reader {
   return async function (): Promise<Input> {
     const result = await readFolderRecursive(inputFolder, inputFolder, inputValidator, 0, readFile)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const input = new Input(result.application!, result.modules, result.schemas)
+    if (result.application === undefined) {
+      throw new Error('No application file found')
+    }
     inputValidator.finishValidation()
+    const input: Input = { application: result.application, modules: result.modules, schemas: result.schemas }
     plugins.forEach(plugin => { plugin.validateInput(input) })
     return input
   }
@@ -34,21 +50,22 @@ async function readFolderRecursive (baseFolder: string, folder: string, inputVal
       result.schemas.push(...recResult.schemas)
       result.modules.push(...recResult.modules)
     } else if (filePath.endsWith('index.yaml') && depth === 0) {
-      const application = await readFile(filePath) as Application
+      const application = await readFile(filePath)
       inputValidator.validateApplicationFile(application)
-      result.application = application
+      result.application = application as Application
     } else if (filePath.endsWith('index.yaml')) {
-      const module = await readFile(filePath) as Module
+      const module = await readFile(filePath)
       const expectedId = '/' + path.dirname(path.relative(baseFolder, filePath))
-      validateId(module.$id, filePath, expectedId)
-      inputValidator.validateModuleFile(module)
-      result.modules.push(module)
+      validateId(module, filePath, expectedId)
+      inputValidator.validateModuleFile(module as WithId)
+      result.modules.push(module as Module)
     } else if (filePath.endsWith('.yaml')) {
-      const schema = await readFile(filePath) as Schema
+      const schema = await readFile(filePath)
       const expectedId = '/' + path.relative(baseFolder, filePath)
-      validateId(schema.$id, filePath, expectedId)
-      inputValidator.validateSchemaFile(schema)
-      result.schemas.push(schema)
+      validateId(schema, filePath, expectedId)
+      inputValidator.validateSchemaFile(schema as WithId)
+      const normalized = inputNormalizer(schema as SchemaCommon)
+      result.schemas.push(normalized)
     } else {
       throw new Error(`Unexpected file ${filePath}. Not a valid input file`)
     }
@@ -56,10 +73,11 @@ async function readFolderRecursive (baseFolder: string, folder: string, inputVal
   return result
 }
 
-function validateId (id: string, filePath: string, expectedId: string): void {
-  if (!id) {
+function validateId (obj: unknown, filePath: string, expectedId: string): void {
+  if (obj === null || obj === undefined || (typeof obj !== 'object') || !('$id' in obj)) {
     throw new Error(`Invalid file ${filePath}: $id is missing`)
   }
+  const id = obj.$id as string
   if (id !== expectedId) {
     throw new Error(`Invalid file ${filePath}: $id must be the same as the absolute file path '${expectedId}' but is '${id}'`)
   }

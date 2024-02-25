@@ -1,3 +1,13 @@
 $id: /Module
 title: Module
-description: Module
+description: |
+  Some longer multiline description of the Module
+  Could contain **markdown** or <i>HTML</i>, umlaute like öäü are allowed
+x-todos:
+  - Add a description
+  - Add tags
+  - Add operations
+  - Add links
+x-tags:
+  Status: 'In Progress'
+  Author: 'John Doe'

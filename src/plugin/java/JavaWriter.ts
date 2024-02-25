@@ -1,8 +1,9 @@
-import { type EnumSchema, type Input, type Property, type Schema } from '../../reader/Reader.ts'
 import { type Plugin } from '../Plugin.ts'
 import path from 'path'
 import Handlebars from 'handlebars'
 import { loadTemplate, writeOutput } from '../../writer/Writer.ts'
+import { type EnumDefinition, type Property, type Schema } from '../../reader/input/Schema.ts'
+import { type Input } from '../../reader/input/Input.ts'
 
 const classTemplate = loadTemplate('src/plugin/java/class.hbs')
 const enumTemplate = loadTemplate('src/plugin/java/enum.hbs')
@@ -13,13 +14,13 @@ export const javaWriter: Plugin = {
   generateOutput: generateJavaOutput,
   getApplicationLinks: () => [],
   getModuleLinks: () => [{ text: 'Java-Files', href: './java' }],
-  getSchemaLink: (schema: Schema) => [{ text: 'Java-File', href: `./${getFileName(schema)}` }]
+  getSchemaLinks: (schema: Schema) => [{ text: 'Java-File', href: `.${getFileName(schema)}` }]
 }
 
 export async function generateJavaOutput (outputFolder: string, input: Input): Promise<void> {
   Handlebars.registerHelper('javaComment', (text: string, indentation: number) => javaComment(text, indentation))
   Handlebars.registerHelper('javaClassName', (schema: Schema) => className(schema))
-  Handlebars.registerHelper('javaEnumDoc', (schema: EnumSchema, key: string) => enumDoc(schema, key))
+  Handlebars.registerHelper('javaEnumDoc', (schema: EnumDefinition, key: string) => enumDoc(schema, key))
   Handlebars.registerHelper('javaPropertyType', (property: Property) => propertyType(property))
 
   for (const schema of input.schemas) {
@@ -54,7 +55,7 @@ function className (schema: Schema): string {
   return path.basename(schema.$id).replace(path.extname(schema.$id), '')
 }
 
-function enumDoc (schema: EnumSchema, key: string): string {
+function enumDoc (schema: EnumDefinition, key: string): string {
   return schema['x-enum-description']?.[key] ?? ''
 }
 
@@ -63,7 +64,7 @@ function propertyType (_: Property): string {
   return 'String'
 }
 
-function getImports (_: Schema): string[] {
+function getImports (_: Property): string[] {
   // TODO: Implement type mapping
   return []
 }

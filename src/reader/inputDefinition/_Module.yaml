@@ -2,29 +2,18 @@ $id: _Module.yaml
 $schema: http://json-schema.org/draft-07/schema#
 title: Module Definition
 type: object
-properties:
-  $id:
-    type: string
-  title:
-    type: string
-  description:
-    type: string
-  todos:
-    type: array
-    items:
-      type: string
-  operations:
-    type: object
-  links:
-    type: array
-    items:
-      type: object
-      properties:
-        text:
-          type: string
-        href:
-          type: string
-required:
-  - $id
-  - title
-  - description
+allOf:
+  - $ref: _Keywords.yaml
+  - type: object
+    properties:
+      $id:
+        type: string
+      title:
+        type: string
+      description:
+        type: string
+      operations:
+        type: object
+    required:
+      - title
+      - description
