@@ -25,7 +25,7 @@ describe('InputNormalizer', () => {
     expect(result).toEqual({
       ...testSchema,
       oneOf: [{ type: 'object', $ref: '#/definitions/OneOfTest1' }, { type: 'object', $ref: 'test3' }],
-      definitions: { OneOfTest1: { type: 'object', properties: { key: { type: 'string' } } } }
+      definitions: { OneOfTest1: { type: 'object', required: [], properties: { key: { type: 'string' } } } }
     })
   })
 
@@ -39,7 +39,7 @@ describe('InputNormalizer', () => {
     expect(result).toEqual({
       ...testSchema,
       oneOf: [{ type: 'object', $ref: '#/definitions/OneOfTest1' }, { type: 'object', $ref: 'test3' }],
-      definitions: { OneOfTest1: { type: 'object', properties: { key: { type: 'string' } } }, test: { type: 'string' } }
+      definitions: { OneOfTest1: { type: 'object', required: [], properties: { key: { type: 'string' } } }, test: { type: 'string' } }
     })
   })
 
@@ -54,8 +54,9 @@ describe('InputNormalizer', () => {
     const result = inputNormalizer(schema as SchemaCommon)
     expect(result).toEqual({
       ...testSchema,
+      required: [],
       properties: { key: { type: 'object', $ref: '#/definitions/TestKey' }, value: { type: 'string' } },
-      definitions: { TestKey: { type: 'object', properties: { key1: { type: 'string' } } } }
+      definitions: { TestKey: { type: 'object', required: [], properties: { key1: { type: 'string' } } } }
     })
   })
 
@@ -77,8 +78,9 @@ describe('InputNormalizer', () => {
     expect(result).toEqual({
       ...testSchema,
       properties: { key: { type: 'object', $ref: '#/definitions/TestKey' }, value: { type: 'string' } },
+      required: [],
       definitions: {
-        TestKey: { type: 'object', properties: { key1: { type: 'string' }, key2: { type: 'object', $ref: '#/definitions/TestKeyKey2' } } },
+        TestKey: { type: 'object', required: [], properties: { key1: { type: 'string' }, key2: { type: 'object', $ref: '#/definitions/TestKeyKey2' } } },
         TestKeyKey2: { type: 'string', enum: ['A', 'B'] }
       }
     })
@@ -108,8 +110,9 @@ describe('InputNormalizer', () => {
     expect(result).toEqual({
       ...testSchema,
       properties: { key: { type: 'object', $ref: '#/definitions/TestKey' }, value: { type: 'string' } },
+      required: [],
       definitions: {
-        TestKey: { type: 'object', properties: { key1: { type: 'string' }, key2: { type: 'object', $ref: '#/definitions/TestKeyKey2' } } },
+        TestKey: { type: 'object', required: [], properties: { key1: { type: 'string' }, key2: { type: 'object', $ref: '#/definitions/TestKeyKey2' } } },
         TestKeyKey2: {
           type: 'object',
           oneOf: [

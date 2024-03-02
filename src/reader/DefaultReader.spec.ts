@@ -17,7 +17,7 @@ const inputValidator = {
 
 const applicationFile: Application = { title: 'Title', description: 'Description' }
 const moduleFile: Module = { $id: '/Module', title: 'Module', description: 'Description' }
-const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: {} }
+const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: {}, required: [] }
 
 describe('DefaultReader', () => {
   let tmpDir: tmp.DirResult

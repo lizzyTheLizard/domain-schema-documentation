@@ -32,7 +32,7 @@ export interface EnumDefinition {
 export interface ObjectDefinition {
   type: 'object'
   properties: Record<string, Property>
-  required?: string[]
+  required: string[]
 }
 
 export interface InterfaceDefinition {

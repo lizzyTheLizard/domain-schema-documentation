@@ -1,29 +1,29 @@
 ### {{{name}}}
-{{#if subSchema.description}}
-{{{mdMultiline subSchema.description}}}
+{{#if description}}
+{{{mdMultiline description}}}
 
 {{/if}}
-{{#if subSchema.oneOf}}
-#### One of
-{{#each subSchema.oneOf}}
-1. {{{mdGetType .. this}}}
+{{#if oneOf}}
+#### One Of
+{{#each oneOf}}
+1. {{{mdGetType ../schema this}}}
 {{/each}}
 
 {{/if}}
-{{#if subSchema.enum}}
+{{#if enum}}
 #### Enum-Values
 | Name | Description |
 |------|-------------|
-{{#each subSchema.enum}}
+{{#each enum}}
 | {{this}} | {{{mdMultiline (mdGetEnumDocu .. this)}}} |
 {{/each}}
 
 {{/if}}
-{{#if subSchema.properties}}
+{{#if properties}}
 #### Properties
-| Name | Type | Description |
-|------|-----|-------------|
-{{#each subSchema.properties}}
-| {{@key}} | {{{mdGetType .. this}}} | {{{mdMultiline description}}} |
+| Name |  | Type | Description |
+|------|--|------|-------------|
+{{#each properties}}
+| {{@key}} | {{mdIsRequired .. @key}} | {{{mdGetType ../schema this}}} | {{{mdMultiline description}}} |
 {{/each}}
 {{/if}}

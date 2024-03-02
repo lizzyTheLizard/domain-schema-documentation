@@ -13,6 +13,8 @@ definitions:
       value:
         type: string
         description: The value
+    required:
+      - key
 examples:
   - firstP: 'test'
 properties:
@@ -49,4 +51,8 @@ properties:
                 type: string
                 enum:
                   - test
+    required:
+      - p2
+required:
+  - firstP
 

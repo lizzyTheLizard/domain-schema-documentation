@@ -52,7 +52,7 @@ function objectNormalizer (schema: SchemaCommon): Schema {
   const name = capitalize(getName(schema))
   const cleaned = cleanProperties(schema, name)
   const properties = cleaned.result
-  const result: Schema = { ...schema, type: 'object', properties }
+  const result: Schema = { required: [], ...schema, type: 'object', properties }
   if (schema.definitions !== undefined || Object.keys(cleaned.definitions).length > 0) {
     result.definitions = cleanDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions })
   }
@@ -77,7 +77,7 @@ function cleanDefinition (definition: Record<string, unknown>, name: string): Re
     return { [name]: result, ...cleanDefinitions(cleaned.definitions) }
   } else if ('properties' in definition) {
     const cleaned = cleanProperties(definition, name)
-    const result: Definition = { ...definition, type: 'object', properties: cleaned.result }
+    const result: Definition = { required: [], ...definition, type: 'object', properties: cleaned.result }
     return { [name]: result, ...cleanDefinitions(cleaned.definitions) }
   } else {
     return { [name]: definition as unknown as Definition }

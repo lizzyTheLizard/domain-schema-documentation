@@ -1,14 +1,12 @@
 # {{{title}}}
-
 {{#if x-todos.length}}
 > ### Todos
 {{#each x-todos}}
 > 1. {{this}}
 {{/each}}
+
 {{/if}}
-
 {{{mdMultiline description}}}
-
 {{#if x-tags}}
 | Key | Value |
 |-----|-------|
@@ -16,6 +14,7 @@
 | {{@key}} | {{this}} |
 {{/each}}
 {{/if}}
+{{#if modules}}
 
 ## Modules
 | Name | Description |
@@ -23,8 +22,9 @@
 {{#each modules}}
 | [{{title}}](./{{mdRemovePrefixAndFileEnding $id '/'}}/README.md) | {{{mdMultiline description}}} |
 {{/each}}
-
+{{/if}}
 {{#if x-links}}
+
 ## Links
 {{#each x-links}}
 1. [{{{text}}}]({{href}})

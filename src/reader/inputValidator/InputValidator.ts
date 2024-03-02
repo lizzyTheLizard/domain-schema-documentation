@@ -152,14 +152,8 @@ export class InputValidator {
   private verifyExamples (m: WithId): void {
     const hasExamples = 'examples' in m
     const schemaType = 'x-schema-type' in m ? m['x-schema-type'] as SchemaType : 'Entity'
-    switch (schemaType) {
-      case 'Aggregate':
-      case 'ReferenceData':
-        if (hasExamples) console.error(`Schema ${m.$id} is an ${schemaType} and should have at least one example.`)
-        break
-      case 'Entity':
-      case 'ValueObject':
-        if (hasExamples) console.error(`Schema ${m.$id} is an ${schemaType} and should not have an example.`)
+    if (!hasExamples && (schemaType === 'Aggregate' || schemaType === 'ReferenceData')) {
+      console.error(`Schema ${m.$id} is an ${schemaType} and should have at least one example.`)
     }
     if (!hasExamples) {
       return

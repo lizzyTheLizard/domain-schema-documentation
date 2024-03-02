@@ -4,9 +4,12 @@ import path from 'path'
 import { type Plugin, type VerificationError } from '../plugin/Plugin.ts'
 import Handlebars from 'handlebars'
 import { getIdWithoutEnding, getName } from '../reader/input/InputHelper.ts'
-import { type EnumDefinition, type Property, type Schema } from '../reader/input/Schema.ts'
-
-// TODO: Test this
+import {
+  type EnumDefinition,
+  type ObjectDefinition,
+  type Property,
+  type Schema
+} from '../reader/input/Schema.ts'
 
 export function defaultWriter (
   outputFolder: string,
@@ -19,8 +22,9 @@ export function defaultWriter (
   Handlebars.registerHelper('mdRemovePrefixAndFileEnding', (toId: string, fromId: string) => mdRemovePrefixAndFileEnding(toId, fromId))
   Handlebars.registerHelper('mdMultiline', (input: string) => mdMultiline(input))
   Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, property))
-  Handlebars.registerHelper('mdGetEnumDocu', (property: EnumDefinition, key: string) => mdGetEnumDocu(property, key))
+  Handlebars.registerHelper('mdGetEnumDocu', (definition: EnumDefinition, key: string) => mdGetEnumDocu(definition, key))
   Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input))
+  Handlebars.registerHelper('mdIsRequired', (definition: ObjectDefinition, propertyName: string) => mdIsRequired(definition, propertyName))
   Handlebars.registerPartial('mdSubSchema', loadTemplate('src/writer/subSchema.hbs'))
 
   return async function (input: Input): Promise<void> {
@@ -34,8 +38,7 @@ export function defaultWriter (
         'x-links': [...schema['x-links'] ?? [], ...plugins.flatMap(p => p.getSchemaLinks(schema))],
         'x-todos': [...schema['x-todos'] ?? [], ...getErrorTodos(errors)],
         'x-tags': { $id: schema.$id, type: schema['x-schema-type'], ...schema['x-tags'] },
-        errors,
-        subSchemas: schema.definitions ?? {}
+        errors
       }
       const output = schemaTemplate(context)
       await write(output, `${getIdWithoutEnding(schema.$id)}.md`)
@@ -97,8 +100,12 @@ function mdMultiline (input: string): string {
   return input.split('\n').map(l => l.trim()).join('<br>')
 }
 
-function mdGetEnumDocu (property: EnumDefinition, key: string): string {
-  return property['x-enum-description']?.[key] ?? ''
+function mdGetEnumDocu (definition: EnumDefinition, key: string): string {
+  return definition['x-enum-description']?.[key] ?? ''
+}
+
+function mdIsRequired (definition: ObjectDefinition, propertyName: string): string {
+  return definition.required?.includes(propertyName) ? '*' : ''
 }
 
 function mdGetType (schema: Schema, property: Property): string {

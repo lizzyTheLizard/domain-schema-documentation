@@ -19,7 +19,7 @@
 
 {{/if}}
 {{#if oneOf}}
-## One of
+## One Of
 {{#each oneOf}}
 1. {{mdGetType .. this}}
 {{/each}}
@@ -36,17 +36,17 @@
 {{/if}}
 {{#if properties}}
 ## Properties
-| Name | Type | Description |
-|------|-----|-------------|
+| Name |  | Type | Description |
+|------|--|------|-------------|
 {{#each properties}}
-| {{@key}} | {{mdGetType .. this}} | {{{mdMultiline description}}} |
+| {{@key}} | {{mdIsRequired .. @key}} | {{mdGetType .. this}} | {{{mdMultiline description}}} |
 {{/each}}
 
 {{/if}}
-{{#if subSchemas}}
+{{#if definitions}}
 ## Subschemas
-{{#each subSchemas}}
-{{> mdSubSchema .. subSchema=this name=@key}}
+{{#each definitions}}
+{{> mdSubSchema this schema=.. name=@key}}
 
 {{/each}}
 {{/if}}
