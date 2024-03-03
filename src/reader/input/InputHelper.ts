@@ -3,7 +3,7 @@ import { type Input, type Module } from './Input.ts'
 import { type Property, type Schema, type SchemaType } from './Schema.ts'
 
 export function getSchemasForModule (input: Input, module: Module): Schema[] {
-  return input.schemas.filter(schema => schema.$id.startsWith(module.$id))
+  return input.schemas.filter(schema => schema.$id.startsWith(module.$id + '/'))
 }
 
 export function getSchemasForModuleAndTyp (input: Input, module: Module, typ: SchemaType): Schema[] {
