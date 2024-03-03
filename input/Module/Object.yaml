@@ -49,10 +49,12 @@ properties:
             properties:
               p1:
                 type: string
+                x-enum-description:
+                  test: 'This is a test'
                 enum:
                   - test
     required:
-      - p2
+      - p1
 required:
   - firstP
 

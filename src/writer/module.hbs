@@ -1,35 +1,31 @@
 # {{{title}}}
-
 {{#if x-todos.length}}
 > ### Todos
 {{#each x-todos}}
 > 1. {{this}}
 {{/each}}
-{{/if}}
 
+{{/if}}
+{{{mdMultiline description}}}
 {{#if x-tags}}
+
 | Key | Value |
 |-----|-------|
 {{#each x-tags}}
 | {{@key}} | {{this}} |
 {{/each}}
 {{/if}}
-
-{{{mdMultiline description}}}
-
 {{#if schemas}}
-## Class Diagramm
-TODOTODO
 
 ## Schemas
 | Name | Type | Description |
 |------|-----|-------------|
 {{#each schemas}}
-| [{{title}}](.{{mdRemovePrefixAndFileEnding $id ../$id}}.md) | {{x-schema-type}} | {{{mdMultiline description}}} |
+| [{{title}}]({{mdRelativeLink ../$id $id}}.md) | {{x-schema-type}} | {{{mdMultiline description}}} |
 {{/each}}
 {{/if}}
-
 {{#if x-links}}
+
 ## Links
 {{#each x-links}}
 1. [{{{text}}}]({{href}})

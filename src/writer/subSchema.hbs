@@ -1,29 +1,27 @@
 ### {{{name}}}
-{{#if description}}
 {{{mdMultiline description}}}
-
-{{/if}}
 {{#if oneOf}}
+
 #### One Of
 {{#each oneOf}}
 1. {{{mdGetType ../schema this}}}
 {{/each}}
-
 {{/if}}
 {{#if enum}}
+
 #### Enum-Values
 | Name | Description |
 |------|-------------|
 {{#each enum}}
-| {{this}} | {{{mdMultiline (mdGetEnumDocu .. this)}}} |
+| {{this}} | {{{mdMultiline (mdGetProperty ../[x-enum-description] this)}}} |
 {{/each}}
-
 {{/if}}
 {{#if properties}}
+
 #### Properties
 | Name |  | Type | Description |
 |------|--|------|-------------|
 {{#each properties}}
-| {{@key}} | {{mdIsRequired .. @key}} | {{{mdGetType ../schema this}}} | {{{mdMultiline description}}} |
+| {{@key}} | {{#if (mdGetProperty ../required @key)}}*{{/if}} | {{{mdGetType ../schema this}}} | {{{mdMultiline description}}} |
 {{/each}}
 {{/if}}

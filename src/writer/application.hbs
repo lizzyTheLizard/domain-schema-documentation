@@ -8,6 +8,7 @@
 {{/if}}
 {{{mdMultiline description}}}
 {{#if x-tags}}
+
 | Key | Value |
 |-----|-------|
 {{#each x-tags}}
@@ -20,7 +21,7 @@
 | Name | Description |
 |------|-------------|
 {{#each modules}}
-| [{{title}}](./{{mdRemovePrefixAndFileEnding $id '/'}}/README.md) | {{{mdMultiline description}}} |
+| [{{title}}]({{mdRelativeLink '/' $id}}/README.md) | {{{mdMultiline description}}} |
 {{/each}}
 {{/if}}
 {{#if x-links}}

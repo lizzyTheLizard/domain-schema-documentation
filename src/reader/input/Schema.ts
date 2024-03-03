@@ -7,7 +7,7 @@ export type Property = ArrayProperty | ObjectProperty | BasicProperty
 
 export interface SchemaCommon {
   $id: string
-  title?: string
+  title: string
   description?: string
   examples?: unknown[]
   definitions?: Record<string, Definition>

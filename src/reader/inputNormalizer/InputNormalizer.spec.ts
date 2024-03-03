@@ -1,7 +1,7 @@
 import { inputNormalizer } from './InputNormalizer.ts'
 import { type SchemaCommon } from '../input/Schema.ts'
 
-const testSchema: SchemaCommon = { $id: 'test', type: 'object', 'x-schema-type': 'Aggregate' }
+const testSchema: SchemaCommon = { $id: 'test', title: 'Test', type: 'object', 'x-schema-type': 'Aggregate' }
 
 describe('InputNormalizer', () => {
   test('flat interface', async () => {

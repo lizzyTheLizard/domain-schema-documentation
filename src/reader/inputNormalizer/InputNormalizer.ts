@@ -1,5 +1,5 @@
 import { type ArrayProperty, type Definition, type ObjectProperty, type Property, type Schema, type SchemaCommon } from '../input/Schema.ts'
-import { capitalize, getName } from '../input/InputHelper.ts'
+import { cleanName } from '../input/InputHelper.ts'
 
 export function inputNormalizer (schema: SchemaCommon): Schema {
   switch (getType(schema)) {
@@ -38,7 +38,7 @@ function getType (schema: SchemaCommon): 'Interface' | 'Object' | 'Enum' {
 }
 
 function oneOfNormalizer (schema: SchemaCommon): Schema {
-  const name = capitalize(getName(schema))
+  const name = cleanName(schema.title)
   const cleaned = cleanOneOf(schema, name)
   const oneOf = cleaned.result
   const result: Schema = { ...schema, type: 'object', oneOf }
@@ -49,7 +49,7 @@ function oneOfNormalizer (schema: SchemaCommon): Schema {
 }
 
 function objectNormalizer (schema: SchemaCommon): Schema {
-  const name = capitalize(getName(schema))
+  const name = cleanName(schema.title)
   const cleaned = cleanProperties(schema, name)
   const properties = cleaned.result
   const result: Schema = { required: [], ...schema, type: 'object', properties }
@@ -105,7 +105,7 @@ function cleanProperties (parent: unknown, name: string): { result: Record<strin
   const definitions: Record<string, unknown> = {}
   const properties = (parent as any).properties as Record<string, unknown>
   Object.entries(properties).forEach(([propertyName, property]) => {
-    const cleaned = cleanProperty(property, name + capitalize(propertyName))
+    const cleaned = cleanProperty(property, name + cleanName(propertyName))
     result[propertyName] = cleaned.result
     Object.entries(cleaned.definitions).forEach(([defName, definition]) => {
       definitions[defName] = definition

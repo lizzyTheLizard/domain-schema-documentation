@@ -3,13 +3,10 @@ import { type Input } from '../reader/input/Input.ts'
 import path from 'path'
 import { type Plugin, type VerificationError } from '../plugin/Plugin.ts'
 import Handlebars from 'handlebars'
-import { getIdWithoutEnding, getName } from '../reader/input/InputHelper.ts'
-import {
-  type EnumDefinition,
-  type ObjectDefinition,
-  type Property,
-  type Schema
-} from '../reader/input/Schema.ts'
+import { type Property, type Schema } from '../reader/input/Schema.ts'
+import { getPropertyType, type PropertyType } from '../reader/input/InputHelper.ts'
+
+// TODO: Class diagramms
 
 export function defaultWriter (
   outputFolder: string,
@@ -19,15 +16,14 @@ export function defaultWriter (
   moduleTemplate: HandlebarsTemplateDelegate = loadTemplate('src/writer/module.hbs'),
   schemaTemplate: HandlebarsTemplateDelegate = loadTemplate('src/writer/schema.hbs')
 ): Writer {
-  Handlebars.registerHelper('mdRemovePrefixAndFileEnding', (toId: string, fromId: string) => mdRemovePrefixAndFileEnding(toId, fromId))
-  Handlebars.registerHelper('mdMultiline', (input: string) => mdMultiline(input))
-  Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, property))
-  Handlebars.registerHelper('mdGetEnumDocu', (definition: EnumDefinition, key: string) => mdGetEnumDocu(definition, key))
-  Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input))
-  Handlebars.registerHelper('mdIsRequired', (definition: ObjectDefinition, propertyName: string) => mdIsRequired(definition, propertyName))
-  Handlebars.registerPartial('mdSubSchema', loadTemplate('src/writer/subSchema.hbs'))
-
   return async function (input: Input): Promise<void> {
+    Handlebars.registerHelper('mdMultiline', (input: string) => mdMultiline(input))
+    Handlebars.registerHelper('mdRelativeLink', (fromId: string, toId: string) => mdRelativeLink(fromId, toId))
+    Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, getPropertyType(input, schema, property)))
+    Handlebars.registerHelper('mdGetProperty', (obj: any | undefined, property: string) => obj?.[property])
+    Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input))
+    Handlebars.registerPartial('mdSubSchema', loadTemplate('src/writer/subSchema.hbs'))
+
     const verificationErrors = await validateAll(input, plugins)
     await generateOutput(outputFolder, input, plugins)
 
@@ -41,7 +37,7 @@ export function defaultWriter (
         errors
       }
       const output = schemaTemplate(context)
-      await write(output, `${getIdWithoutEnding(schema.$id)}.md`)
+      await write(output, `${schema.$id}.md`)
     }
 
     for (const module of input.modules) {
@@ -64,7 +60,7 @@ export function defaultWriter (
       ...application,
       'x-links': [...application['x-links'] ?? [], ...plugins.flatMap(p => p.getApplicationLinks(application))],
       'x-todos': [...application['x-todos'] ?? [], ...getErrorTodos(errors)],
-      'x-tags': { ...application['x-tags'] },
+      'x-tags': application['x-tags'] ?? undefined,
       errors,
       modules: input.modules
     }
@@ -89,58 +85,26 @@ function getErrorTodos (error: VerificationError[]): string[] {
   return [`${error.length} validation errors`]
 }
 
-function mdRemovePrefixAndFileEnding (text: string, prefix: string): string {
-  text = text.replace(path.extname(text), '')
-  if (text.startsWith(prefix)) return text.substring(prefix.length)
-  return text
-}
-
 function mdMultiline (input: string): string {
   if (input === undefined) return ''
   return input.split('\n').map(l => l.trim()).join('<br>')
 }
 
-function mdGetEnumDocu (definition: EnumDefinition, key: string): string {
-  return definition['x-enum-description']?.[key] ?? ''
+function mdRelativeLink (fromId: string, toId: string): string {
+  return `./${path.relative(fromId, toId)}`
 }
 
-function mdIsRequired (definition: ObjectDefinition, propertyName: string): string {
-  return definition.required?.includes(propertyName) ? '*' : ''
-}
-
-function mdGetType (schema: Schema, property: Property): string {
-  if (property === undefined) return 'UNDEFINED'
-  if ('const' in property) return JSON.stringify(property.const)
-  if (property.type === 'array') return `[${mdGetType(schema, property.items ?? { type: 'object' })}]`
-  if (property.type === 'null') return 'Null'
-  if ('enum' in property) return (property.enum as string[]).map(e => `"${e}"`).join(' | ')
-  if ('format' in property) return property.format ?? 'MISSING FORMAT'
-  if ('$ref' in property) return mdGetReferenceType(schema, property.$ref ?? 'MISSING REFERENCE')
-  if ('x-references' in property) return `Reference to ${mdGetReferenceType(schema, property['x-references'] ?? '')}`
-  return property.type
-}
-
-function mdGetReferenceType (schema: Schema, reference: string | string[]): string {
-  if (Array.isArray(reference)) {
-    const references = reference.map(r => mdGetReferenceType(schema, r))
-    if (references.length === 1) return references[0]
-    return references.slice(0, -1).join(', ') + ' or ' + references.pop()
+function mdGetType (schema: Schema, type: PropertyType): string {
+  switch (type.type) {
+    case 'array': return `[${mdGetType(schema, type.array)}]`
+    case 'reference': return `[${type.name}](${mdRelativeLink(path.dirname(schema.$id), type.$id)}.md)`
+    case 'self': return `[${type.name}](./)`
+    case 'definition': return `[${type.name}](#${type.name})`
+    case 'local':
+      if (type.references) {
+        return `References ${type.references.map(r => mdGetType(schema, r)).join(', ')}`
+      } else {
+        return type.name
+      }
   }
-  if (!reference.startsWith('#')) {
-    const name = getName(reference)
-    const link = `${getIdWithoutEnding(reference)}.md`
-    return `[${name}](${link})`
-  }
-  if (reference === '#') {
-    const name = getName(schema)
-    const link = `./${getName(schema)}.md`
-    return `[${name}](${link})`
-  }
-  if (reference.startsWith('#/definitions/')) {
-    const name = getName(reference)
-    const link = `#${name}`
-    return `[${name}](${link})`
-  }
-  console.error(`Invalid reference '${reference}' in ${schema.$id}, cannot determine type`)
-  return 'Invalid reference'
 }

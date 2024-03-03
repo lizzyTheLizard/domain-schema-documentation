@@ -6,60 +6,58 @@
 {{/each}}
 
 {{/if}}
+{{{mdMultiline description}}}
 {{#if x-tags}}
+
 | Key | Value |
 |-----|-------|
 {{#each x-tags}}
 | {{@key}} | {{this}} |
 {{/each}}
-
-{{/if}}
-{{#if description}}
-{{{mdMultiline description}}}
-
 {{/if}}
 {{#if oneOf}}
+
 ## One Of
 {{#each oneOf}}
 1. {{mdGetType .. this}}
 {{/each}}
-
 {{/if}}
 {{#if enum}}
+
 ## Enum-Values
 | Name | Description |
 |------|-------------|
 {{#each enum}}
-| {{this}} | {{{mdMultiline (mdGetEnumDocu .. this)}}} |
+| {{this}} | {{{mdMultiline (mdGetProperty ../[x-enum-description] this)}}} |
 {{/each}}
-
 {{/if}}
 {{#if properties}}
+
 ## Properties
 | Name |  | Type | Description |
 |------|--|------|-------------|
 {{#each properties}}
-| {{@key}} | {{mdIsRequired .. @key}} | {{mdGetType .. this}} | {{{mdMultiline description}}} |
+| {{@key}} | {{#if (mdGetProperty ../required @key)}}*{{/if}} | {{mdGetType .. this}} | {{{mdMultiline description}}} |
 {{/each}}
-
 {{/if}}
 {{#if definitions}}
+
 ## Subschemas
 {{#each definitions}}
 {{> mdSubSchema this schema=.. name=@key}}
-
 {{/each}}
 {{/if}}
 {{#if examples}}
+
 ## Examples
 {{#each examples}}
 ```json
 {{{mdJson this}}}
 ```
 {{/each}}
-
 {{/if}}
 {{#if x-links}}
+
 ## Links
 {{#each x-links}}
 1. [{{{text}}}]({{href}})

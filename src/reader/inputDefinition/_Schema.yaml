@@ -19,8 +19,8 @@ definitions:
               - type: array
                 items:
                   type: string
-      - type: object
-        properties:
+          title:
+            type: string
           definitions:
             type: object
             additionalProperties:
@@ -35,8 +35,6 @@ definitions:
               $ref: '#/definitions/SubSchema'
           items:
             $ref: '#/definitions/SubSchema'
-      - type: object
-        properties:
           additionalProperties: false
           additionalItems: false
           maxProperties: false
@@ -47,8 +45,6 @@ definitions:
           anyOf: false
           type:
             type: string
-          items:
-            $ref: "#/definitions/SubSchema"
           enum:
             type: array
             items:
