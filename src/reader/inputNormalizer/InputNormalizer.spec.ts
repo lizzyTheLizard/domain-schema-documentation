@@ -1,7 +1,7 @@
 import { inputNormalizer } from './InputNormalizer.ts'
 import { type SchemaCommon } from '../input/Schema.ts'
 
-const testSchema: SchemaCommon = { $id: 'test', title: 'Test', type: 'object', 'x-schema-type': 'Aggregate' }
+const testSchema: SchemaCommon = { $id: 'test', title: 'Test', type: 'object', 'x-schema-type': 'Aggregate', definitions: {} }
 
 describe('InputNormalizer', () => {
   test('flat interface', async () => {
@@ -33,13 +33,13 @@ describe('InputNormalizer', () => {
     const schema = {
       ...testSchema,
       oneOf: [{ type: 'object', properties: { key: { type: 'string' } } }, { type: 'object', $ref: 'test3' }],
-      definitions: { test: { type: 'string' } }
+      definitions: { test: { type: 'string', enum: ['A', 'B'] } }
     }
     const result = inputNormalizer(schema as SchemaCommon)
     expect(result).toEqual({
       ...testSchema,
       oneOf: [{ type: 'object', $ref: '#/definitions/OneOfTest1' }, { type: 'object', $ref: 'test3' }],
-      definitions: { OneOfTest1: { type: 'object', required: [], properties: { key: { type: 'string' } } }, test: { type: 'string' } }
+      definitions: { OneOfTest1: { type: 'object', required: [], properties: { key: { type: 'string' } } }, test: { type: 'string', enum: ['A', 'B'] } }
     })
   })
 

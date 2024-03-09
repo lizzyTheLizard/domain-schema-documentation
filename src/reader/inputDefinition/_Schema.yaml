@@ -2,11 +2,51 @@ $id: _Schema.yaml
 $schema: http://json-schema.org/draft-07/schema#
 title: Schema Definition
 type: object
+allOf:
+  - $ref: "#/definitions/Schema"
+  # On top level, we want to enforce additional properties
+  # First keywords must be valid
+  - $ref: _Keywords.yaml
+  # Some things are required
+  - type: object
+    required:
+    - $id
+    - x-schema-type
+    - title
+   # Must be either an enum, object or interface
+  - type: object
+    oneOf:
+      - type: object
+        properties:
+            type:
+                type: string
+                enum:
+                - object
+        required:
+          - properties
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+              - string
+        required:
+          - enum
+      - type: object
+        properties:
+          type:
+            type: string
+            enum:
+              - object
+        required:
+          - oneOf
 definitions:
-  SubSchema:
+  Schema:
     type: object
     allOf:
+      # The Schema must be a valid JSON-Schema
       - $ref: http://json-schema.org/draft-07/schema#
+      # We want to enforce the type of additional properties
       - type: object
         properties:
           x-enum-description:
@@ -19,22 +59,25 @@ definitions:
               - type: array
                 items:
                   type: string
+      # On some types we are stricter than the JSON-Schema
+      - type: object
+        properties:
           title:
             type: string
           definitions:
             type: object
             additionalProperties:
-              $ref: '#/definitions/SubSchema'
+              $ref: '#/definitions/Schema'
           properties:
             type: object
             additionalProperties:
-              $ref: '#/definitions/SubSchema'
+              $ref: '#/definitions/Schema'
           oneOf:
             type: array
             items:
-              $ref: '#/definitions/SubSchema'
+              $ref: '#/definitions/Schema'
           items:
-            $ref: '#/definitions/SubSchema'
+            $ref: '#/definitions/Schema'
           additionalProperties: false
           additionalItems: false
           maxProperties: false
@@ -49,8 +92,3 @@ definitions:
             type: array
             items:
               type: string
-allOf:
-  - $ref: _Keywords.yaml
-  - $ref: "#/definitions/SubSchema"
-required:
-  - $id

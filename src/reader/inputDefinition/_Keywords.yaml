@@ -3,6 +3,14 @@ $schema: http://json-schema.org/draft-07/schema#
 title: Keywods Definition
 type: object
 properties:
+  x-schema-type:
+    type: string
+    enum:
+      - Aggregate
+      - Entity
+      - ValueObject
+      - ReferenceData
+      - Other
   x-tags:
     type: object
     additionalProperties:

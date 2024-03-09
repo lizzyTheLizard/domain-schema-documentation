@@ -13,20 +13,20 @@ describe('InputValidator.Examples', () => {
   })
 
   test('valid example', () => {
-    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, examples: [{ key: 27 }] }
+    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, examples: [{ key: 27 }], definitions: {} }
     inputValidator.validateSchemaFile(schemaFile)
     expect(() => { inputValidator.finishValidation() }).not.toThrow()
   })
 
   test('invalid example', () => {
-    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, examples: [{ key: 'value' }] }
+    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, examples: [{ key: 'value' }], definitions: {} }
     inputValidator.validateSchemaFile(schemaFile)
     expect(() => { inputValidator.finishValidation() })
       .toThrow(new Error('Invalid example [0] in Schema /Module/Schema.yaml: data/key must be number'))
   })
 
   test('invalid additional properties in example', () => {
-    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, examples: [{ key: 2, key2: 'value' }] }
+    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, examples: [{ key: 2, key2: 'value' }], definitions: {} }
     inputValidator.validateSchemaFile(schemaFile)
     expect(() => { inputValidator.finishValidation() })
       .toThrow(new Error('Invalid example [0] in Schema /Module/Schema.yaml: data must NOT have additional properties'))
@@ -35,22 +35,22 @@ describe('InputValidator.Examples', () => {
   test('valid additional properties in example', () => {
     inputValidator = new InputValidator({ noAdditionalPropertiesInExamples: false, ajvOptions: {}, formats: [] })
     inputValidator.validateApplicationFile(applicationFile)
-    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, examples: [{ key: 2, key2: 'value' }] }
+    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, examples: [{ key: 2, key2: 'value' }], definitions: {} }
     inputValidator.validateSchemaFile(schemaFile)
     expect(() => { inputValidator.finishValidation() }).not.toThrow()
   })
 
   test('valid example with reference over module', () => {
-    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'object', $ref: './Schema2.yaml' } }, examples: [{ key: { key2: 2 } }] }
-    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'number' } } }
+    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'object', $ref: './Schema2.yaml' } }, examples: [{ key: { key2: 2 } }], definitions: {} }
+    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'number' } }, definitions: {} }
     inputValidator.validateSchemaFile(schemaFile2)
     inputValidator.validateSchemaFile(schemaFile)
     expect(() => { inputValidator.finishValidation() }).not.toThrow()
   })
 
   test('invalid example with reference over module', () => {
-    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'object', $ref: './Schema2.yaml' } }, examples: [{ key: { key2: 'value' } }] }
-    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'number' } } }
+    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'object', $ref: './Schema2.yaml' } }, examples: [{ key: { key2: 'value' } }], definitions: {} }
+    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'number' } }, definitions: {} }
     inputValidator.validateSchemaFile(schemaFile2)
     inputValidator.validateSchemaFile(schemaFile)
     expect(() => { inputValidator.finishValidation() })

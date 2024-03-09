@@ -10,7 +10,7 @@ export interface SchemaCommon {
   title: string
   description?: string
   examples?: unknown[]
-  definitions?: Record<string, Definition>
+  definitions: Record<string, Definition>
   type: 'object' | 'string'
   'x-schema-type': SchemaType
   'x-tags'?: Record<string, string>

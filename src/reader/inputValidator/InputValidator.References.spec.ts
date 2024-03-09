@@ -6,14 +6,14 @@ describe('InputValidator.References', () => {
   let inputValidator: InputValidator
   const applicationFile: Application = { title: 'Title', description: 'Description' }
   const moduleFile: Module = { $id: '/Module', title: 'Module', description: 'Description' }
-  const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } } }
+  const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, definitions: {} }
 
   beforeEach(() => {
     inputValidator = new InputValidator({ ajvOptions: { allErrors: true }, noAdditionalPropertiesInExamples: true, formats: [] })
   })
 
   test('valid reference in schema', () => {
-    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema2', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'object', $ref: './Schema.yaml' } } }
+    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema2', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'object', $ref: './Schema.yaml' } }, definitions: {} }
     inputValidator.validateApplicationFile(applicationFile)
     inputValidator.validateModuleFile(moduleFile)
     inputValidator.validateSchemaFile(schemaFile2)
@@ -22,7 +22,7 @@ describe('InputValidator.References', () => {
   })
 
   test('invalid $ref reference', () => {
-    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema2', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'object', $ref: './Schema.yaml' } } }
+    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema2', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'object', $ref: './Schema.yaml' } }, definitions: {} }
     inputValidator.validateApplicationFile(applicationFile)
     inputValidator.validateModuleFile(moduleFile)
     inputValidator.validateSchemaFile(schemaFile2)
@@ -31,7 +31,7 @@ describe('InputValidator.References', () => {
   })
 
   test('invalid x-reference reference', () => {
-    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema2', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'string', 'x-references': './Schema.yaml' } } }
+    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema2', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'string', 'x-references': './Schema.yaml' } }, definitions: {} }
     inputValidator.validateApplicationFile(applicationFile)
     inputValidator.validateModuleFile(moduleFile)
     inputValidator.validateSchemaFile(schemaFile2)
@@ -40,7 +40,7 @@ describe('InputValidator.References', () => {
   })
 
   test('invalid x-references reference', () => {
-    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema2', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'string', 'x-references': ['./Schema.yaml'] } } }
+    const schemaFile2: Schema = { $id: '/Module/Schema2.yaml', title: 'Schema2', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'string', 'x-references': ['./Schema.yaml'] } }, definitions: {} }
     inputValidator.validateApplicationFile(applicationFile)
     inputValidator.validateModuleFile(moduleFile)
     inputValidator.validateSchemaFile(schemaFile2)
@@ -68,7 +68,7 @@ describe('InputValidator.References', () => {
   })
 
   test('valid reference over modules', () => {
-    const schemaFile2: Schema = { $id: '/Module2/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'object', $ref: '../Module/Schema.yaml' } } }
+    const schemaFile2: Schema = { $id: '/Module2/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key2: { type: 'object', $ref: '../Module/Schema.yaml' } }, definitions: {} }
     inputValidator.validateApplicationFile(applicationFile)
     inputValidator.validateModuleFile(moduleFile)
     inputValidator.validateSchemaFile(schemaFile)

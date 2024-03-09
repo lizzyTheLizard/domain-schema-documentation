@@ -2,7 +2,7 @@ $id: /Module/Enum.yaml
 title: Enum
 description: An example for an enum
 type: string
-x-schema-type: ValueObject
+x-schema-type: Entity
 x-enum-description:
   A: The first value
   B: |

@@ -1,96 +1,92 @@
-import { type ArrayProperty, type Definition, type ObjectProperty, type Property, type Schema, type SchemaCommon } from '../input/Schema.ts'
+import {
+  type ArrayProperty, type BasicProperty,
+  type Definition,
+  type ObjectProperty,
+  type Property,
+  type Schema,
+  type SchemaType
+} from '../input/Schema.ts'
 import { cleanName } from '../input/InputHelper.ts'
+import { type Link } from '../input/Input.ts'
 
-export function inputNormalizer (schema: SchemaCommon): Schema {
-  switch (getType(schema)) {
-    case 'Interface':
-      return oneOfNormalizer(schema)
-    case 'Enum':
-      return schema as Schema
-    case 'Object':
-      return objectNormalizer(schema)
-  }
+interface NormalizerInput {
+  $id: string
+  title: string
+  'x-schema-type': SchemaType
+  type?: string
+  'x-tags'?: Record<string, string>
+  'x-todos'?: string[]
+  'x-links'?: Link[]
+  description?: string
+  examples?: unknown[]
+  definitions?: Record<string, NormalizerSubInput>
+  oneOf?: NormalizerSubInput[]
+  properties?: Record<string, NormalizerSubInput>
+  required?: string[]
+  enum?: string[] | undefined
 }
 
-function getType (schema: SchemaCommon): 'Interface' | 'Object' | 'Enum' {
-  if ('oneOf' in schema) {
-    if ('enum' in schema) {
+interface NormalizerSubInput {
+  oneOf?: NormalizerSubInput[]
+  properties?: Record<string, NormalizerSubInput>
+  required?: string[]
+  $ref?: string
+  type?: string
+  items?: NormalizerSubInput
+  enum?: string[]
+}
+
+export function inputNormalizer (schema: NormalizerInput): Schema {
+  if (schema.oneOf) {
+    if (schema.enum) {
       throw new Error(`Schema ${schema.$id} is an interface and an enum`)
     }
-    if ('properties' in schema) {
+    if (schema.properties) {
       throw new Error(`Schema ${schema.$id} is an interface and an object`)
     }
-    return 'Interface'
+    const name = cleanName(schema.title)
+    const cleaned = cleanOneOf(schema.oneOf, name)
+    return {
+      ...schema,
+      type: 'object',
+      oneOf: cleaned.result,
+      definitions: cleanDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions })
+    }
   }
 
-  if ('enum' in schema) {
-    if ('properties' in schema) {
+  if (schema.enum !== undefined) {
+    if (schema.properties) {
       throw new Error(`Schema ${schema.$id} is an enum and an object`)
     }
-    return 'Enum'
+    return {
+      ...schema,
+      enum: schema.enum,
+      type: 'string',
+      definitions: cleanDefinitions(schema.definitions ?? {})
+    }
   }
 
-  if ('properties' in schema) {
-    return 'Object'
+  if (schema.properties) {
+    const name = cleanName(schema.title)
+    const cleaned = cleanProperties(schema.properties, name)
+    return {
+      ...schema,
+      type: 'object',
+      properties: cleaned.result,
+      required: schema.required ?? [],
+      definitions: cleanDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions })
+    }
   }
-
   throw new Error(`Schema ${schema.$id} is not an interface, object or enum`)
 }
 
-function oneOfNormalizer (schema: SchemaCommon): Schema {
-  const name = cleanName(schema.title)
-  const cleaned = cleanOneOf(schema, name)
-  const oneOf = cleaned.result
-  const result: Schema = { ...schema, type: 'object', oneOf }
-  if (schema.definitions !== undefined || Object.keys(cleaned.definitions).length > 0) {
-    result.definitions = cleanDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions })
-  }
-  return result
-}
-
-function objectNormalizer (schema: SchemaCommon): Schema {
-  const name = cleanName(schema.title)
-  const cleaned = cleanProperties(schema, name)
-  const properties = cleaned.result
-  const result: Schema = { required: [], ...schema, type: 'object', properties }
-  if (schema.definitions !== undefined || Object.keys(cleaned.definitions).length > 0) {
-    result.definitions = cleanDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions })
-  }
-  return result
-}
-
-function cleanDefinitions (definitions: Record<string, unknown>): Record<string, Definition> {
-  const result: Record<string, Definition> = {}
-  Object.entries(definitions).forEach(([oldName, oldDefinition]) => {
-    const cleaned = cleanDefinition(oldDefinition as Record<string, unknown>, oldName)
-    Object.entries(cleaned).forEach(([newName, newDefinition]) => {
-      result[newName] = newDefinition
-    })
-  })
-  return result
-}
-
-function cleanDefinition (definition: Record<string, unknown>, name: string): Record<string, Definition> {
-  if ('oneOf' in definition) {
-    const cleaned = cleanOneOf(definition, name)
-    const result: Definition = { ...definition, type: 'object', oneOf: cleaned.result }
-    return { [name]: result, ...cleanDefinitions(cleaned.definitions) }
-  } else if ('properties' in definition) {
-    const cleaned = cleanProperties(definition, name)
-    const result: Definition = { required: [], ...definition, type: 'object', properties: cleaned.result }
-    return { [name]: result, ...cleanDefinitions(cleaned.definitions) }
-  } else {
-    return { [name]: definition as unknown as Definition }
-  }
-}
-
-function cleanOneOf (parent: unknown, name: string): { result: Property[], definitions: Record<string, unknown> } {
+function cleanOneOf (oneOf: NormalizerSubInput[], name: string): { result: Property[], definitions: Record<string, NormalizerSubInput> } {
   const result: Property[] = []
-  const definitions: Record<string, unknown> = {}
-  const oneOfs = (parent as any).oneOf as Array<Record<string, unknown>>
-  oneOfs.forEach((oneOf, index) => {
-    if ('$ref' in oneOf) {
-      result.push({ type: 'object', ...oneOf })
+  const definitions: Record<string, NormalizerSubInput> = {}
+  oneOf.forEach((oneOf, index) => {
+    if (oneOf.$ref !== undefined) {
+      const p: ObjectProperty = { ...oneOf, type: 'object', $ref: oneOf.$ref }
+      result.push(p)
     } else {
       const definitionName = `OneOf${name}${index + 1}`
       result.push({ type: 'object', $ref: `#/definitions/${definitionName}` })
@@ -100,10 +96,9 @@ function cleanOneOf (parent: unknown, name: string): { result: Property[], defin
   return ({ result, definitions })
 }
 
-function cleanProperties (parent: unknown, name: string): { result: Record<string, Property>, definitions: Record<string, unknown> } {
+function cleanProperties (properties: Record<string, NormalizerSubInput>, name: string): { result: Record<string, Property>, definitions: Record<string, NormalizerSubInput> } {
   const result: Record<string, Property> = {}
-  const definitions: Record<string, unknown> = {}
-  const properties = (parent as any).properties as Record<string, unknown>
+  const definitions: Record<string, NormalizerSubInput> = {}
   Object.entries(properties).forEach(([propertyName, property]) => {
     const cleaned = cleanProperty(property, name + cleanName(propertyName))
     result[propertyName] = cleaned.result
@@ -114,17 +109,57 @@ function cleanProperties (parent: unknown, name: string): { result: Record<strin
   return ({ result, definitions })
 }
 
-function cleanProperty (propertyIn: unknown, name: string): { result: Property, definitions: Record<string, unknown> } {
-  const property = propertyIn as { type: string }
-  if (property.type === 'array' && 'items' in property) {
+function cleanProperty (property: NormalizerSubInput, name: string): { result: Property, definitions: Record<string, NormalizerSubInput> } {
+  if (property.$ref !== undefined) {
+    const result: ObjectProperty = { ...property, type: 'object' }
+    return { result, definitions: {} }
+  }
+  if (property.type === 'array' && property.items) {
     const cleanItem = cleanProperty(property.items, name)
     const result: ArrayProperty = { ...property, type: 'array', items: cleanItem.result }
     return { result, definitions: cleanItem.definitions }
   }
-  if ('properties' in property || 'oneOf' in property || 'enum' in property) {
+  if (property.properties ?? property.oneOf ?? property.enum) {
     const result: ObjectProperty = { type: 'object', $ref: `#/definitions/${name}` }
     return { result, definitions: { [name]: property } }
   }
-  const result = property as Property
+  if (property.type === undefined || (property.type !== 'boolean' && property.type !== 'integer' && property.type !== 'null' && property.type !== 'number' && property.type !== 'string')) {
+    console.error(`Invalid type ${property.type} for property ${name}. Assuming string`)
+    const result: BasicProperty = { ...property, type: 'string' }
+    return ({ result, definitions: {} })
+  }
+
+  const result: BasicProperty = { ...property, type: property.type }
   return ({ result, definitions: {} })
+}
+
+function cleanDefinitions (definitions: Record<string, NormalizerSubInput>): Record<string, Definition> {
+  const result: Record<string, Definition> = {}
+  Object.entries(definitions).forEach(([oldName, oldDefinition]) => {
+    const cleaned = cleanDefinition(oldDefinition, oldName)
+    Object.entries(cleaned).forEach(([newName, newDefinition]) => {
+      result[newName] = newDefinition
+    })
+  })
+  return result
+}
+
+function cleanDefinition (definition: NormalizerSubInput, name: string): Record<string, Definition> {
+  if (definition.oneOf) {
+    const cleaned = cleanOneOf(definition.oneOf, name)
+    const result: Definition = { ...definition, type: 'object', oneOf: cleaned.result }
+    return { [name]: result, ...cleanDefinitions(cleaned.definitions) }
+  } else if (definition.properties) {
+    const cleaned = cleanProperties(definition.properties, name)
+    const result: Definition = { required: [], ...definition, type: 'object', properties: cleaned.result }
+    return { [name]: result, ...cleanDefinitions(cleaned.definitions) }
+  } else if (definition.enum !== undefined) {
+    const result: Definition = { ...definition, type: 'string', enum: definition.enum }
+    return { [name]: result }
+  } else if (definition.type === 'object') {
+    const result: Definition = { ...definition, oneOf: undefined, type: 'object' }
+    return { [name]: result }
+  } else {
+    throw new Error('A definition cannot be a base type. Only enums, oneOf or objects are allowed')
+  }
 }
