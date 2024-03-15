@@ -23,7 +23,9 @@ describe('defaultWriter', () => {
     description: 'Test Schema Description',
     'x-schema-type': 'Aggregate',
     type: 'object',
-    properties: { id: { type: 'string' } }
+    properties: { id: { type: 'string' } },
+    definitions: {},
+    required: []
   }
 
   beforeEach(() => {
@@ -95,7 +97,8 @@ describe('defaultWriter', () => {
       'x-schema-type': 'Aggregate',
       type: 'string',
       enum: ['A', 'B'],
-      'x-enum-description': { A: 'Description' }
+      'x-enum-description': { A: 'Description' },
+      definitions: {}
     }
     await target({ application, modules: [module], schemas: [schema2] })
     const content = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.md', 'utf-8')).toString()
@@ -107,7 +110,7 @@ describe('defaultWriter', () => {
   })
 
   test('Write Interface Schema file', async () => {
-    const schema2: Schema = { $id: '/test/Schema2.yaml', title: 'Title', 'x-schema-type': 'Aggregate', type: 'object', oneOf: [{ type: 'object', $ref: './Schema.yaml' }] }
+    const schema2: Schema = { $id: '/test/Schema2.yaml', title: 'Title', 'x-schema-type': 'Aggregate', type: 'object', oneOf: [{ type: 'object', $ref: './Schema.yaml' }], definitions: {} }
     await target({ application, modules: [module], schemas: [schema, schema2] })
     const content = (await fs.readFile(tmpDir.name + '/test/Schema2.yaml.md', 'utf-8')).toString()
     expect(content).toContain('## One Of')
@@ -118,7 +121,7 @@ describe('defaultWriter', () => {
   })
 
   test('Write Object SubSchema file', async () => {
-    const schema2: Schema = { ...schema, type: 'object', properties: { id: { type: 'object', $ref: '#/definitions/SubSchema' } }, required: [], definitions: { SubSchema: { type: 'object', description: 'Sub-Schema Description', properties: { key: { type: 'string' } } } } }
+    const schema2: Schema = { ...schema, type: 'object', properties: { id: { type: 'object', $ref: '#/definitions/SubSchema' } }, required: [], definitions: { SubSchema: { type: 'object', description: 'Sub-Schema Description', properties: { key: { type: 'string' } }, required: [] } } }
     await target({ application, modules: [module], schemas: [schema2] })
     const content = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.md', 'utf-8')).toString()
     expect(content).toContain('| id |  | [SubSchema](#SubSchema) |')

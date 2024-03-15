@@ -1,8 +1,0 @@
-$id: /Module/Enum2.yaml
-title: Enum2
-description: An example for an enum
-type: string
-x-schema-type: Aggregate
-enum:
-  - A
-  - B

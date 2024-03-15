@@ -1,9 +1,0 @@
-$id: /Module2/Object.yaml
-title: Object
-description: An example for an object
-type: object
-x-schema-type: ValueObject
-properties:
-  firstP:
-    type: object
-    $ref: ../Module/Enum.yaml

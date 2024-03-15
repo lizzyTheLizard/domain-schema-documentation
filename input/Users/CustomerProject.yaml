@@ -1,0 +1,20 @@
+$id: /Users/CustomerProject.yaml
+title: Customer Project
+description: An customer project
+x-schema-type: Entity
+type: object
+properties:
+  projectId:
+    type: string
+    description: The id of the project
+  projectName:
+    type: string
+    description: The name of the project
+  projectDescription:
+    type: string
+    description: The description of the project
+required:
+    - projectId
+    - projectName
+    - projectDescription
+

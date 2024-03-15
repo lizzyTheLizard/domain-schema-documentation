@@ -1,0 +1,28 @@
+$id: /Expenses/ExpenseJournal.yaml
+title: Expense Journal Entry
+description: An changed that was made to an expense
+type: object
+x-schema-type: Entity
+properties:
+  id:
+    type: string
+    description: The unique identifier of the expense
+  date:
+    type: string
+    format: date
+    description: The date of the expense
+  newStatus:
+    $ref: ./ExpenseStatus.yaml
+  userId:
+    type: string
+    x-references: ../../Users/User.yaml
+    description: The user who changed the expense
+  comment:
+    type: string
+    description: Description of the change
+required:
+  - id
+  - date
+  - newStatus
+  - userId
+

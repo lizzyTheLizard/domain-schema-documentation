@@ -1,6 +1,6 @@
 import {
   type ArrayProperty, type BasicProperty,
-  type Definition,
+  type Definition, type EnumDefinition, type InterfaceDefinition, type ObjectDefinition,
   type ObjectProperty,
   type Property,
   type Schema,
@@ -80,8 +80,8 @@ export function inputNormalizer (schema: NormalizerInput): Schema {
   throw new Error(`Schema ${schema.$id} is not an interface, object or enum`)
 }
 
-function cleanOneOf (oneOf: NormalizerSubInput[], name: string): { result: Property[], definitions: Record<string, NormalizerSubInput> } {
-  const result: Property[] = []
+function cleanOneOf (oneOf: NormalizerSubInput[], name: string): { result: ObjectProperty[], definitions: Record<string, NormalizerSubInput> } {
+  const result: ObjectProperty[] = []
   const definitions: Record<string, NormalizerSubInput> = {}
   oneOf.forEach((oneOf, index) => {
     if (oneOf.$ref !== undefined) {
@@ -111,7 +111,7 @@ function cleanProperties (properties: Record<string, NormalizerSubInput>, name: 
 
 function cleanProperty (property: NormalizerSubInput, name: string): { result: Property, definitions: Record<string, NormalizerSubInput> } {
   if (property.$ref !== undefined) {
-    const result: ObjectProperty = { ...property, type: 'object' }
+    const result: ObjectProperty = { ...property, $ref: property.$ref, type: 'object' }
     return { result, definitions: {} }
   }
   if (property.type === 'array' && property.items) {
@@ -147,17 +147,14 @@ function cleanDefinitions (definitions: Record<string, NormalizerSubInput>): Rec
 function cleanDefinition (definition: NormalizerSubInput, name: string): Record<string, Definition> {
   if (definition.oneOf) {
     const cleaned = cleanOneOf(definition.oneOf, name)
-    const result: Definition = { ...definition, type: 'object', oneOf: cleaned.result }
+    const result: InterfaceDefinition = { ...definition, type: 'object', oneOf: cleaned.result }
     return { [name]: result, ...cleanDefinitions(cleaned.definitions) }
   } else if (definition.properties) {
     const cleaned = cleanProperties(definition.properties, name)
-    const result: Definition = { required: [], ...definition, type: 'object', properties: cleaned.result }
+    const result: ObjectDefinition = { required: [], ...definition, type: 'object', properties: cleaned.result }
     return { [name]: result, ...cleanDefinitions(cleaned.definitions) }
   } else if (definition.enum !== undefined) {
-    const result: Definition = { ...definition, type: 'string', enum: definition.enum }
-    return { [name]: result }
-  } else if (definition.type === 'object') {
-    const result: Definition = { ...definition, oneOf: undefined, type: 'object' }
+    const result: EnumDefinition = { ...definition, type: 'string', enum: definition.enum }
     return { [name]: result }
   } else {
     throw new Error('A definition cannot be a base type. Only enums, oneOf or objects are allowed')

@@ -1,0 +1,18 @@
+$id: /Expenses/ExpenseStatus.yaml
+title: Expense Status
+description: The status of an expense
+type: string
+x-schema-type: ValueObject
+enum:
+  - Draft
+  - Submitted
+  - Approved
+  - Rejected
+  - Paid
+x-enum-description:
+  Draft: The expense has been created but not yet submitted
+  Submitted: The expense has been submitted for approval
+  Approved: The expense has been approved
+  Rejected: The expense has been rejected
+  Paid: The expense has been paid
+

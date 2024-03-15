@@ -1,0 +1,53 @@
+$id: /Expenses/Expense.yaml
+title: Expense
+description: An expense
+type: object
+x-schema-type: Aggregate
+examples:
+  - id: "exp123"
+    date: "2023-10-01"
+    amount: 200.50
+    currency: "USD"
+    description: "Office Supplies"
+    userId: "user456"
+    costCenter: "CC789"
+    status: "Submitted"
+    journal:
+      - id: "jrn1"
+        date: "2023-10-01"
+        newStatus: "Submitted"
+        userId: "user456"
+        comment: "Initial submission"
+properties:
+  id:
+    type: string
+    description: The unique identifier of the expense
+  date:
+    type: string
+    format: date
+    description: The date of the expense
+  amount:
+    type: number
+    format: float
+    description: The amount of the expense
+  currency:
+    type: string
+    description: The currency of the expense
+  description:
+    type: string
+    description: The description of the expense
+  userId:
+    type: string
+    x-references: ../Users/User.yaml
+    description: The user who created the expense
+  costCenter:
+    type: string
+    description: The cost center of the expense
+    x-references: ../Users/Project.yaml
+  status:
+    $ref: ./ExpenseStatus.yaml
+  journal:
+    type: array
+    description: The journal of the expense
+    items:
+      $ref: ./ExpenseJournal.yaml

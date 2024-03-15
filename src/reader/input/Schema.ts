@@ -37,7 +37,7 @@ export interface ObjectDefinition {
 
 export interface InterfaceDefinition {
   type: 'object'
-  oneOf?: Property[]
+  oneOf: ObjectProperty[]
 }
 
 export interface ArrayProperty {
@@ -47,7 +47,7 @@ export interface ArrayProperty {
 
 export interface ObjectProperty {
   type: 'object'
-  $ref?: string
+  $ref: string
 }
 
 export interface BasicProperty {

@@ -5,8 +5,7 @@ import { type Plugin, type VerificationError } from '../plugin/Plugin.ts'
 import Handlebars from 'handlebars'
 import { type Property, type Schema } from '../reader/input/Schema.ts'
 import { getPropertyType, type PropertyType } from '../reader/input/InputHelper.ts'
-
-// TODO: Class diagramms
+import { applicationDiagram, moduleDiagram, schemaDiagramm } from './MermaidDiagramGenerator.ts'
 
 export function defaultWriter (
   outputFolder: string,
@@ -31,9 +30,11 @@ export function defaultWriter (
       const errors = verificationErrors.filter(e => 'schema' in e && e.schema === schema)
       const context = {
         ...schema,
+        definitions: Object.keys(schema.definitions).length === 0 ? undefined : schema.definitions,
         'x-links': [...schema['x-links'] ?? [], ...plugins.flatMap(p => p.getSchemaLinks(schema))],
         'x-todos': [...schema['x-todos'] ?? [], ...getErrorTodos(errors)],
         'x-tags': { $id: schema.$id, type: schema['x-schema-type'], ...schema['x-tags'] },
+        classDiagramm: schemaDiagramm(input, schema),
         errors
       }
       const output = schemaTemplate(context)
@@ -48,6 +49,7 @@ export function defaultWriter (
         'x-todos': [...module['x-todos'] ?? [], ...getErrorTodos(errors)],
         'x-tags': { $id: module.$id, ...module['x-tags'] },
         errors,
+        classDiagram: moduleDiagram(input, module),
         schemas: input.schemas.filter(s => s.$id.startsWith(module.$id))
       }
       const output = moduleTemplate(context)
@@ -62,6 +64,7 @@ export function defaultWriter (
       'x-todos': [...application['x-todos'] ?? [], ...getErrorTodos(errors)],
       'x-tags': application['x-tags'] ?? undefined,
       errors,
+      classDiagram: applicationDiagram(input),
       modules: input.modules
     }
     const output = applicationTemplate(context)

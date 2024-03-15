@@ -10,8 +10,8 @@ import { type Schema } from './Schema.ts'
 describe('InputHelper', () => {
   const application: Application = { title: 'Application', description: 'Application description' }
   const module: Module = { $id: '/Module', title: 'Module', description: 'Module description' }
-  const schema1: Schema = { $id: '/Module/Schema1.yaml', 'x-schema-type': 'Aggregate', title: 'Schema 1', type: 'object', definitions: {} }
-  const schema2: Schema = { $id: '/Module2/Schema2.yaml', 'x-schema-type': 'ValueObject', title: 'Schema 2', type: 'object', definitions: {} }
+  const schema1: Schema = { $id: '/Module/Schema1.yaml', 'x-schema-type': 'Aggregate', title: 'Schema 1', type: 'object', properties: {}, required: [], definitions: {} }
+  const schema2: Schema = { $id: '/Module2/Schema2.yaml', 'x-schema-type': 'ValueObject', title: 'Schema 2', type: 'object', properties: {}, required: [], definitions: {} }
   const input: Input = { application, modules: [module], schemas: [schema1, schema2] }
 
   test('cleanName', async () => {

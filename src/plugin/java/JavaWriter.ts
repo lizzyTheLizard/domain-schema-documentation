@@ -64,7 +64,7 @@ function propertyType (_: Property): string {
   return 'String'
 }
 
-function getImports (_: Property): string[] {
+function getImports (_: Property | Schema): string[] {
   // TODO: Implement type mapping
   return []
 }

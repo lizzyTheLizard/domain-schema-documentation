@@ -1,0 +1,66 @@
+$id: /Users/User.yaml
+title: User
+description: An user of the system
+x-schema-type: Aggregate
+type: object
+examples:
+    - firstName: "John"
+      lastName: "Doe"
+      email: "john.doe@example.com"
+      customerProjects:
+      - projectId: "1"
+        roleInProject: ["admin"]
+      - projectId: "2"
+        roleInProject: ["member"]
+      role: ["admin"]
+
+properties:
+  firstName:
+    type: string
+    description: The first name of the user
+  lastName:
+    type: string
+    description: The last name of the user
+  email:
+    type: string
+    format: email
+    description: The email of the user
+  customerProjects:
+    type: array
+    items:
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: The id of the project
+          x-references: ./CustomerProject.yaml
+        roleInProject:
+          type: array
+          items:
+              type: string
+              enum:
+              - admin
+              - member
+              - leader
+              x-enum-description:
+                admin: Administrator of the project
+                member: Regular member of the project
+                leader: Project-leader, can accept expenses
+  role:
+    type: array
+    items:
+      type: string
+      enum:
+        - admin
+        - user
+        - finance
+      x-enum-description:
+        admin: Administrator
+        user: Regular user
+        finance: Employee in the finance department
+required:
+  - firstName
+  - lastName
+  - email
+
+

@@ -9,7 +9,7 @@ describe('InputValidator.Schema', () => {
   })
 
   test('valid schema file', () => {
-    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, definitions: {} }
+    const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } }, required: [], definitions: {} }
     expect(() => { inputValidator.validateSchemaFile(schemaFile) }).not.toThrow()
   })
 
