@@ -18,9 +18,12 @@
 {{#if modules}}
 
 ## Modules
+{{#if classDiagram}}
 ```mermaid
+classDiagram
 {{{classDiagram}}}
 ```
+{{/if}}
 | Name | Description |
 |------|-------------|
 {{#each modules}}

@@ -1,11 +1,11 @@
 import {
   cleanName,
-  getPropertyType,
   getSchemasForModule,
   getSchemasForModuleAndTyp
 } from './InputHelper.ts'
 import { type Application, type Input, type Module } from './Input.ts'
 import { type Schema } from './Schema.ts'
+import { getType } from './GetType.ts'
 
 describe('InputHelper', () => {
   const application: Application = { title: 'Application', description: 'Application description' }
@@ -29,11 +29,13 @@ describe('InputHelper', () => {
     expect(getSchemasForModuleAndTyp(input, module, 'ValueObject')).toEqual([])
   })
 
+  // TODO test getType and getDependencies
+
   test('getPropertyType', async () => {
-    expect(getPropertyType(input, schema1, { type: 'string' })).toEqual({ type: 'local', name: 'string' })
-    expect(getPropertyType(input, schema1, { type: 'string', format: 'date' })).toEqual({ type: 'local', name: 'date' })
-    expect(getPropertyType(input, schema1, { type: 'object', $ref: '../Module2/Schema2.yaml' })).toEqual({ type: 'reference', name: 'Schema 2', $id: '/Module2/Schema2.yaml' })
-    expect(getPropertyType(input, schema1, { type: 'string', 'x-references': '../Module2/Schema2.yaml' })).toEqual({ type: 'local', name: 'string', references: [{ type: 'reference', name: 'Schema 2', $id: '/Module2/Schema2.yaml' }] })
-    expect(getPropertyType(input, schema1, { type: 'object', $ref: '#/definitions/SubSchema' })).toEqual({ type: 'definition', name: 'SubSchema' })
+    expect(getType(input, schema1, { type: 'string' })).toEqual({ type: 'local', name: 'string' })
+    expect(getType(input, schema1, { type: 'string', format: 'date' })).toEqual({ type: 'local', name: 'date' })
+    expect(getType(input, schema1, { type: 'object', $ref: '../Module2/Schema2.yaml' })).toEqual({ type: 'reference', name: 'Schema 2', $id: '/Module2/Schema2.yaml' })
+    expect(getType(input, schema1, { type: 'string', 'x-references': '../Module2/Schema2.yaml' })).toEqual({ type: 'local', name: 'string', references: [{ type: 'reference', name: 'Schema 2', $id: '/Module2/Schema2.yaml' }] })
+    expect(getType(input, schema1, { type: 'object', $ref: '#/definitions/SubSchema' })).toEqual({ type: 'definition', name: 'SubSchema' })
   })
 })

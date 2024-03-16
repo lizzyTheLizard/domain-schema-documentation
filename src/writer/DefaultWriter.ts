@@ -4,8 +4,8 @@ import path from 'path'
 import { type Plugin, type VerificationError } from '../plugin/Plugin.ts'
 import Handlebars from 'handlebars'
 import { type Property, type Schema } from '../reader/input/Schema.ts'
-import { getPropertyType, type PropertyType } from '../reader/input/InputHelper.ts'
 import { applicationDiagram, moduleDiagram, schemaDiagramm } from './MermaidDiagramGenerator.ts'
+import { getType, type PropertyType } from '../reader/input/GetType.ts'
 
 export function defaultWriter (
   outputFolder: string,
@@ -18,7 +18,7 @@ export function defaultWriter (
   return async function (input: Input): Promise<void> {
     Handlebars.registerHelper('mdMultiline', (input: string) => mdMultiline(input))
     Handlebars.registerHelper('mdRelativeLink', (fromId: string, toId: string) => mdRelativeLink(fromId, toId))
-    Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, getPropertyType(input, schema, property)))
+    Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, getType(input, schema, property)))
     Handlebars.registerHelper('mdGetProperty', (obj: any | undefined, property: string) => obj?.[property])
     Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input))
     Handlebars.registerPartial('mdSubSchema', loadTemplate('src/writer/subSchema.hbs'))
@@ -34,7 +34,7 @@ export function defaultWriter (
         'x-links': [...schema['x-links'] ?? [], ...plugins.flatMap(p => p.getSchemaLinks(schema))],
         'x-todos': [...schema['x-todos'] ?? [], ...getErrorTodos(errors)],
         'x-tags': { $id: schema.$id, type: schema['x-schema-type'], ...schema['x-tags'] },
-        classDiagramm: schemaDiagramm(input, schema),
+        classDiagram: schemaDiagramm(input, schema),
         errors
       }
       const output = schemaTemplate(context)
