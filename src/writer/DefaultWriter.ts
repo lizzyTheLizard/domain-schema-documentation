@@ -1,11 +1,10 @@
 import { loadTemplate, writeOutput, type Writer } from './Writer.ts'
-import { type Input } from '../reader/input/Input.ts'
+import { type Property, type Schema, type Model } from '../reader/Reader.ts'
 import path from 'path'
 import { type Plugin, type VerificationError } from '../plugin/Plugin.ts'
 import Handlebars from 'handlebars'
-import { type Property, type Schema } from '../reader/input/Schema.ts'
 import { applicationDiagram, moduleDiagram, schemaDiagramm } from './MermaidDiagramGenerator.ts'
-import { getType, type PropertyType } from '../reader/input/GetType.ts'
+import { getType, type PropertyType } from '../reader/helper/GetType.ts'
 
 export function defaultWriter (
   outputFolder: string,
@@ -15,18 +14,18 @@ export function defaultWriter (
   moduleTemplate: HandlebarsTemplateDelegate = loadTemplate('src/writer/module.hbs'),
   schemaTemplate: HandlebarsTemplateDelegate = loadTemplate('src/writer/schema.hbs')
 ): Writer {
-  return async function (input: Input): Promise<void> {
+  return async function (model: Model): Promise<void> {
     Handlebars.registerHelper('mdMultiline', (input: string) => mdMultiline(input))
     Handlebars.registerHelper('mdRelativeLink', (fromId: string, toId: string) => mdRelativeLink(fromId, toId))
-    Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, getType(input, schema, property)))
+    Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, getType(model, schema, property)))
     Handlebars.registerHelper('mdGetProperty', (obj: any | undefined, property: string) => obj?.[property])
     Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input))
     Handlebars.registerPartial('mdSubSchema', loadTemplate('src/writer/subSchema.hbs'))
 
-    const verificationErrors = await validateAll(input, plugins)
-    await generateOutput(outputFolder, input, plugins)
+    const verificationErrors = await validateAll(model, plugins)
+    await generateOutput(outputFolder, model, plugins)
 
-    for (const schema of input.schemas) {
+    for (const schema of model.schemas) {
       const errors = verificationErrors.filter(e => 'schema' in e && e.schema === schema)
       const context = {
         ...schema,
@@ -34,14 +33,14 @@ export function defaultWriter (
         'x-links': [...schema['x-links'] ?? [], ...plugins.flatMap(p => p.getSchemaLinks(schema))],
         'x-todos': [...schema['x-todos'] ?? [], ...getErrorTodos(errors)],
         'x-tags': { $id: schema.$id, type: schema['x-schema-type'], ...schema['x-tags'] },
-        classDiagram: schemaDiagramm(input, schema),
+        classDiagram: schemaDiagramm(model, schema),
         errors
       }
       const output = schemaTemplate(context)
       await write(output, `${schema.$id}.md`)
     }
 
-    for (const module of input.modules) {
+    for (const module of model.modules) {
       const errors = verificationErrors.filter(e => 'module' in e && e.module === module)
       const context = {
         ...module,
@@ -49,14 +48,14 @@ export function defaultWriter (
         'x-todos': [...module['x-todos'] ?? [], ...getErrorTodos(errors)],
         'x-tags': { $id: module.$id, ...module['x-tags'] },
         errors,
-        classDiagram: moduleDiagram(input, module),
-        schemas: input.schemas.filter(s => s.$id.startsWith(module.$id))
+        classDiagram: moduleDiagram(model, module),
+        schemas: model.schemas.filter(s => s.$id.startsWith(module.$id))
       }
       const output = moduleTemplate(context)
       await write(output, path.join(module.$id, 'README.md'))
     }
 
-    const application = input.application
+    const application = model.application
     const errors = verificationErrors.filter(e => 'application' in e && e.application === application)
     const context = {
       ...application,
@@ -64,22 +63,22 @@ export function defaultWriter (
       'x-todos': [...application['x-todos'] ?? [], ...getErrorTodos(errors)],
       'x-tags': application['x-tags'] ?? undefined,
       errors,
-      classDiagram: applicationDiagram(input),
-      modules: input.modules
+      classDiagram: applicationDiagram(model),
+      modules: model.modules
     }
     const output = applicationTemplate(context)
     await write(output, 'README.md')
   }
 }
 
-async function validateAll (input: Input, plugins: Plugin[]): Promise<VerificationError[]> {
-  const errors = await Promise.all(plugins.map(async p => await p.validate(input)))
+async function validateAll (model: Model, plugins: Plugin[]): Promise<VerificationError[]> {
+  const errors = await Promise.all(plugins.map(async p => await p.validate(model)))
   return errors.flatMap(e => e)
 }
 
-async function generateOutput (outputFolder: string, input: Input, plugins: Plugin[]): Promise<void> {
+async function generateOutput (outputFolder: string, model: Model, plugins: Plugin[]): Promise<void> {
   for (const plugin of plugins) {
-    await plugin.generateOutput(outputFolder, input)
+    await plugin.generateOutput(outputFolder, model)
   }
 }
 

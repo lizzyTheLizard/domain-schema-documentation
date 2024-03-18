@@ -1,5 +1,10 @@
-import { type Application, type Input, type Link, type Module } from '../reader/input/Input.ts'
-import { type Schema } from '../reader/input/Schema.ts'
+import {
+  type Schema,
+  type Application,
+  type Link,
+  type Module,
+  type Model
+} from '../reader/Reader.ts'
 
 export type VerificationError = ApplicationVerificationError | ModuleVerificationError | SchemaVerificationError
 
@@ -24,9 +29,9 @@ export interface SchemaVerificationError {
 export type VerificationErrorType = 'NOT_IN_DOMAIN_MODEL' | 'MISSING_IN_IMPLEMENTATION' | 'WRONG'
 
 export interface Plugin {
-  validateInput: (input: Input) => void
-  validate: (input: Input) => Promise<VerificationError[]>
-  generateOutput: (outputFolder: string, input: Input) => Promise<void>
+  validateInput: (model: Model) => void
+  validate: (model: Model) => Promise<VerificationError[]>
+  generateOutput: (outputFolder: string, model: Model) => Promise<void>
   getApplicationLinks: (application: Application) => Link[]
   getModuleLinks: (module: Module) => Link[]
   getSchemaLinks: (schema: Schema) => Link[]

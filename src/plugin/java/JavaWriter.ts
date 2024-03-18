@@ -2,8 +2,12 @@ import { type Plugin } from '../Plugin.ts'
 import path from 'path'
 import Handlebars from 'handlebars'
 import { loadTemplate, writeOutput } from '../../writer/Writer.ts'
-import { type EnumDefinition, type Property, type Schema } from '../../reader/input/Schema.ts'
-import { type Input } from '../../reader/input/Input.ts'
+import {
+  type EnumDefinition,
+  type Property,
+  type Schema,
+  type Model
+} from '../../reader/Reader.ts'
 
 const classTemplate = loadTemplate('src/plugin/java/class.hbs')
 const enumTemplate = loadTemplate('src/plugin/java/enum.hbs')
@@ -17,13 +21,13 @@ export const javaWriter: Plugin = {
   getSchemaLinks: (schema: Schema) => [{ text: 'Java-File', href: `.${getFileName(schema)}` }]
 }
 
-export async function generateJavaOutput (outputFolder: string, input: Input): Promise<void> {
+export async function generateJavaOutput (outputFolder: string, model: Model): Promise<void> {
   Handlebars.registerHelper('javaComment', (text: string, indentation: number) => javaComment(text, indentation))
   Handlebars.registerHelper('javaClassName', (schema: Schema) => className(schema))
   Handlebars.registerHelper('javaEnumDoc', (schema: EnumDefinition, key: string) => enumDoc(schema, key))
   Handlebars.registerHelper('javaPropertyType', (property: Property) => propertyType(property))
 
-  for (const schema of input.schemas) {
+  for (const schema of model.schemas) {
     const relativeFilename = path.join(path.dirname(schema.$id), getFileName(schema))
     if (schema.type === 'object') {
       // TODO Implement template and test

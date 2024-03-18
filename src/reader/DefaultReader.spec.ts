@@ -1,19 +1,16 @@
 import * as tmp from 'tmp'
-import { type InputValidator } from './inputValidator/InputValidator.ts'
 import { promises as fs } from 'fs'
 import path from 'path'
-import { type Application, type Module } from './input/Input.ts'
+import { type Application, type Module, type Schema, type Reader } from './Reader.ts'
 import { defaultReader, readYamlFile } from './DefaultReader.ts'
-import { type Reader } from './Reader.ts'
-import { getSchemasForModuleAndTyp } from './input/InputHelper.ts'
-import { type Schema } from './input/Schema.ts'
+import { type InputNormalizer } from './InputNormalizer.ts'
 
 const inputValidator = {
-  validateModuleFile: jest.fn(),
-  validateApplicationFile: jest.fn(),
-  validateSchemaFile: jest.fn(),
-  finishValidation: jest.fn()
-} as unknown as InputValidator
+  addApplication: jest.fn(),
+  addModule: jest.fn(),
+  addSchema: jest.fn(),
+  toModel: jest.fn()
+} as unknown as InputNormalizer
 
 const applicationFile: Application = { title: 'Title', description: 'Description' }
 const moduleFile: Module = { $id: '/Module', title: 'Module', description: 'Description' }
@@ -25,7 +22,7 @@ describe('DefaultReader', () => {
 
   beforeEach(() => {
     tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    target = defaultReader(tmpDir.name, [], [], inputValidator, readYamlFile)
+    target = defaultReader(tmpDir.name, [], [], [], () => inputValidator, readYamlFile)
   })
 
   afterEach(() => {
@@ -33,108 +30,36 @@ describe('DefaultReader', () => {
   })
 
   test('Read application file', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
+    const filePath = path.join(tmpDir.name, 'index.yaml')
+    await fs.writeFile(filePath, JSON.stringify(applicationFile))
 
-    const input = await target()
+    await target()
 
-    expect(input.schemas).toEqual([])
-    expect(input.modules).toEqual([])
-    expect(input.application).toEqual(applicationFile)
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(inputValidator.validateApplicationFile).toHaveBeenCalledWith(applicationFile)
-  })
-
-  test('missing application file', async () => {
-    await expect(target()).rejects.toThrow('No application file found')
-  })
-
-  test('Fail on invalid top level file', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
-    await fs.writeFile(path.join(tmpDir.name, 'otherFile.txt'), 'Garbage')
-
-    await expect(target()).rejects.toThrow('Unexpected file')
-  })
-
-  test('Fail on invalid lower level file', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
-    await fs.mkdir(path.join(tmpDir.name, 'module'))
-    await fs.writeFile(path.join(tmpDir.name, 'module', 'otherFile.txt'), 'Garbage')
-
-    await expect(target()).rejects.toThrow('Unexpected file')
+    expect(inputValidator.addApplication).toHaveBeenCalledWith(applicationFile, filePath)
   })
 
   test('Read module file', async () => {
     await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
     await fs.mkdir(path.join(tmpDir.name, 'Module'))
-    await fs.writeFile(path.join(tmpDir.name, 'Module', 'index.yaml'), JSON.stringify(moduleFile))
+    const filePath = path.join(tmpDir.name, 'Module', 'index.yaml')
+    await fs.writeFile(filePath, JSON.stringify(moduleFile))
 
-    const input = await target()
+    await target()
 
-    expect(input.schemas).toEqual([])
-    expect(input.modules).toEqual([moduleFile])
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(inputValidator.validateModuleFile).toHaveBeenCalledWith(moduleFile)
-  })
-
-  test('module file with invalid Id', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
-    await fs.mkdir(path.join(tmpDir.name, 'Module'))
-    await fs.writeFile(path.join(tmpDir.name, 'Module', 'index.yaml'), JSON.stringify({ ...moduleFile, $id: 'Module2' }))
-
-    await expect(async () => await target()).rejects.toThrow()
-  })
-
-  test('module file with missing Id', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
-    await fs.mkdir(path.join(tmpDir.name, 'Module'))
-    const moduleFile2: any = { ...moduleFile }
-    delete moduleFile2.$id
-    await fs.writeFile(path.join(tmpDir.name, 'Module', 'index.yaml'), JSON.stringify(moduleFile2))
-
-    await expect(async () => await target()).rejects.toThrow()
+    expect(inputValidator.addModule).toHaveBeenCalledWith(moduleFile, filePath, moduleFile.$id)
   })
 
   test('Read schema file', async () => {
     await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
     await fs.mkdir(path.join(tmpDir.name, 'Module'))
-    await fs.writeFile(path.join(tmpDir.name, 'Module', 'Schema.yaml'), JSON.stringify(schemaFile))
+    const filePath = path.join(tmpDir.name, 'Module', 'Schema.yaml')
+    await fs.writeFile(filePath, JSON.stringify(schemaFile))
 
-    const input = await target()
+    await target()
 
-    expect(input.schemas).toEqual([schemaFile])
-    expect(input.modules).toEqual([])
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(inputValidator.validateSchemaFile).toHaveBeenCalledWith(schemaFile)
-  })
-
-  test('Get schema by module and typ', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
-    await fs.mkdir(path.join(tmpDir.name, 'Module'))
-    await fs.writeFile(path.join(tmpDir.name, 'Module', 'index.yaml'), JSON.stringify(moduleFile))
-    await fs.writeFile(path.join(tmpDir.name, 'Module', 'Schema.yaml'), JSON.stringify(schemaFile))
-
-    const input = await target()
-
-    expect(getSchemasForModuleAndTyp(input, moduleFile, 'Aggregate')).toEqual([schemaFile])
-    expect(getSchemasForModuleAndTyp(input, { ...moduleFile, $id: 'Other' }, 'Aggregate')).toEqual([])
-    expect(getSchemasForModuleAndTyp(input, moduleFile, 'Entity')).toEqual([])
-  })
-
-  test('schema file with invalid Id', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
-    await fs.mkdir(path.join(tmpDir.name, 'Module'))
-    await fs.writeFile(path.join(tmpDir.name, 'Module', 'Schema.yaml'), JSON.stringify({ ...schemaFile, $id: 'Module2/Schema2.yaml' }))
-
-    await expect(async () => await target()).rejects.toThrow()
-  })
-
-  test('schema file with missing Id', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
-    await fs.mkdir(path.join(tmpDir.name, 'Module'))
-    const schemaFile2: any = { ...schemaFile }
-    delete schemaFile2.$id
-    await fs.writeFile(path.join(tmpDir.name, 'Module', 'Schema.yaml'), JSON.stringify(schemaFile2))
-
-    await expect(async () => await target()).rejects.toThrow()
+    expect(inputValidator.addSchema).toHaveBeenCalledWith(schemaFile, filePath, schemaFile.$id)
   })
 })

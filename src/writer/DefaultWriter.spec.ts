@@ -2,8 +2,7 @@ import { defaultWriter } from './DefaultWriter.ts'
 import * as tmp from 'tmp'
 import { type Writer } from './Writer.ts'
 import { promises as fs } from 'fs'
-import { type Application, type Module } from '../reader/input/Input.ts'
-import { type Schema } from '../reader/input/Schema.ts'
+import { type Schema, type Application, type Module } from '../reader/Reader.ts'
 
 describe('defaultWriter', () => {
   let tmpDir: tmp.DirResult
@@ -110,7 +109,7 @@ describe('defaultWriter', () => {
   })
 
   test('Write Interface Schema file', async () => {
-    const schema2: Schema = { $id: '/test/Schema2.yaml', title: 'Title', 'x-schema-type': 'Aggregate', type: 'object', oneOf: [{ type: 'object', $ref: './Schema.yaml' }], definitions: {} }
+    const schema2: Schema = { $id: '/test/Schema2.yaml', title: 'Title', 'x-schema-type': 'Aggregate', type: 'object', oneOf: [{ $ref: './Schema.yaml' }], definitions: {} }
     await target({ application, modules: [module], schemas: [schema, schema2] })
     const content = (await fs.readFile(tmpDir.name + '/test/Schema2.yaml.md', 'utf-8')).toString()
     expect(content).toContain('## One Of')
@@ -121,7 +120,7 @@ describe('defaultWriter', () => {
   })
 
   test('Write Object SubSchema file', async () => {
-    const schema2: Schema = { ...schema, type: 'object', properties: { id: { type: 'object', $ref: '#/definitions/SubSchema' } }, required: [], definitions: { SubSchema: { type: 'object', description: 'Sub-Schema Description', properties: { key: { type: 'string' } }, required: [] } } }
+    const schema2: Schema = { ...schema, type: 'object', properties: { id: { $ref: '#/definitions/SubSchema' } }, required: [], definitions: { SubSchema: { type: 'object', description: 'Sub-Schema Description', properties: { key: { type: 'string' } }, required: [] } } }
     await target({ application, modules: [module], schemas: [schema2] })
     const content = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.md', 'utf-8')).toString()
     expect(content).toContain('| id |  | [SubSchema](#SubSchema) |')
@@ -132,7 +131,7 @@ describe('defaultWriter', () => {
   })
 
   test('Write Enum SubSchema file', async () => {
-    const schema2: Schema = { ...schema, type: 'object', properties: { id: { type: 'object', $ref: '#/definitions/SubSchema' } }, required: [], definitions: { SubSchema: { type: 'string', description: 'Sub-Schema Description', enum: ['A', 'B'], 'x-enum-description': { A: 'Description' } } } }
+    const schema2: Schema = { ...schema, type: 'object', properties: { id: { $ref: '#/definitions/SubSchema' } }, required: [], definitions: { SubSchema: { type: 'string', description: 'Sub-Schema Description', enum: ['A', 'B'], 'x-enum-description': { A: 'Description' } } } }
     await target({ application, modules: [module], schemas: [schema2] })
     const content = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.md', 'utf-8')).toString()
     expect(content).toContain('## Subschemas')
@@ -142,7 +141,7 @@ describe('defaultWriter', () => {
   })
 
   test('Write Interface SubSchema file', async () => {
-    const schema2: Schema = { ...schema, $id: '/test/Schema2.yaml', type: 'object', properties: { id: { type: 'object', $ref: '#/definitions/SubSchema' } }, required: ['id'], definitions: { SubSchema: { type: 'object', oneOf: [{ type: 'object', $ref: './Schema.yaml' }] } } }
+    const schema2: Schema = { ...schema, $id: '/test/Schema2.yaml', type: 'object', properties: { id: { $ref: '#/definitions/SubSchema' } }, required: ['id'], definitions: { SubSchema: { type: 'object', oneOf: [{ $ref: './Schema.yaml' }] } } }
     await target({ application, modules: [module], schemas: [schema, schema2] })
     const content = (await fs.readFile(tmpDir.name + '/test/Schema2.yaml.md', 'utf-8')).toString()
     expect(content).toContain('## Subschemas')

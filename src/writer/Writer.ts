@@ -1,9 +1,9 @@
 import path from 'path'
 import fs from 'fs'
 import Handlebars from 'handlebars'
-import { type Input } from '../reader/input/Input.ts'
+import { type Model } from '../reader/Reader.ts'
 
-export type Writer = (input: Input) => Promise<void>
+export type Writer = (model: Model) => Promise<void>
 
 export async function writeOutput (output: string, relativeFilename: string, outputFolder: string): Promise<void> {
   const outputFileName = path.join(outputFolder, relativeFilename)

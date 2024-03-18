@@ -1,85 +1,57 @@
-import { type Application, type Input, type Module } from './input/Input.ts'
+import { type Model, type Reader } from './Reader.ts'
 import { promises as fs } from 'fs'
 import path from 'path'
 import * as yaml from 'yaml'
-import { InputValidator, type WithId } from './inputValidator/InputValidator.ts'
 import { type Plugin } from '../plugin/Plugin.ts'
-import { type Reader } from './Reader.ts'
-import { inputNormalizer } from './inputNormalizer/InputNormalizer.ts'
-import { type Schema, type SchemaCommon } from './input/Schema.ts'
+import { InputNormalizer } from './InputNormalizer.ts'
 import { type FormatName } from 'ajv-formats'
 import { fullFormats } from 'ajv-formats/dist/formats'
 import { type Format as avjFormat } from 'ajv'
 
-export interface Format {
-  name: string
-  avjFormat: avjFormat
-}
-
+export interface Format { name: string, avjFormat: avjFormat }
 export const defaultFormats: Format[] = Object.keys(fullFormats).map(name => ({ name, avjFormat: fullFormats[name as FormatName] }))
+export const defaultKeywords = ['discriminator']
+export type InputNormalizerGenerator = () => InputNormalizer
+export type FileReader = (filePath: string) => Promise<unknown>
 
 export function defaultReader (
   inputFolder: string,
   plugins: Plugin[] = [],
   formats: Format[] = defaultFormats,
-  inputValidator: InputValidator = new InputValidator({ ajvOptions: { allErrors: true }, noAdditionalPropertiesInExamples: true, formats }),
-  readFile: (filePath: string) => Promise<unknown> = async (filePath) => await readYamlFile(filePath)
+  allowedKeywords: string[] = defaultKeywords,
+  inputNormalizerGenerator: InputNormalizerGenerator = () => new InputNormalizer({ ajvOptions: { allErrors: true }, noAdditionalPropertiesInExamples: true, formats, allowedKeywords }),
+  readFile: FileReader = async (filePath) => await readYamlFile(filePath)
 ): Reader {
-  return async function (): Promise<Input> {
-    const result = await readFolderRecursive(inputFolder, inputFolder, inputValidator, 0, readFile)
-    if (result.application === undefined) {
-      throw new Error('No application file found')
-    }
-    inputValidator.finishValidation()
-    const input: Input = { application: result.application, modules: result.modules, schemas: result.schemas }
-    plugins.forEach(plugin => { plugin.validateInput(input) })
-    return input
+  return async function (): Promise<Model> {
+    const inputNormalizer = inputNormalizerGenerator()
+    await readFolderRecursive(inputFolder, inputFolder, inputNormalizer, 0, readFile)
+    const model = inputNormalizer.toModel()
+    plugins.forEach(plugin => { plugin.validateInput(model) })
+    return model
   }
 }
 
-interface Result { schemas: Schema[], modules: Module[], application?: Application }
-
-async function readFolderRecursive (baseFolder: string, folder: string, inputValidator: InputValidator, depth: number, readFile: (filePath: string) => Promise<unknown>): Promise<Result> {
-  const result: Result = { schemas: [], modules: [] }
+async function readFolderRecursive (baseFolder: string, folder: string, inputNormalizer: InputNormalizer, depth: number, readFile: (filePath: string) => Promise<unknown>): Promise<void> {
   const files = await fs.readdir(folder)
   for (const file of files) {
     const filePath = path.join(folder, file)
     const lstat = await fs.lstat(filePath)
     if (lstat.isDirectory()) {
-      const recResult = await readFolderRecursive(baseFolder, filePath, inputValidator, depth + 1, readFile)
-      result.schemas.push(...recResult.schemas)
-      result.modules.push(...recResult.modules)
+      await readFolderRecursive(baseFolder, filePath, inputNormalizer, depth + 1, readFile)
     } else if (filePath.endsWith('index.yaml') && depth === 0) {
       const application = await readFile(filePath)
-      inputValidator.validateApplicationFile(application)
-      result.application = application as Application
+      inputNormalizer.addApplication(application, filePath)
     } else if (filePath.endsWith('index.yaml')) {
       const module = await readFile(filePath)
       const expectedId = '/' + path.dirname(path.relative(baseFolder, filePath))
-      validateId(module, filePath, expectedId)
-      inputValidator.validateModuleFile(module as WithId)
-      result.modules.push(module as Module)
+      inputNormalizer.addModule(module, filePath, expectedId)
     } else if (filePath.endsWith('.yaml')) {
       const schema = await readFile(filePath)
       const expectedId = '/' + path.relative(baseFolder, filePath)
-      validateId(schema, filePath, expectedId)
-      inputValidator.validateSchemaFile(schema as WithId)
-      const normalized = inputNormalizer(schema as SchemaCommon)
-      result.schemas.push(normalized)
+      inputNormalizer.addSchema(schema, filePath, expectedId)
     } else {
       throw new Error(`Unexpected file ${filePath}. Not a valid input file`)
     }
-  }
-  return result
-}
-
-function validateId (obj: unknown, filePath: string, expectedId: string): void {
-  if (obj === null || obj === undefined || (typeof obj !== 'object') || !('$id' in obj)) {
-    throw new Error(`Invalid file ${filePath}: $id is missing`)
-  }
-  const id = obj.$id as string
-  if (id !== expectedId) {
-    throw new Error(`Invalid file ${filePath}: $id must be the same as the absolute file path '${expectedId}' but is '${id}'`)
   }
 }
 

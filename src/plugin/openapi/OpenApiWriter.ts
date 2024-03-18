@@ -1,7 +1,7 @@
 import path from 'path'
 import { type Plugin } from '../Plugin.ts'
 import { loadTemplate, writeOutput } from '../../writer/Writer.ts'
-import { type Input, type Module } from '../../reader/input/Input.ts'
+import { type Module, type Model } from '../../reader/Reader.ts'
 
 const template = loadTemplate('src/plugin/openapi/spec.hbs')
 
@@ -14,8 +14,8 @@ export const openApiWriter: Plugin = {
   getSchemaLinks: () => []
 }
 
-export async function generateOpenApiOutput (outputFolder: string, input: Input): Promise<void> {
-  for (const module of input.modules) {
+export async function generateOpenApiOutput (outputFolder: string, model: Model): Promise<void> {
+  for (const module of model.modules) {
     // TODO: Implement template and test
     const relativeFilename = path.join(module.$id, getFileName(module))
     const output = template(module)
