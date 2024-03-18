@@ -255,8 +255,7 @@ export class InputNormalizer {
     }
 
     if (schema.properties) {
-      const name = cleanName(schema.title)
-      const cleaned = this.normalizeProperties(schema.properties, name)
+      const cleaned = this.normalizeProperties(schema.properties)
       return {
         ...schema,
         type: 'object',
@@ -284,7 +283,7 @@ export class InputNormalizer {
     return ({ result, definitions })
   }
 
-  private normalizeProperties (properties: Record<string, NonNormalizedSubSchema>, name: string): NormalizerResult<Record<string, Property>> {
+  private normalizeProperties (properties: Record<string, NonNormalizedSubSchema>): NormalizerResult<Record<string, Property>> {
     const result: Record<string, Property> = {}
     const definitions: Record<string, NonNormalizedSubSchema> = {}
     Object.entries(properties).forEach(([propertyName, property]) => {
@@ -338,7 +337,7 @@ export class InputNormalizer {
       const result: InterfaceDefinition = { ...definition, type: 'object', oneOf: cleaned.result }
       return { [name]: result, ...this.normalizeDefinitions(cleaned.definitions) }
     } else if (definition.properties) {
-      const cleaned = this.normalizeProperties(definition.properties, name)
+      const cleaned = this.normalizeProperties(definition.properties)
       const result: ObjectDefinition = {
         required: [],
         ...definition,
