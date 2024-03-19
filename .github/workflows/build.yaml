@@ -1,0 +1,23 @@
+name: Test, Build and Deploy Example to GitHub-Pages
+on: [ push ]
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+      - name: Install Dependencies
+        run: npm ci
+      - name: Check whole project
+        run: npm run check
+  Example:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+      - name: Generate Example output
+        run: npm run generate:ci
