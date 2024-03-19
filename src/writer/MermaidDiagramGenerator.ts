@@ -2,6 +2,8 @@ import { type Module, type Schema, type Model } from '../reader/Reader.ts'
 import { getModuleForSchema, getModuleId, getSchemasForModule } from '../reader/helper/InputHelper.ts'
 import { type Dependency, type DependencyType, getDependencies } from '../reader/helper/GetDependencies.ts'
 
+// TODO: Is it possible to add links to the generated diagrams?
+
 export function applicationDiagram (model: Model): string | undefined {
   const dependencies = model.schemas
     .flatMap(s => getDependencies(model, s))

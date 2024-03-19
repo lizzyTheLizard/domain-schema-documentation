@@ -42,7 +42,10 @@ function getDependenciesForProperty (model: Model, fromSchema: Schema, p: Proper
     const references = (typeof p['x-references'] === 'string') ? [p['x-references']] : p['x-references'] ?? []
     return references.map(r => {
       const { toSchema, toDefinitionName } = getTo(model, fromSchema, r)
-      return { toSchema, fromSchema, toDefinitionName, fromDefinitionName, type: 'REFERENCES', array: false }
+      const dependency: Dependency = { toSchema, fromSchema, type: 'REFERENCES', array: false }
+      if (toDefinitionName !== undefined) { dependency.toDefinitionName = toDefinitionName }
+      if (fromDefinitionName !== undefined) { dependency.fromDefinitionName = fromDefinitionName }
+      return dependency
     })
   }
   if ('$ref' in p) {
@@ -53,7 +56,10 @@ function getDependenciesForProperty (model: Model, fromSchema: Schema, p: Proper
       return []
     }
     const type = getDependencyType(fromSchema, toSchema)
-    return [{ toSchema, fromSchema, toDefinitionName, fromDefinitionName, type, array: false }]
+    const dependency: Dependency = { toSchema, fromSchema, type, array: false }
+    if (toDefinitionName !== undefined) { dependency.toDefinitionName = toDefinitionName }
+    if (fromDefinitionName !== undefined) { dependency.fromDefinitionName = fromDefinitionName }
+    return [dependency]
   }
   return []
 }
