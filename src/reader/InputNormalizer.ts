@@ -69,7 +69,6 @@ export class InputNormalizer {
     this.#ajv.addKeyword('x-references')
     this.#ajv.addKeyword('x-enum-description')
     this.#ajv.addKeyword('x-todos')
-    this.#ajv.addKeyword('x-tags')
     this.#ajv.addKeyword('x-links')
     this.options.allowedKeywords?.forEach(f => this.#ajv.addKeyword(f))
   }

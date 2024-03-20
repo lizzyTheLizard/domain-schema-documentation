@@ -9,7 +9,6 @@ export interface Model {
 export interface Application {
   title: string
   description: string
-  'x-tags'?: string[]
   'x-todos'?: string[]
   'x-links'?: Link[]
 }
@@ -19,7 +18,6 @@ export interface Module {
   title: string
   description: string
   operations?: unknown
-  'x-tags'?: string[]
   'x-todos'?: string[]
   'x-links'?: Link[]
 }
@@ -42,7 +40,6 @@ export interface SchemaCommon {
   definitions: Record<string, Definition>
   type: 'object' | 'string'
   'x-schema-type': SchemaType
-  'x-tags'?: string[]
   'x-todos'?: string[]
   'x-links'?: Link[]
 }

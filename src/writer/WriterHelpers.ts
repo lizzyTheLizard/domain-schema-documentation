@@ -28,7 +28,6 @@ export function enhanceSchema (model: Model, schema: Schema, plugins: Plugin[], 
     hasDefinitions: Object.keys(schema.definitions).length !== 0,
     'x-links': [...schema['x-links'] ?? [], ...plugins.flatMap(p => p.getSchemaLinks(schema))],
     'x-todos': [...schema['x-todos'] ?? [], ...getErrorTodos(errors)],
-    'x-tags': [...schema['x-tags'] ?? [], schema['x-schema-type']],
     classDiagram: schemaDiagramm(model, schema),
     errors,
     module: getModuleForSchema(model, schema)
@@ -47,7 +46,6 @@ export function enhanceModule (model: Model, module: Module, plugins: Plugin[], 
     ...module,
     'x-links': [...module['x-links'] ?? [], ...plugins.flatMap(p => p.getModuleLinks(module))],
     'x-todos': [...module['x-todos'] ?? [], ...getErrorTodos(errors)],
-    'x-tags': module['x-tags'] ?? [],
     errors,
     classDiagram: moduleDiagram(model, module),
     schemas: model.schemas.filter(s => s.$id.startsWith(module.$id))
@@ -67,7 +65,6 @@ export function enhanceApplication (model: Model, plugins: Plugin[], verificatio
     ...application,
     'x-links': [...application['x-links'] ?? [], ...plugins.flatMap(p => p.getApplicationLinks(application))],
     'x-todos': [...application['x-todos'] ?? [], ...getErrorTodos(errors)],
-    'x-tags': application['x-tags'] ?? [],
     errors,
     classDiagram: applicationDiagram(model),
     modules: model.modules

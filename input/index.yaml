@@ -1,7 +1,5 @@
 title: 'Test Application'
 description: This is a example for a domain model. It contains an expenses management system consisting of users, groups, expenses and a lot of other stuff.
-x-tags:
-  - Example
 x-links:
   - href: https://www.github.com
     text: GitHub

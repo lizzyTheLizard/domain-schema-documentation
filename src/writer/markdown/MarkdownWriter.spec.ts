@@ -180,17 +180,4 @@ describe('defaultWriter', () => {
     expect(schemaContent).toContain('### Todo')
     expect(schemaContent).toContain('> 1. todo')
   })
-
-  test('Write Tags', async () => {
-    const application2: Application = { ...application, 'x-tags': ['value'] }
-    const module2: Module = { ...module, 'x-tags': ['value'] }
-    const schema2: Schema = { ...schema, 'x-tags': ['value'] }
-    await target({ application: application2, modules: [module2], schemas: [schema2] })
-    const applicationContent = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.md', 'utf-8')).toString()
-    expect(applicationContent).toContain('**Tags**: value')
-    const moduleContent = (await fs.readFile(tmpDir.name + '/test/README.md', 'utf-8')).toString()
-    expect(moduleContent).toContain('**Tags**: value')
-    const schemaContent = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.md', 'utf-8')).toString()
-    expect(schemaContent).toContain('**Tags**: value')
-  })
 })

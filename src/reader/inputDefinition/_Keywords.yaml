@@ -11,10 +11,6 @@ properties:
       - ValueObject
       - ReferenceData
       - Other
-  x-tags:
-    type: array
-    items:
-      type: string
   x-todos:
     type: array
     items:
