@@ -1,7 +1,7 @@
 import path from 'path'
 import { type Plugin } from '../Plugin.ts'
-import { loadTemplate, writeOutput } from '../../writer/Writer.ts'
 import { type Module, type Model } from '../../reader/Reader.ts'
+import { loadTemplate, writeOutput } from '../../writer/WriterHelpers.ts'
 
 const template = loadTemplate('src/plugin/openapi/spec.hbs')
 

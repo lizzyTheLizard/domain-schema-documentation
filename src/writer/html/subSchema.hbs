@@ -1,0 +1,51 @@
+<a id="{{{name}}}"></a><h3>{{{name}}} {{#if oneOf}} (OneOf){{/if}} {{#if enum}} (Enum) {{/if}} {{#if properties}} (Object){{/if}}</h3>
+<section>
+  <p>{{description}}</p>
+{{#if oneOf}}
+  <ul>
+{{#each oneOf}}
+    <li>{{{htmlGetType ../schema this}}}</li>
+{{/each}}
+  </ul>
+</section>
+{{/if}}
+{{#if enum}}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+{{#each enum}}
+      <tr>
+        <td>{{this}}</td>
+        <td>{{htmlGetProperty ../[x-enum-description] this}}</td>
+      </tr>
+{{/each}}
+    </tbody>
+  </table>
+{{/if}}
+
+{{#if properties}}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+{{#each properties}}
+      <tr>
+        <td>{{@key}}{{#if (htmlHasProperty ../required @key)}}*{{/if}}</td>
+        <td>{{{htmlGetType ../schema this}}}</td>
+        <td>{{description}}</td>
+      </tr>
+{{/each}}
+    </tbody>
+  </table>
+{{/if}}
+</section>

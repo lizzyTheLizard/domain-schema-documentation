@@ -12,8 +12,8 @@ properties:
       - ReferenceData
       - Other
   x-tags:
-    type: object
-    additionalProperties:
+    type: array
+    items:
       type: string
   x-todos:
     type: array

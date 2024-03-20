@@ -25,6 +25,12 @@ export function resolveRelativeId (from: Schema | string, relativeId: string): s
   return path.join(path.dirname(fromId), relativeId)
 }
 
+export function relativeLink (fromSchemaOrId: Schema | string, toSchemaOrId: Schema | string): string {
+  const fromId = typeof fromSchemaOrId === 'string' ? fromSchemaOrId : fromSchemaOrId.$id
+  const toId = typeof toSchemaOrId === 'string' ? toSchemaOrId : toSchemaOrId.$id
+  return `./${path.relative(fromId, toId)}`
+}
+
 export function getModuleForSchema (model: Model, schemaOrSchemaId: string | Schema): Module {
   const moduleId = getModuleId(schemaOrSchemaId)
   const module = model.modules.find(m => m.$id === moduleId)

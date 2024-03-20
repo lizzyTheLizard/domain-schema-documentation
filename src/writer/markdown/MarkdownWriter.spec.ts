@@ -1,8 +1,8 @@
-import { defaultWriter } from './DefaultWriter.ts'
+import { markdownWriter } from './MarkdownWriter.ts'
 import * as tmp from 'tmp'
-import { type Writer } from './Writer.ts'
+import { type Writer } from '../Writer.ts'
 import { promises as fs } from 'fs'
-import { type Schema, type Application, type Module } from '../reader/Reader.ts'
+import { type Schema, type Application, type Module } from '../../reader/Reader.ts'
 
 describe('defaultWriter', () => {
   let tmpDir: tmp.DirResult
@@ -29,15 +29,17 @@ describe('defaultWriter', () => {
 
   beforeEach(() => {
     tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    target = defaultWriter(tmpDir.name, [])
+    target = markdownWriter(tmpDir.name, [])
   })
 
   afterEach(() => {
     tmpDir.removeCallback()
   })
 
+  // TODO: What is markdown, what is helper test?
+
   test('Write Application File', async () => {
-    await target({ application, modules: [], schemas: [schema] })
+    await target({ application, modules: [], schemas: [] })
     const files = await fs.readdir(tmpDir.name)
     expect(files).toContain('README.md')
     const content = (await fs.readFile(tmpDir.name + '/README.md', 'utf-8')).toString()
@@ -82,7 +84,7 @@ describe('defaultWriter', () => {
     expect(content).toContain('# Test Schema')
     expect(content).toContain('Test Schema Description')
     expect(content).toContain('## Properties')
-    expect(content).toContain('| id |  | string')
+    expect(content).toContain('| id | string')
     expect(content).not.toContain('## SubSchema')
     expect(content).not.toContain('## Enum-Values')
     expect(content).not.toContain('## One Of')
@@ -123,11 +125,10 @@ describe('defaultWriter', () => {
     const schema2: Schema = { ...schema, type: 'object', properties: { id: { $ref: '#/definitions/SubSchema' } }, required: [], definitions: { SubSchema: { type: 'object', description: 'Sub-Schema Description', properties: { key: { type: 'string' } }, required: [] } } }
     await target({ application, modules: [module], schemas: [schema2] })
     const content = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.md', 'utf-8')).toString()
-    expect(content).toContain('| id |  | [SubSchema](#SubSchema) |')
+    expect(content).toContain('| id | [SubSchema](#SubSchema) |')
     expect(content).toContain('## Subschemas')
-    expect(content).toContain('### SubSchema')
-    expect(content).toContain('#### Properties')
-    expect(content).toContain('| key |  | string')
+    expect(content).toContain('### SubSchema (Object)')
+    expect(content).toContain('| key | string')
   })
 
   test('Write Enum SubSchema file', async () => {
@@ -135,8 +136,7 @@ describe('defaultWriter', () => {
     await target({ application, modules: [module], schemas: [schema2] })
     const content = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.md', 'utf-8')).toString()
     expect(content).toContain('## Subschemas')
-    expect(content).toContain('### SubSchema')
-    expect(content).toContain('#### Enum-Values')
+    expect(content).toContain('### SubSchema (Enum)')
     expect(content).toContain('| A | Description |')
   })
 
@@ -145,8 +145,7 @@ describe('defaultWriter', () => {
     await target({ application, modules: [module], schemas: [schema, schema2] })
     const content = (await fs.readFile(tmpDir.name + '/test/Schema2.yaml.md', 'utf-8')).toString()
     expect(content).toContain('## Subschemas')
-    expect(content).toContain('### SubSchema')
-    expect(content).toContain('#### One Of')
+    expect(content).toContain('### SubSchema (OneOf)')
     expect(content).toContain('1. [Test Schema](./Schema.yaml.md)')
   })
 
@@ -183,15 +182,15 @@ describe('defaultWriter', () => {
   })
 
   test('Write Tags', async () => {
-    const application2: Application = { ...application, 'x-tags': { key: 'value' } }
-    const module2: Module = { ...module, 'x-tags': { key: 'value' } }
-    const schema2: Schema = { ...schema, 'x-tags': { key: 'value' } }
+    const application2: Application = { ...application, 'x-tags': ['value'] }
+    const module2: Module = { ...module, 'x-tags': ['value'] }
+    const schema2: Schema = { ...schema, 'x-tags': ['value'] }
     await target({ application: application2, modules: [module2], schemas: [schema2] })
     const applicationContent = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.md', 'utf-8')).toString()
-    expect(applicationContent).toContain('| key | value |')
+    expect(applicationContent).toContain('**Tags**: value')
     const moduleContent = (await fs.readFile(tmpDir.name + '/test/README.md', 'utf-8')).toString()
-    expect(moduleContent).toContain('| key | value |')
+    expect(moduleContent).toContain('**Tags**: value')
     const schemaContent = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.md', 'utf-8')).toString()
-    expect(schemaContent).toContain('| key | value |')
+    expect(schemaContent).toContain('**Tags**: value')
   })
 })

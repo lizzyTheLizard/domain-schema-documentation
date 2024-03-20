@@ -1,0 +1,121 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{htmlRelativeLink $id '/index.html'}}">Application</a></li>
+    <li class="breadcrumb-item"><a href="./index.html">{{module.title}}</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{title}}</li>
+  </ol>
+</nav>
+
+<h1>{{{title}}}
+{{#each x-tags}}
+  <span class="badge rounded-pill title-badge text-bg-secondary">{{this}}</span>
+{{/each}}
+</h1>
+
+{{#if x-todos}}
+<div class="alert alert-danger" role="alert">
+  <ul>
+{{#each x-todos}}
+    <li>{{this}}</li>
+{{/each}}
+  </ul>
+</div>
+{{/if}}
+
+<section>
+  <p>{{description}}</p>
+{{#if classDiagram}}
+  <pre id="mermaid">
+  classDiagram
+  {{{classDiagram}}}
+  </pre>
+{{/if}}
+</section>
+
+{{#if oneOf}}
+<section>
+  <h2>One Of</h2>
+  <ul>
+{{#each oneOf}}
+    <li>{{{htmlGetType .. this}}}</li>
+{{/each}}
+  </ul>
+</section>
+{{/if}}
+
+{{#if enum}}
+<section>
+  <h2>Enum-Values</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+{{#each enum}}
+      <tr>
+        <td>{{this}}</td>
+        <td>{{htmlGetProperty ../[x-enum-description] this}}</td>
+      </tr>
+{{/each}}
+    </tbody>
+  </table>
+</section>
+{{/if}}
+
+{{#if properties}}
+<section>
+  <h2>Properties</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+{{#each properties}}
+      <tr>
+        <td>{{@key}}{{#if (htmlHasProperty ../required @key)}}*{{/if}}</td>
+        <td>{{{htmlGetType .. this}}}</td>
+        <td>{{description}}</td>
+      </tr>
+{{/each}}
+    </tbody>
+  </table>
+</section>
+{{/if}}
+
+{{#if examples}}
+<section>
+  <h2>Examples</h2>
+{{#each examples}}
+  <pre class="json">
+  {{{htmlJson this}}}
+  </pre>
+{{/each}}
+</section>
+{{/if}}
+
+{{#if x-links}}
+<section>
+  <h2>Links</h2>
+  <ul>
+{{#each x-links}}
+    <li><a href="{{href}}">{{text}}</a></li>
+{{/each}}
+  </ul>
+</section>
+{{/if}}
+
+
+
+{{#if hasDefinitions}}
+<h2>Subschemas</h2>
+{{#each definitions}}
+{{> htmlSubSchema this schema=.. name=@key}}
+{{/each}}
+{{/if}}

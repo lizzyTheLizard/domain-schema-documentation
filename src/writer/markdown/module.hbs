@@ -8,12 +8,7 @@
 {{/if}}
 {{{mdMultiline description}}}
 {{#if x-tags}}
-
-| Key | Value |
-|-----|-------|
-{{#each x-tags}}
-| {{@key}} | {{this}} |
-{{/each}}
+>**Tags**: {{#each x-tags}}{{this}}, {{/each}}
 {{/if}}
 {{#if schemas}}
 

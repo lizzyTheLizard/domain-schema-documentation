@@ -1,7 +1,7 @@
 import { type Plugin } from '../Plugin.ts'
 import path from 'path'
 import Handlebars from 'handlebars'
-import { loadTemplate, writeOutput } from '../../writer/Writer.ts'
+import { loadTemplate, writeOutput } from '../../writer/WriterHelpers.ts'
 import {
   type EnumDefinition,
   type Property,

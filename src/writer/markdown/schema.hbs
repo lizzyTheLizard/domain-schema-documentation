@@ -8,12 +8,7 @@
 {{/if}}
 {{{mdMultiline description}}}
 {{#if x-tags}}
-
-| Key | Value |
-|-----|-------|
-{{#each x-tags}}
-| {{@key}} | {{this}} |
-{{/each}}
+>**Tags**: {{#each x-tags}}{{this}}, {{/each}}
 {{/if}}
 {{#if classDiagram}}
 ```mermaid
@@ -40,13 +35,13 @@ classDiagram
 {{#if properties}}
 
 ## Properties
-| Name |  | Type | Description |
-|------|--|------|-------------|
+| Name | Type | Description |
+|------|------|-------------|
 {{#each properties}}
-| {{@key}} | {{#if (mdGetProperty ../required @key)}}*{{/if}} | {{mdGetType .. this}} | {{{mdMultiline description}}} |
+| {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{mdGetType .. this}} | {{{mdMultiline description}}} |
 {{/each}}
 {{/if}}
-{{#if definitions}}
+{{#if hasDefinitions}}
 
 ## Subschemas
 {{#each definitions}}
