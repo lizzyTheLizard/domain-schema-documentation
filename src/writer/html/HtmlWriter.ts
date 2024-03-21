@@ -22,6 +22,7 @@ export function htmlWriter (
     Handlebars.registerHelper('htmlHasProperty', (obj: any[] | undefined, property: any) => obj?.includes(property))
     Handlebars.registerHelper('htmlJson', (input: unknown) => JSON.stringify(input))
     Handlebars.registerHelper('htmlGetType', (schema: Schema, property: Property) => htmlGetType(schema, getType(model, schema, property)))
+    Handlebars.registerHelper('htmlIntent', (input: string, intent: number) => input.split('\n').map(l => ' '.repeat(intent) + l).join('\n'))
     Handlebars.registerPartial('htmlSubSchema', loadTemplate('src/writer/html/subSchema.hbs'))
 
     const verificationErrors = await executePlugins(outputFolder, model, plugins)
