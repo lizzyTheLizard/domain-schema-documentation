@@ -1,5 +1,10 @@
 import { type Module, type Schema, type Model } from '../reader/Reader.ts'
-import { getModuleForSchema, getModuleId, getSchemasForModule } from '../reader/helper/InputHelper.ts'
+import {
+  getModuleForSchema,
+  getModuleId,
+  getSchemasForModule,
+  relativeLink
+} from '../reader/helper/InputHelper.ts'
 import { type Dependency, type DependencyType, getDependencies } from '../reader/helper/GetDependencies.ts'
 
 // TODO: Is it possible to add links to the generated diagrams?
@@ -13,7 +18,8 @@ export function applicationDiagram (model: Model): string | undefined {
       ? `${safeId(getModuleId(d.toSchema))} ..> ${safeId(getModuleId(d.fromSchema))}`
       : `${safeId(getModuleId(d.fromSchema))} ..> ${safeId(getModuleId(d.toSchema))}`)
   const moduleStrs = model.modules.map(m => `class ${safeId(m)}["${m.title}"]`)
-  const lines = [...moduleStrs, ...unique(dependencies)]
+  const links = model.modules.map(m => `click ${safeId(m)} href ".${m.$id}/index.html" "${m.title}"`)
+  const lines = [...moduleStrs, ...unique(dependencies), ...links]
   return lines.length === 0 ? undefined : lines.join('\n')
 }
 
@@ -25,7 +31,7 @@ export function moduleDiagram (model: Model, module: Module): string | undefined
   const dependenciesFrom = getSchemasForModule(model, module)
     .flatMap(s => getDependencies(model, s))
   const dependencies = [...dependenciesTo, ...dependenciesFrom]
-  return toDiagram(dependencies, model)
+  return toDiagram(dependencies, model, module.$id)
 }
 
 export function schemaDiagramm (model: Model, schema: Schema): string | undefined {
@@ -35,7 +41,7 @@ export function schemaDiagramm (model: Model, schema: Schema): string | undefine
     .filter(s => s.toSchema === schema)
   const dependenciesFrom = getDependencies(model, schema)
   const dependencies = [...dependenciesTo, ...dependenciesFrom]
-  return toDiagram(dependencies, model)
+  return toDiagram(dependencies, model, getModuleId(schema))
 }
 
 function safeId (obj: string | Schema | Module): string {
@@ -43,7 +49,7 @@ function safeId (obj: string | Schema | Module): string {
   return id.replace(/\//g, '_').replace(/\./g, '_')
 }
 
-function toDiagram (dependencies: Dependency[], model: Model): string | undefined {
+function toDiagram (dependencies: Dependency[], model: Model, moduleId: string): string | undefined {
   const endpoints = dependencies.flatMap(d => [
     { schema: d.fromSchema, name: d.fromDefinitionName },
     { schema: d.toSchema, name: d.toDefinitionName }
@@ -66,7 +72,14 @@ function toDiagram (dependencies: Dependency[], model: Model): string | undefine
     const to = d.toDefinitionName ?? safeId(d.toSchema)
     return `${from} ${toMermaidType(d.type)} ${d.array ? '"N"' : ''} ${to} ${d.dependencyName !== undefined ? ':' + d.dependencyName : ''}\n`
   })
-  const lines = [...namespaceStrs, ...dependenciesStr]
+  const links = unique(endpoints.map(e => {
+    if (e.name === undefined) {
+      return `click ${safeId(e.schema)} href "${relativeLink(moduleId, e.schema.$id)}.html" "${e.schema.title}"`
+    } else {
+      return `click ${e.name} href "${relativeLink(moduleId, e.schema.$id)}.html" "${e.schema.title}"`
+    }
+  }))
+  const lines = [...namespaceStrs, ...dependenciesStr, ...links]
   return lines.length === 0 ? undefined : lines.join('\n')
 }
 

@@ -38,7 +38,7 @@
   </head>
   <body>
     <main class="container">
-{{{htmlIntent content 4}}}
+{{{htmlIntent content 6}}}
     </main>
     <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -63,7 +63,7 @@
         const {svg} = await mermaid.render('mySvg_' + i, graphDefinition.innerText);
         const preview = createMermaidPreview(element, svg);
         const modal = createMermaidModal();
-        element.addEventListener('click', () => showMermaidModal(preview,modal));
+        element.addEventListener('click', () => setTimeout(() => showMermaidModal(preview,modal), 30));
       }
 
       function createMermaidPreview(element, svg) {
@@ -108,7 +108,7 @@
         })
       }
 
-      mermaid.initialize({ startOnLoad: false });
+      mermaid.initialize({ startOnLoad: false,securityLevel: 'loose'});
       drawDiagrams();
       prettifyJson();
     </script>
