@@ -11,7 +11,7 @@ export interface Dependency {
   array: boolean
 }
 
-export type DependencyType = 'IS_IMPLEMENTED_BY' | 'CONTAINS' | 'REFERENCES'
+export type DependencyType = 'IS_IMPLEMENTED_BY' | 'CONTAINS' | 'REFERENCES' | 'ENUM'
 
 export function getDependencies (model: Model, s: Schema): Dependency[] {
   const schemaDependencies = getDependenciesForDefinition(model, s)
@@ -51,11 +51,7 @@ function getDependenciesForProperty (model: Model, fromSchema: Schema, p: Proper
   if ('$ref' in p) {
     const { toSchema, toDefinitionName } = getTo(model, fromSchema, p.$ref)
     const toDefinition: Definition = toDefinitionName !== undefined ? toSchema.definitions[toDefinitionName] : toSchema
-    // If this is a dependency to an enum, this is not a real reference and we skip it
-    if ('enum' in toDefinition) {
-      return []
-    }
-    const type = getDependencyType(fromSchema, toSchema)
+    const type = getDependencyType(fromSchema, toSchema, toDefinition)
     const dependency: Dependency = { toSchema, fromSchema, type, array: false }
     if (toDefinitionName !== undefined) { dependency.toDefinitionName = toDefinitionName }
     if (fromDefinitionName !== undefined) { dependency.fromDefinitionName = fromDefinitionName }
@@ -77,7 +73,11 @@ function getTo (model: Model, schema: Schema, refOrReference: string): { toSchem
   return { toSchema }
 }
 
-function getDependencyType (fromSchema: Schema, toSchema: Schema): DependencyType {
+function getDependencyType (fromSchema: Schema, toSchema: Schema, toDefinition: Definition): DependencyType {
+  // If this is to an enum, this is not a real reference but an enum reference
+  if ('enum' in toDefinition) {
+    return 'ENUM'
+  }
   // If this is within the same schema, the type does not matter and it is contains
   if (fromSchema === toSchema) {
     return 'CONTAINS'

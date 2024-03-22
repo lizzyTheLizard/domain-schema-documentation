@@ -65,10 +65,12 @@ function toDiagram (dependencies: Dependency[], model: Model, moduleId: string):
     return `namespace ${module.title} {\n${classesStr.join('\n')}\n}`
   })
 
-  const dependenciesStr = dependencies.map(d => {
+  const dependenciesStr = dependencies.flatMap(d => {
     const from = d.fromDefinitionName ?? safeId(d.fromSchema)
     const to = d.toDefinitionName ?? safeId(d.toSchema)
-    return `${from} ${toMermaidType(d.type)} ${d.array ? '"N"' : ''} ${to} ${d.dependencyName !== undefined ? ':' + d.dependencyName : ''}\n`
+    const arrow = toMermaidType(d.type)
+    if (arrow === undefined) return []
+    return [`${from} ${toMermaidType(d.type)} ${d.array ? '"N"' : ''} ${to} ${d.dependencyName !== undefined ? ':' + d.dependencyName : ''}\n`]
   })
   const links = unique(endpoints.map(e => {
     if (e.name === undefined) {
@@ -81,11 +83,12 @@ function toDiagram (dependencies: Dependency[], model: Model, moduleId: string):
   return lines.length === 0 ? undefined : lines.join('\n')
 }
 
-function toMermaidType (type: DependencyType): string {
+function toMermaidType (type: DependencyType): string | undefined {
   switch (type) {
     case 'IS_IMPLEMENTED_BY': return '<|--'
     case 'CONTAINS': return 'o--'
     case 'REFERENCES': return '..>'
+    case 'ENUM': return undefined
   }
 }
 function unique<T> (arr: T[]): T[] {

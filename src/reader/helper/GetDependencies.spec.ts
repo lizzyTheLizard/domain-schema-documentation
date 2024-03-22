@@ -147,9 +147,16 @@ describe('GetDependencies', () => {
     }])
   })
 
-  test('no enum references', async () => {
+  test('enum reference', async () => {
     const schema1: Schema = { ...schema, properties: { reference: { $ref: '#/definitions/Reference' } }, definitions: { Reference: { type: 'string', enum: ['A'] } } }
     const model = { application, modules: [module], schemas: [schema1] }
-    expect(getDependencies(model, schema1)).toEqual([])
+    expect(getDependencies(model, schema1)).toEqual([{
+      fromSchema: schema1,
+      toSchema: schema1,
+      toDefinitionName: 'Reference',
+      type: 'ENUM',
+      dependencyName: 'reference',
+      array: false
+    }])
   })
 })
