@@ -25,8 +25,10 @@ export function defaultReader (
   return async function (): Promise<Model> {
     const inputNormalizer = inputNormalizerGenerator()
     await readFolderRecursive(inputFolder, inputFolder, inputNormalizer, 0, readFile)
-    const model = inputNormalizer.toModel()
-    plugins.forEach(plugin => { plugin.validateInput(model) })
+    let model = inputNormalizer.toModel()
+    for (const plugin of plugins) {
+      model = await plugin.updateModel?.(model) ?? model
+    }
     return model
   }
 }

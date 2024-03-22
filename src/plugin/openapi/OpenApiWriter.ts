@@ -6,12 +6,8 @@ import { loadTemplate, writeOutput } from '../../writer/WriterHelpers.ts'
 const template = loadTemplate('src/plugin/openapi/spec.hbs')
 
 export const openApiWriter: Plugin = {
-  validateInput: () => {},
-  validate: async () => [],
   generateOutput: generateOpenApiOutput,
-  getApplicationLinks: () => [],
-  getModuleLinks: (module) => [{ text: 'OpenApiSpec', href: './' + getFileName(module) }],
-  getSchemaLinks: () => []
+  getModuleLinks: (module) => [{ text: 'OpenApiSpec', href: './' + getFileName(module) }]
 }
 
 export async function generateOpenApiOutput (outputFolder: string, model: Model): Promise<void> {

@@ -13,10 +13,7 @@ const classTemplate = loadTemplate('src/plugin/java/class.hbs')
 const enumTemplate = loadTemplate('src/plugin/java/enum.hbs')
 
 export const javaWriter: Plugin = {
-  validateInput: () => {},
-  validate: async () => [],
   generateOutput: generateJavaOutput,
-  getApplicationLinks: () => [],
   getModuleLinks: () => [{ text: 'Java-Files', href: './java' }],
   getSchemaLinks: (schema: Schema) => [{ text: 'Java-File', href: `.${getFileName(schema)}` }]
 }

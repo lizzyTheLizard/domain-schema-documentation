@@ -1,9 +1,9 @@
-import { markdownWriter } from './MarkdownWriter.ts'
 import * as tmp from 'tmp'
 import { promises as fs } from 'fs'
 import { type Schema, type Application, type Module } from '../../reader/Reader.ts'
+import { htmlWriter } from './HtmlWriter.ts'
 
-describe('markdownWriter', () => {
+describe('htmlWriter', () => {
   const application: Application = {
     title: 'Test Application',
     description: 'Test Application Description'
@@ -25,37 +25,37 @@ describe('markdownWriter', () => {
   }
   test('Write Application File', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = markdownWriter(tmpDir.name, [])
+    const target = htmlWriter(tmpDir.name, [])
 
     await target({ application, modules: [], schemas: [] })
 
     const files = await fs.readdir(tmpDir.name)
-    expect(files).toContain('README.md')
-    const content = (await fs.readFile(tmpDir.name + '/README.md', 'utf-8')).toString()
-    expect(content).toContain('# Test Application')
+    expect(files).toContain('index.html')
+    const content = (await fs.readFile(tmpDir.name + '/index.html', 'utf-8')).toString()
+    expect(content).toContain('<h1>Test Application</h1>')
   })
 
   test('Write Module File', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = markdownWriter(tmpDir.name, [])
+    const target = htmlWriter(tmpDir.name, [])
 
     await target({ application, modules: [module], schemas: [] })
 
     const files = await fs.readdir(tmpDir.name + '/test')
-    expect(files).toContain('README.md')
-    const content = (await fs.readFile(tmpDir.name + '/test/README.md', 'utf-8')).toString()
-    expect(content).toContain('# Test Module')
+    expect(files).toContain('index.html')
+    const content = (await fs.readFile(tmpDir.name + '/test/index.html', 'utf-8')).toString()
+    expect(content).toContain('<h1>Test Module</h1>')
   })
 
   test('Write Schema file', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = markdownWriter(tmpDir.name, [])
+    const target = htmlWriter(tmpDir.name, [])
 
     await target({ application, modules: [module], schemas: [schema] })
 
     const files = await fs.readdir(tmpDir.name + '/test')
-    expect(files).toContain('Schema.yaml.md')
-    const content = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.md', 'utf-8')).toString()
-    expect(content).toContain('# Test Schema')
+    expect(files).toContain('Schema.yaml.html')
+    const content = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.html', 'utf-8')).toString()
+    expect(content).toContain('<h1>Test Schema</h1>')
   })
 })

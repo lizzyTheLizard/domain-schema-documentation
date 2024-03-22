@@ -8,15 +8,15 @@ import { getModuleForSchema } from '../reader/helper/InputHelper.ts'
 
 export async function executePlugins (outputFolder: string, model: Model, plugins: Plugin[]): Promise<VerificationError[]> {
   for (const plugin of plugins) {
-    await plugin.generateOutput(outputFolder, model)
+    await plugin.generateOutput?.(outputFolder, model)
   }
-  const errors = await Promise.all(plugins.map(async p => await p.validate(model)))
+  const errors = await Promise.all(plugins.map(async p => await p.validate?.(model) ?? []))
   return errors.flatMap(e => e)
 }
 
 export type EnhancedSchema = Schema & {
   hasDefinitions: boolean
-  classDiagram: string | undefined
+  classDiagram: string
   errors: VerificationError[]
   module: Module
 }
@@ -26,7 +26,7 @@ export function enhanceSchema (model: Model, schema: Schema, plugins: Plugin[], 
   return {
     ...schema,
     hasDefinitions: Object.keys(schema.definitions).length !== 0,
-    'x-links': [...schema['x-links'] ?? [], ...plugins.flatMap(p => p.getSchemaLinks(schema))],
+    'x-links': [...schema['x-links'] ?? [], ...plugins.flatMap(p => p.getSchemaLinks?.(schema) ?? [])],
     'x-todos': [...schema['x-todos'] ?? [], ...getErrorTodos(errors)],
     classDiagram: schemaDiagramm(model, schema),
     errors,
@@ -35,7 +35,7 @@ export function enhanceSchema (model: Model, schema: Schema, plugins: Plugin[], 
 }
 
 export type EnhancedModule = Module & {
-  classDiagram: string | undefined
+  classDiagram: string
   errors: VerificationError[]
   schemas: Schema[]
 }
@@ -44,7 +44,7 @@ export function enhanceModule (model: Model, module: Module, plugins: Plugin[], 
   const errors = verificationErrors.filter(e => 'module' in e && e.module === module)
   return {
     ...module,
-    'x-links': [...module['x-links'] ?? [], ...plugins.flatMap(p => p.getModuleLinks(module))],
+    'x-links': [...module['x-links'] ?? [], ...plugins.flatMap(p => p.getModuleLinks?.(module) ?? [])],
     'x-todos': [...module['x-todos'] ?? [], ...getErrorTodos(errors)],
     errors,
     classDiagram: moduleDiagram(model, module),
@@ -53,7 +53,7 @@ export function enhanceModule (model: Model, module: Module, plugins: Plugin[], 
 }
 
 export type EnhancedApplication = Application & {
-  classDiagram: string | undefined
+  classDiagram: string
   errors: VerificationError[]
   modules: Module[]
 }
@@ -63,7 +63,7 @@ export function enhanceApplication (model: Model, plugins: Plugin[], verificatio
   const errors = verificationErrors.filter(e => 'application' in e && e.application === application)
   return {
     ...application,
-    'x-links': [...application['x-links'] ?? [], ...plugins.flatMap(p => p.getApplicationLinks(application))],
+    'x-links': [...application['x-links'] ?? [], ...plugins.flatMap(p => p.getApplicationLinks?.(application) ?? [])],
     'x-todos': [...application['x-todos'] ?? [], ...getErrorTodos(errors)],
     errors,
     classDiagram: applicationDiagram(model),
@@ -73,6 +73,7 @@ export function enhanceApplication (model: Model, plugins: Plugin[], verificatio
 
 function getErrorTodos (error: VerificationError[]): string[] {
   if (error.length === 0) return []
+  if (error.length === 1) return ['1 validation error']
   return [`${error.length} validation errors`]
 }
 

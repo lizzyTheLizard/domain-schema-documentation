@@ -1,8 +1,9 @@
 import path from 'path'
 import { type Schema, type SchemaType, type Module, type Model } from '../Reader.ts'
 
-export function getSchemasForModule (model: Model, module: Module): Schema[] {
-  return model.schemas.filter(schema => schema.$id.startsWith(module.$id + '/'))
+export function getSchemasForModule (model: Model, moduleOrModuleId: Module | string): Schema[] {
+  const moduleId = typeof moduleOrModuleId === 'string' ? moduleOrModuleId : moduleOrModuleId.$id
+  return model.schemas.filter(schema => schema.$id.startsWith(moduleId + '/'))
 }
 
 export function getSchemasForModuleAndTyp (model: Model, module: Module, typ: SchemaType): Schema[] {
