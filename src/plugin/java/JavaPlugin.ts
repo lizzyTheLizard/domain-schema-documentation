@@ -1,4 +1,4 @@
-import { type Plugin, type VerificationError } from '../Plugin.ts'
+import { type Plugin } from '../Plugin.ts'
 import path from 'path'
 import Handlebars from 'handlebars'
 import { loadTemplate, writeOutput } from '../../writer/WriterHelpers.ts'
@@ -8,16 +8,24 @@ import {
   type Schema,
   type Model
 } from '../../reader/Reader.ts'
+import { type VerificationError } from '../../writer/Writer.ts'
 
 const classTemplate = loadTemplate('src/plugin/java/class.hbs')
 const enumTemplate = loadTemplate('src/plugin/java/enum.hbs')
 
 export function javaPlugin (outputFolder: string): Plugin {
   return {
+    updateModel: async (model) => addLinks(model),
     validate: async () => await validateJava(),
-    generateOutput: async (model) => { await generateJavaOutput(model, outputFolder) },
-    getModuleLinks: () => [{ text: 'Java-Files', href: './java' }],
-    getSchemaLinks: (schema: Schema) => [{ text: 'Java-File', href: `.${getFileName(schema)}` }]
+    generateOutput: async (model) => { await generateJavaOutput(model, outputFolder) }
+  }
+}
+
+function addLinks (model: Model): Model {
+  return {
+    application: model.application,
+    modules: model.modules.map(m => ({ ...m, 'x-links': [...m['x-links'] ?? [], { text: 'Java-Files', href: './java' }] })),
+    schemas: model.schemas.map(s => ({ ...s, 'x-links': [...s['x-links'] ?? [], { text: 'Java-File', href: `.${getFileName(s)}` }] }))
   }
 }
 

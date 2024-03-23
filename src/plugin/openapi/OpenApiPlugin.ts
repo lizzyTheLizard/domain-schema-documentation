@@ -1,31 +1,63 @@
 import path from 'path'
-import { type Plugin, type VerificationError } from '../Plugin.ts'
+import { type Plugin } from '../Plugin.ts'
 import { type Module, type Model } from '../../reader/Reader.ts'
-import { loadTemplate, writeOutput } from '../../writer/WriterHelpers.ts'
+import { writeOutput } from '../../writer/WriterHelpers.ts'
+import { type VerificationError } from '../../writer/Writer.ts'
+import * as yaml from 'yaml'
 
-const template = loadTemplate('src/plugin/openapi/spec.hbs')
+export interface OpenApiPluginOptions {
+  servers?: string[]
+  securitySchemes: Record<string, any>
+}
 
-export function openApiPlugin (outputFolder: string): Plugin {
+export function openApiPlugin (outputFolder: string, options?: OpenApiPluginOptions): Plugin {
   return {
+    updateModel: async (model) => addLinks(model),
     validate: async () => await validateOpenApiSpec(),
-    generateOutput: async (model) => { await generateOpenApiOutput(model, outputFolder) },
-    getModuleLinks: (module) => [{ text: 'OpenApiSpec', href: './' + getFileName(module) }]
+    generateOutput: async (model) => { await generateOpenApiSpecs(model, outputFolder, options) }
   }
 }
 
-async function validateOpenApiSpec (): Promise<VerificationError[]> {
-  return []
-}
-
-async function generateOpenApiOutput (model: Model, outputFolder: string): Promise<void> {
-  for (const module of model.modules) {
-    // TODO: Implement template and test
-    const relativeFilename = path.join(module.$id, getFileName(module))
-    const output = template(module)
-    await writeOutput(output, relativeFilename, outputFolder)
+function addLinks (model: Model): Model {
+  return {
+    application: model.application,
+    modules: model.modules.map(m => ({ ...m, 'x-links': [...m['x-links'] ?? [], { text: 'OpenApiSpec', href: `./${getFileName(m)}` }] })),
+    schemas: model.schemas
   }
 }
 
 function getFileName (module: Module): string {
   return `${path.basename(module.$id).replace(path.extname(module.$id), '')}.openapi.yaml`
+}
+
+async function validateOpenApiSpec (): Promise<VerificationError[]> {
+  // TODO: Implement validation
+  return []
+}
+
+async function generateOpenApiSpecs (model: Model, outputFolder: string, options?: OpenApiPluginOptions): Promise<void> {
+  await Promise.all(model.modules.map(async module => {
+    if (module.operations === undefined) return
+    const relativeFilename = path.join(module.$id, getFileName(module))
+    const output = generateOpenApiSpec(model, module, options)
+    const yamlOutput = yaml.stringify(output)
+    await writeOutput(yamlOutput, relativeFilename, outputFolder)
+  }))
+}
+
+function generateOpenApiSpec (model: Model, module: Module, options?: OpenApiPluginOptions): Record<any, any> {
+  return {
+    openapi: '3.0.3',
+    info: {
+      title: module.title,
+      description: module.description
+    },
+    servers: options?.servers?.map(server => ({ url: server })) ?? [],
+    paths: module.operations,
+    components: {
+      // TODO: Get all relevant schemas
+      schemas: {},
+      securitySchemes: options?.securitySchemes ?? {}
+    }
+  }
 }

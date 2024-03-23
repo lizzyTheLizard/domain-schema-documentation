@@ -1,7 +1,6 @@
-import { type Writer } from '../Writer.ts'
+import { type VerificationError, type Writer } from '../Writer.ts'
 import { type Model, type Property, type Schema } from '../../reader/Reader.ts'
 import path from 'path'
-import { type Plugin, type VerificationError } from '../../plugin/Plugin.ts'
 import { loadTemplate, writeOutput, enhanceApplication, enhanceModule, enhanceSchema } from '../WriterHelpers.ts'
 import Handlebars from 'handlebars'
 import { relativeLink } from '../../reader/helper/InputHelper.ts'
@@ -16,7 +15,7 @@ export interface HtmlWriterOptions {
 }
 
 export function htmlWriter (outputFolder: string, options?: HtmlWriterOptions): Writer {
-  return async function (model: Model, verificationErrors: VerificationError[], plugins: Plugin[]): Promise<void> {
+  return async function (model: Model, verificationErrors: VerificationError[]): Promise<void> {
     Handlebars.registerHelper('htmlRelativeLink', (fromId: string, toId: string) => relativeLink(fromId, toId))
     Handlebars.registerHelper('htmlGetProperty', (obj: any | undefined, property: string) => obj?.[property])
     Handlebars.registerHelper('htmlHasProperty', (obj: any[] | undefined, property: any) => obj?.includes(property))
@@ -32,20 +31,20 @@ export function htmlWriter (outputFolder: string, options?: HtmlWriterOptions): 
     const write = options?.write ?? (async (o, f) => { await writeOutput(o, f, outputFolder) })
 
     for (const schema of model.schemas) {
-      const context = enhanceSchema(model, schema, plugins, verificationErrors)
+      const context = enhanceSchema(model, schema, verificationErrors)
       const output1 = schemaTemplate(context)
       const output2 = basicTemplate({ content: output1, title: schema.title })
       await write(output2, `${schema.$id}.html`)
     }
 
     for (const module of model.modules) {
-      const context = enhanceModule(model, module, plugins, verificationErrors)
+      const context = enhanceModule(model, module, verificationErrors)
       const output1 = moduleTemplate(context)
       const output2 = basicTemplate({ content: output1, title: module.title })
       await write(output2, path.join(module.$id, 'index.html'))
     }
 
-    const context = enhanceApplication(model, plugins, verificationErrors)
+    const context = enhanceApplication(model, verificationErrors)
     const output1 = applicationTemplate(context)
     const output2 = basicTemplate({ content: output1, title: model.application.title })
     await write(output2, 'index.html')

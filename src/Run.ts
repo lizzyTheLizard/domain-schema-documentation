@@ -30,5 +30,5 @@ export async function run (options?: RunOptions): Promise<void> {
   await Promise.all(plugins.map(async p => await p.generateOutput?.(model)))
 
   // Write output, can be executed in parallel
-  await Promise.all(writers.map(async w => { await w(model, errors, plugins) }))
+  await Promise.all(writers.map(async w => { await w(model, errors) }))
 }

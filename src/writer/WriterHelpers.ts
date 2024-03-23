@@ -1,10 +1,10 @@
 import { type Application, type Model, type Module, type Schema } from '../reader/Reader.ts'
-import { type Plugin, type VerificationError } from '../plugin/Plugin.ts'
 import { applicationDiagram, moduleDiagram, schemaDiagramm } from './MermaidDiagramGenerator.ts'
 import path from 'path'
 import fs from 'fs'
 import Handlebars from 'handlebars'
 import { getModuleForSchema } from '../reader/helper/InputHelper.ts'
+import { type VerificationError } from './Writer.ts'
 
 export type EnhancedSchema = Schema & {
   hasDefinitions: boolean
@@ -13,12 +13,12 @@ export type EnhancedSchema = Schema & {
   module: Module
 }
 
-export function enhanceSchema (model: Model, schema: Schema, plugins: Plugin[], verificationErrors: VerificationError[]): EnhancedSchema {
+export function enhanceSchema (model: Model, schema: Schema, verificationErrors: VerificationError[]): EnhancedSchema {
   const errors = verificationErrors.filter(e => 'schema' in e && e.schema === schema)
   return {
     ...schema,
     hasDefinitions: Object.keys(schema.definitions).length !== 0,
-    'x-links': [...schema['x-links'] ?? [], ...plugins.flatMap(p => p.getSchemaLinks?.(schema) ?? [])],
+    'x-links': schema['x-links'] ?? [],
     'x-todos': [...schema['x-todos'] ?? [], ...getErrorTodos(errors)],
     classDiagram: schemaDiagramm(model, schema),
     errors,
@@ -32,11 +32,11 @@ export type EnhancedModule = Module & {
   schemas: Schema[]
 }
 
-export function enhanceModule (model: Model, module: Module, plugins: Plugin[], verificationErrors: VerificationError[]): EnhancedModule {
+export function enhanceModule (model: Model, module: Module, verificationErrors: VerificationError[]): EnhancedModule {
   const errors = verificationErrors.filter(e => 'module' in e && e.module === module)
   return {
     ...module,
-    'x-links': [...module['x-links'] ?? [], ...plugins.flatMap(p => p.getModuleLinks?.(module) ?? [])],
+    'x-links': module['x-links'] ?? [],
     'x-todos': [...module['x-todos'] ?? [], ...getErrorTodos(errors)],
     errors,
     classDiagram: moduleDiagram(model, module),
@@ -50,12 +50,12 @@ export type EnhancedApplication = Application & {
   modules: Module[]
 }
 
-export function enhanceApplication (model: Model, plugins: Plugin[], verificationErrors: VerificationError[]): EnhancedApplication {
+export function enhanceApplication (model: Model, verificationErrors: VerificationError[]): EnhancedApplication {
   const application = model.application
   const errors = verificationErrors.filter(e => 'application' in e && e.application === application)
   return {
     ...application,
-    'x-links': [...application['x-links'] ?? [], ...plugins.flatMap(p => p.getApplicationLinks?.(application) ?? [])],
+    'x-links': application['x-links'] ?? [],
     'x-todos': [...application['x-todos'] ?? [], ...getErrorTodos(errors)],
     errors,
     classDiagram: applicationDiagram(model),

@@ -8,7 +8,7 @@ import {
 } from './WriterHelpers.ts'
 import path from 'path'
 import { type Application, type Model, type Module, type Schema } from '../reader/Reader.ts'
-import { type VerificationError, type Plugin } from '../plugin/Plugin.ts'
+import { type VerificationError } from './Writer.ts'
 
 describe('writerHelpers', () => {
   const application: Application = {
@@ -71,14 +71,13 @@ describe('writerHelpers', () => {
 
   test('enhanceApplication', async () => {
     const model: Model = { application, modules: [module], schemas: [schema] }
-    const plugin: Plugin = { getApplicationLinks: () => [{ href: 'testHref', text: 'text' }] }
 
-    const result = enhanceApplication(model, [plugin], [applicationError, schemaError, moduleError])
+    const result = enhanceApplication(model, [applicationError, schemaError, moduleError])
 
     expect(result).toEqual({
       ...application,
       classDiagram: 'classDiagram\nclass _test["Test Module"]\nclick _test href "./test/index.html" "Test Module"',
-      'x-links': [{ href: 'testHref', text: 'text' }],
+      'x-links': [],
       'x-todos': ['1 validation error'],
       modules: [module],
       errors: [applicationError]
@@ -87,14 +86,13 @@ describe('writerHelpers', () => {
 
   test('enhanceModule', async () => {
     const model: Model = { application, modules: [module], schemas: [schema] }
-    const plugin: Plugin = { getModuleLinks: () => [{ href: 'testHref', text: 'text' }] }
 
-    const result = enhanceModule(model, module, [plugin], [applicationError, schemaError, moduleError])
+    const result = enhanceModule(model, module, [applicationError, schemaError, moduleError])
 
     expect(result).toEqual({
       ...module,
       classDiagram: result.classDiagram,
-      'x-links': [{ href: 'testHref', text: 'text' }],
+      'x-links': [],
       'x-todos': ['1 validation error'],
       schemas: [schema],
       errors: [moduleError]
@@ -103,14 +101,13 @@ describe('writerHelpers', () => {
 
   test('enhanceSchema', async () => {
     const model: Model = { application, modules: [module], schemas: [schema] }
-    const plugin: Plugin = { getSchemaLinks: () => [{ href: 'testHref', text: 'text' }] }
 
-    const result = enhanceSchema(model, schema, [plugin], [applicationError, schemaError, moduleError])
+    const result = enhanceSchema(model, schema, [applicationError, schemaError, moduleError])
 
     expect(result).toEqual({
       ...schema,
       classDiagram: result.classDiagram,
-      'x-links': [{ href: 'testHref', text: 'text' }],
+      'x-links': [],
       'x-todos': ['1 validation error'],
       errors: [schemaError],
       module,
