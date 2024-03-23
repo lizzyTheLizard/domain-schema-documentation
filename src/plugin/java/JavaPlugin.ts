@@ -1,4 +1,4 @@
-import { type Plugin } from '../Plugin.ts'
+import { type Plugin, type VerificationError } from '../Plugin.ts'
 import path from 'path'
 import Handlebars from 'handlebars'
 import { loadTemplate, writeOutput } from '../../writer/WriterHelpers.ts'
@@ -12,13 +12,20 @@ import {
 const classTemplate = loadTemplate('src/plugin/java/class.hbs')
 const enumTemplate = loadTemplate('src/plugin/java/enum.hbs')
 
-export const javaWriter: Plugin = {
-  generateOutput: generateJavaOutput,
-  getModuleLinks: () => [{ text: 'Java-Files', href: './java' }],
-  getSchemaLinks: (schema: Schema) => [{ text: 'Java-File', href: `.${getFileName(schema)}` }]
+export function javaPlugin (outputFolder: string): Plugin {
+  return {
+    validate: async () => await validateJava(),
+    generateOutput: async (model) => { await generateJavaOutput(model, outputFolder) },
+    getModuleLinks: () => [{ text: 'Java-Files', href: './java' }],
+    getSchemaLinks: (schema: Schema) => [{ text: 'Java-File', href: `.${getFileName(schema)}` }]
+  }
 }
 
-export async function generateJavaOutput (outputFolder: string, model: Model): Promise<void> {
+async function validateJava (): Promise<VerificationError[]> {
+  return []
+}
+
+async function generateJavaOutput (model: Model, outputFolder: string): Promise<void> {
   Handlebars.registerHelper('javaComment', (text: string, indentation: number) => javaComment(text, indentation))
   Handlebars.registerHelper('javaClassName', (schema: Schema) => className(schema))
   Handlebars.registerHelper('javaEnumDoc', (schema: EnumDefinition, key: string) => enumDoc(schema, key))

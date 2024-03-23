@@ -63,6 +63,7 @@
         const {svg} = await mermaid.render('mySvg_' + i, graphDefinition.innerText);
         const preview = createMermaidPreview(element, svg);
         const modal = createMermaidModal();
+        //Do this with a slight delay to take link in mermaid diagram take precedence
         element.addEventListener('click', () => setTimeout(() => showMermaidModal(preview,modal), 30));
       }
 

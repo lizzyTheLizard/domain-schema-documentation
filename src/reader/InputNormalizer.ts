@@ -1,4 +1,4 @@
-import Ajv, { type AnySchema, type Format, type Options } from 'ajv'
+import Ajv, { type AnySchema, type Options, type Format as avjFormat } from 'ajv'
 import {
   type Application,
   type ArrayProperty,
@@ -17,12 +17,18 @@ import {
 import * as fs from 'fs'
 import * as yaml from 'yaml'
 import { cleanName, resolveRelativeId } from './helper/InputHelper.ts'
+import { fullFormats } from 'ajv-formats/dist/formats'
+import { type FormatName } from 'ajv-formats'
+
+export interface Format { name: string, avjFormat: avjFormat }
+export const defaultFormats: Format[] = Object.keys(fullFormats).map(name => ({ name, avjFormat: fullFormats[name as FormatName] }))
+export const defaultKeywords = ['discriminator']
 
 export interface InputNormalizerOptions {
-  ajvOptions: Options
-  noAdditionalPropertiesInExamples: boolean
-  formats: Array<{ name: string, avjFormat: Format }>
-  allowedKeywords: string[]
+  ajvOptions?: Options
+  noAdditionalPropertiesInExamples?: boolean
+  allowedFormats?: Array<{ name: string, avjFormat: avjFormat }>
+  allowedKeywords?: string[]
 }
 
 interface NonNormalizedSchema {
@@ -53,24 +59,28 @@ interface NormalizerResult<T> {
 }
 
 export class InputNormalizer {
+  readonly #noAdditionalPropertiesInExamples: boolean
   readonly #applications: Application[] = []
   readonly #schemas: Schema[] = []
   readonly #modules: Module[] = []
   readonly #ajv: Ajv
 
-  constructor (private readonly options: InputNormalizerOptions) {
-    this.#ajv = new Ajv(options.ajvOptions)
+  constructor (private readonly options?: InputNormalizerOptions) {
+    this.#noAdditionalPropertiesInExamples = options?.noAdditionalPropertiesInExamples ?? true
+    this.#ajv = new Ajv(options?.ajvOptions ?? { allErrors: true })
     this.#ajv.addSchema(this.readYamlFile('src/reader/inputDefinition/_Application.yaml'))
     this.#ajv.addSchema(this.readYamlFile('src/reader/inputDefinition/_Module.yaml'))
     this.#ajv.addSchema(this.readYamlFile('src/reader/inputDefinition/_Schema.yaml'))
     this.#ajv.addSchema(this.readYamlFile('src/reader/inputDefinition/_Keywords.yaml'))
-    this.options.formats?.forEach(f => this.#ajv.addFormat(f.name, f.avjFormat))
+    const allowedFormats = options?.allowedFormats ?? defaultFormats
+    allowedFormats.forEach(f => this.#ajv.addFormat(f.name, f.avjFormat))
     this.#ajv.addKeyword('x-schema-type')
     this.#ajv.addKeyword('x-references')
     this.#ajv.addKeyword('x-enum-description')
     this.#ajv.addKeyword('x-todos')
     this.#ajv.addKeyword('x-links')
-    this.options.allowedKeywords?.forEach(f => this.#ajv.addKeyword(f))
+    const allowedKeywords = options?.allowedKeywords ?? defaultKeywords
+    allowedKeywords?.forEach(f => this.#ajv.addKeyword(f))
   }
 
   addApplication (parsed: unknown, fileLocation: string): void {
@@ -125,7 +135,7 @@ export class InputNormalizer {
       this.#ajv.addSchema(s, s.$id)
       return
     }
-    if (!this.options.noAdditionalPropertiesInExamples) {
+    if (!this.#noAdditionalPropertiesInExamples) {
       this.#ajv.addSchema(s, s.$id)
       return
     }

@@ -25,9 +25,9 @@ describe('markdownWriter', () => {
   }
   test('Write Application File', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = markdownWriter(tmpDir.name, [])
+    const target = markdownWriter(tmpDir.name)
 
-    await target({ application, modules: [], schemas: [] })
+    await target({ application, modules: [], schemas: [] }, [], [])
 
     const files = await fs.readdir(tmpDir.name)
     expect(files).toContain('README.md')
@@ -37,9 +37,9 @@ describe('markdownWriter', () => {
 
   test('Write Module File', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = markdownWriter(tmpDir.name, [])
+    const target = markdownWriter(tmpDir.name)
 
-    await target({ application, modules: [module], schemas: [] })
+    await target({ application, modules: [module], schemas: [] }, [], [])
 
     const files = await fs.readdir(tmpDir.name + '/test')
     expect(files).toContain('README.md')
@@ -49,9 +49,9 @@ describe('markdownWriter', () => {
 
   test('Write Schema file', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = markdownWriter(tmpDir.name, [])
+    const target = markdownWriter(tmpDir.name)
 
-    await target({ application, modules: [module], schemas: [schema] })
+    await target({ application, modules: [module], schemas: [schema] }, [], [])
 
     const files = await fs.readdir(tmpDir.name + '/test')
     expect(files).toContain('Schema.yaml.md')

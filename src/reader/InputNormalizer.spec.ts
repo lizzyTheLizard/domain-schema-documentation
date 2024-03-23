@@ -31,7 +31,7 @@ describe('InputNormalizer', () => {
     target = new InputNormalizer({
       noAdditionalPropertiesInExamples: true,
       ajvOptions: {},
-      formats: [],
+      allowedFormats: [],
       allowedKeywords: []
     })
   })
@@ -169,7 +169,7 @@ describe('InputNormalizer', () => {
     target = new InputNormalizer({
       noAdditionalPropertiesInExamples: false,
       ajvOptions: {},
-      formats: [],
+      allowedFormats: [],
       allowedKeywords: []
     })
     target.addApplication(applicationFile, 'file.yaml')

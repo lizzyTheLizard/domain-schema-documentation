@@ -6,14 +6,6 @@ import fs from 'fs'
 import Handlebars from 'handlebars'
 import { getModuleForSchema } from '../reader/helper/InputHelper.ts'
 
-export async function executePlugins (outputFolder: string, model: Model, plugins: Plugin[]): Promise<VerificationError[]> {
-  for (const plugin of plugins) {
-    await plugin.generateOutput?.(outputFolder, model)
-  }
-  const errors = await Promise.all(plugins.map(async p => await p.validate?.(model) ?? []))
-  return errors.flatMap(e => e)
-}
-
 export type EnhancedSchema = Schema & {
   hasDefinitions: boolean
   classDiagram: string

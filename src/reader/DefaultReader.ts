@@ -2,34 +2,21 @@ import { type Model, type Reader } from './Reader.ts'
 import { promises as fs } from 'fs'
 import path from 'path'
 import * as yaml from 'yaml'
-import { type Plugin } from '../plugin/Plugin.ts'
 import { InputNormalizer } from './InputNormalizer.ts'
-import { type FormatName } from 'ajv-formats'
-import { fullFormats } from 'ajv-formats/dist/formats'
-import { type Format as avjFormat } from 'ajv'
 
-export interface Format { name: string, avjFormat: avjFormat }
-export const defaultFormats: Format[] = Object.keys(fullFormats).map(name => ({ name, avjFormat: fullFormats[name as FormatName] }))
-export const defaultKeywords = ['discriminator']
-export type InputNormalizerGenerator = () => InputNormalizer
 export type FileReader = (filePath: string) => Promise<unknown>
 
-export function defaultReader (
-  inputFolder: string,
-  plugins: Plugin[] = [],
-  formats: Format[] = defaultFormats,
-  allowedKeywords: string[] = defaultKeywords,
-  inputNormalizerGenerator: InputNormalizerGenerator = () => new InputNormalizer({ ajvOptions: { allErrors: true }, noAdditionalPropertiesInExamples: true, formats, allowedKeywords }),
-  readFile: FileReader = async (filePath) => await readYamlFile(filePath)
-): Reader {
+export interface DefaultReaderOptions {
+  inputNormalizer: InputNormalizer
+  fileReader?: FileReader
+}
+
+export function defaultReader (inputFolder: string, options?: DefaultReaderOptions): Reader {
   return async function (): Promise<Model> {
-    const inputNormalizer = inputNormalizerGenerator()
-    await readFolderRecursive(inputFolder, inputFolder, inputNormalizer, 0, readFile)
-    let model = inputNormalizer.toModel()
-    for (const plugin of plugins) {
-      model = await plugin.updateModel?.(model) ?? model
-    }
-    return model
+    const inputNormalizer = options?.inputNormalizer ?? new InputNormalizer()
+    const fileReader = options?.fileReader ?? readYamlFile
+    await readFolderRecursive(inputFolder, inputFolder, inputNormalizer, 0, fileReader)
+    return inputNormalizer.toModel()
   }
 }
 

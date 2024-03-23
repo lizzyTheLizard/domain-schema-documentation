@@ -1,22 +1,22 @@
 import { type Writer } from '../Writer.ts'
 import { type Model, type Property, type Schema } from '../../reader/Reader.ts'
 import path from 'path'
-import { type Plugin } from '../../plugin/Plugin.ts'
-import { loadTemplate, writeOutput, enhanceApplication, enhanceModule, enhanceSchema, executePlugins } from '../WriterHelpers.ts'
+import { type Plugin, type VerificationError } from '../../plugin/Plugin.ts'
+import { loadTemplate, writeOutput, enhanceApplication, enhanceModule, enhanceSchema } from '../WriterHelpers.ts'
 import Handlebars from 'handlebars'
 import { relativeLink } from '../../reader/helper/InputHelper.ts'
 import { getType, type PropertyType } from '../../reader/helper/GetType.ts'
 
-export function htmlWriter (
-  outputFolder: string,
-  plugins: Plugin[] = [],
-  write: (output: string, relativeFilename: string) => Promise<void> = async (o, f) => { await writeOutput(o, f, outputFolder) },
-  basicTemplate: HandlebarsTemplateDelegate = loadTemplate('src/writer/html/basic.hbs'),
-  applicationTemplate: HandlebarsTemplateDelegate = loadTemplate('src/writer/html/application.hbs'),
-  moduleTemplate: HandlebarsTemplateDelegate = loadTemplate('src/writer/html/module.hbs'),
-  schemaTemplate: HandlebarsTemplateDelegate = loadTemplate('src/writer/html/schema.hbs')
-): Writer {
-  return async function (model: Model): Promise<void> {
+export interface HtmlWriterOptions {
+  write: (output: string, relativeFilename: string) => Promise<void>
+  basicTemplate: HandlebarsTemplateDelegate
+  applicationTemplate: HandlebarsTemplateDelegate
+  moduleTemplate: HandlebarsTemplateDelegate
+  schemaTemplate: HandlebarsTemplateDelegate
+}
+
+export function htmlWriter (outputFolder: string, options?: HtmlWriterOptions): Writer {
+  return async function (model: Model, verificationErrors: VerificationError[], plugins: Plugin[]): Promise<void> {
     Handlebars.registerHelper('htmlRelativeLink', (fromId: string, toId: string) => relativeLink(fromId, toId))
     Handlebars.registerHelper('htmlGetProperty', (obj: any | undefined, property: string) => obj?.[property])
     Handlebars.registerHelper('htmlHasProperty', (obj: any[] | undefined, property: any) => obj?.includes(property))
@@ -25,7 +25,11 @@ export function htmlWriter (
     Handlebars.registerHelper('htmlIntent', (input: string, intent: number) => input.split('\n').map(l => ' '.repeat(intent) + l).join('\n'))
     Handlebars.registerPartial('htmlSubSchema', loadTemplate('src/writer/html/subSchema.hbs'))
 
-    const verificationErrors = await executePlugins(outputFolder, model, plugins)
+    const schemaTemplate = options?.schemaTemplate ?? loadTemplate('src/writer/html/schema.hbs')
+    const moduleTemplate = options?.moduleTemplate ?? loadTemplate('src/writer/html/module.hbs')
+    const applicationTemplate = options?.applicationTemplate ?? loadTemplate('src/writer/html/application.hbs')
+    const basicTemplate = options?.basicTemplate ?? loadTemplate('src/writer/html/basic.hbs')
+    const write = options?.write ?? (async (o, f) => { await writeOutput(o, f, outputFolder) })
 
     for (const schema of model.schemas) {
       const context = enhanceSchema(model, schema, plugins, verificationErrors)

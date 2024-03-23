@@ -2,10 +2,10 @@ import * as tmp from 'tmp'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { type Application, type Module, type Schema, type Reader } from './Reader.ts'
-import { defaultReader, readYamlFile } from './DefaultReader.ts'
+import { defaultReader } from './DefaultReader.ts'
 import { type InputNormalizer } from './InputNormalizer.ts'
 
-const inputValidator = {
+const inputNormalizer = {
   addApplication: jest.fn(),
   addModule: jest.fn(),
   addSchema: jest.fn(),
@@ -22,7 +22,7 @@ describe('DefaultReader', () => {
 
   beforeEach(() => {
     tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    target = defaultReader(tmpDir.name, [], [], [], () => inputValidator, readYamlFile)
+    target = defaultReader(tmpDir.name, { inputNormalizer })
   })
 
   afterEach(() => {
@@ -36,7 +36,7 @@ describe('DefaultReader', () => {
     await target()
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(inputValidator.addApplication).toHaveBeenCalledWith(applicationFile, filePath)
+    expect(inputNormalizer.addApplication).toHaveBeenCalledWith(applicationFile, filePath)
   })
 
   test('Read module file', async () => {
@@ -48,7 +48,7 @@ describe('DefaultReader', () => {
     await target()
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(inputValidator.addModule).toHaveBeenCalledWith(moduleFile, filePath, moduleFile.$id)
+    expect(inputNormalizer.addModule).toHaveBeenCalledWith(moduleFile, filePath, moduleFile.$id)
   })
 
   test('Read schema file', async () => {
@@ -60,6 +60,6 @@ describe('DefaultReader', () => {
     await target()
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(inputValidator.addSchema).toHaveBeenCalledWith(schemaFile, filePath, schemaFile.$id)
+    expect(inputNormalizer.addSchema).toHaveBeenCalledWith(schemaFile, filePath, schemaFile.$id)
   })
 })

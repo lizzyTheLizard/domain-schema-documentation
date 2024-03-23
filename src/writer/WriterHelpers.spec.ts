@@ -3,7 +3,6 @@ import * as fs from 'fs'
 import {
   enhanceApplication,
   enhanceModule, enhanceSchema,
-  executePlugins,
   loadTemplate,
   writeOutput
 } from './WriterHelpers.ts'
@@ -68,17 +67,6 @@ describe('writerHelpers', () => {
 
     const written = await fs.promises.readFile(path.join(tmpDir.name, '/folder/test.txt'))
     expect(written.toString()).toEqual('test-content')
-  })
-
-  test('executePlugins', async () => {
-    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const model: Model = { application, modules: [module], schemas: [schema] }
-    const plugin: Plugin = { generateOutput: jest.fn(), validate: async () => [applicationError] }
-
-    const errors = await executePlugins(tmpDir.name, model, [plugin])
-
-    expect(plugin.generateOutput).toHaveBeenCalledWith(tmpDir.name, model)
-    expect(errors).toEqual([applicationError])
   })
 
   test('enhanceApplication', async () => {

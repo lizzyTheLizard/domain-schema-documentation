@@ -31,7 +31,7 @@ export type VerificationErrorType = 'NOT_IN_DOMAIN_MODEL' | 'MISSING_IN_IMPLEMEN
 export interface Plugin {
   updateModel?: (model: Model) => Promise<Model>
   validate?: (model: Model) => Promise<VerificationError[]>
-  generateOutput?: (outputFolder: string, model: Model) => Promise<void>
+  generateOutput?: (model: Model) => Promise<void>
   getApplicationLinks?: (application: Application) => Link[]
   getModuleLinks?: (module: Module) => Link[]
   getSchemaLinks?: (schema: Schema) => Link[]
