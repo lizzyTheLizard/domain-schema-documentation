@@ -4,7 +4,7 @@
   "scripts": {
     "build": "tsc && cpy 'src/**/*.hbs' ../dist && cpy 'src/**/*.yaml' ../dist",
     "check": "yarn run check:types && yarn run check:lint && yarn run check:test",
-    "check:lint": "eslint --fix src/**/*.ts",
+    "check:lint": "eslint src/**/*.ts",
     "check:test": "jest src/**/*.spec.ts",
     "check:types": "tsc --noEmit --skipLibCheck",
     "lint": "eslint --fix src/**/*.ts",
