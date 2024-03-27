@@ -2893,6 +2893,7 @@ __metadata:
   resolution: "example@workspace:example"
   dependencies:
     "@types/node": "npm:^20.11.30"
+    dir-compare-cli: "npm:^1.0.1"
     domain-schema-documentation: "workspace:*"
     tsx: "npm:^4.7.1"
   languageName: unknown
@@ -3550,17 +3551,6 @@ __metadata:
   checksum: 10c0/4e531f648b29039fb7426fb94075e6545faa1eb9fe83c29f0b6d9e7263aceb4289d2d4557db0d428188eeb449cc7c5e77b0a0b2c4e248ff2a65933a0dee49ef2
   languageName: node
   linkType: hard
-
-"integration-tests@workspace:integration-tests":
-  version: 0.0.0-use.local
-  resolution: "integration-tests@workspace:integration-tests"
-  dependencies:
-    "@types/node": "npm:^20.11.30"
-    dir-compare-cli: "npm:^1.0.1"
-    domain-schema-documentation: "workspace:*"
-    tsx: "npm:^4.7.1"
-  languageName: unknown
-  linkType: soft
 
 "internal-slot@npm:^1.0.7":
   version: 1.0.7

@@ -4,8 +4,8 @@
     <exclude-output />
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/example/expected" />
       <excludeFolder url="file://$MODULE_DIR$/example/out" />
-      <excludeFolder url="file://$MODULE_DIR$/integration-tests/expected" />
       <excludeFolder url="file://$MODULE_DIR$/integration-tests/out" />
     </content>
     <orderEntry type="inheritedJdk" />

@@ -18,10 +18,6 @@ const RAW_RUNTIME_STATE =
       "reference": "workspace:example"\
     },\
     {\
-      "name": "integration-tests",\
-      "reference": "workspace:integration-tests"\
-    },\
-    {\
       "name": "lib",\
       "reference": "workspace:lib"\
     }\
@@ -31,7 +27,6 @@ const RAW_RUNTIME_STATE =
   "fallbackExclusionList": [\
     ["domain-schema-documentation", ["workspace:."]],\
     ["example", ["workspace:example"]],\
-    ["integration-tests", ["workspace:integration-tests"]],\
     ["lib", ["workspace:lib"]]\
   ],\
   "fallbackPool": [\
@@ -3922,6 +3917,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["example", "workspace:example"],\
           ["@types/node", "npm:20.11.30"],\
+          ["dir-compare-cli", "npm:1.0.1"],\
           ["domain-schema-documentation", "workspace:."],\
           ["tsx", "npm:4.7.1"]\
         ],\
@@ -4646,19 +4642,6 @@ const RAW_RUNTIME_STATE =
           ["inherits", "npm:2.0.4"]\
         ],\
         "linkType": "HARD"\
-      }]\
-    ]],\
-    ["integration-tests", [\
-      ["workspace:integration-tests", {\
-        "packageLocation": "./integration-tests/",\
-        "packageDependencies": [\
-          ["integration-tests", "workspace:integration-tests"],\
-          ["@types/node", "npm:20.11.30"],\
-          ["dir-compare-cli", "npm:1.0.1"],\
-          ["domain-schema-documentation", "workspace:."],\
-          ["tsx", "npm:4.7.1"]\
-        ],\
-        "linkType": "SOFT"\
       }]\
     ]],\
     ["internal-slot", [\

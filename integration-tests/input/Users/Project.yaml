@@ -1,8 +1,0 @@
-$id: /Users/Project.yaml
-title: Project
-description: A project
-x-schema-type: Other
-type: object
-oneOf:
-  - $ref: ./InternalProject.yaml
-  - $ref: ./CustomerProject.yaml

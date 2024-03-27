@@ -4,6 +4,7 @@
   "scripts": {
     "build": "yarn workspaces foreach -A run build",
     "check": "yarn workspaces foreach -A run check && syncpack lint && syncpack format",
+    "integration-test": "yarn workspaces foreach -A run integration-test",
     "publish": "yarn check && yarn build && yarn npm publish"
   },
   "author": "Matthias Graf <matthias.graf@zuehlke.com>",
@@ -28,7 +29,6 @@
   "types": "dist/index.d.ts",
   "workspaces": [
     "lib",
-    "example",
-    "integration-tests"
+    "example"
   ]
 }
