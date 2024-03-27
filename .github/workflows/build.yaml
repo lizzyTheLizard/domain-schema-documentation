@@ -30,4 +30,4 @@ jobs:
       - uses: actions/deploy-pages@v4
 
       # publish library
-      - run: yarn run publish
+      - run: yarn npm publish
