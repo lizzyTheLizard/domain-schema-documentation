@@ -9,8 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Setup stuff
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 21
 
       # Check and build project
       - run: yarn install
@@ -19,10 +21,10 @@ jobs:
 
       # Generate example
       - run: yarn workspace example generate:ci
-      - uses: actions/upload-pages-artifact@v1
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: "./example/out"
-      - uses: actions/deploy-pages@v1
+      - uses: actions/deploy-pages@v4
 
       # publish library
       - run: yarn run publish
