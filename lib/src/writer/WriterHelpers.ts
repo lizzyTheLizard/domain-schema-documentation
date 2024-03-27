@@ -76,7 +76,7 @@ export async function writeOutput (output: string, relativeFilename: string, out
   await fs.promises.writeFile(outputFileName, output, 'utf8')
 }
 
-export function loadTemplate (path: string): HandlebarsTemplateDelegate {
+export function loadTemplate (path: string): Handlebars.TemplateDelegate {
   const templateString = fs.readFileSync(path).toString()
   return Handlebars.compile(templateString)
 }

@@ -17,8 +17,9 @@ jobs:
           cache: 'yarn'
 
       # Check and build project
-      - run: yarn run check
-      - run: yarn run build
+      - run: yarn install
+      - run: yarn check
+      - run: yarn build
 
       # Generate example
       - run: yarn workspace example generate:ci

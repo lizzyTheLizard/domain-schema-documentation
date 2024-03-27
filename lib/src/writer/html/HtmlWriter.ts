@@ -8,10 +8,10 @@ import { getType, type PropertyType } from '../../reader/helper/GetType'
 
 export interface HtmlWriterOptions {
   write: (output: string, relativeFilename: string) => Promise<void>
-  basicTemplate: HandlebarsTemplateDelegate
-  applicationTemplate: HandlebarsTemplateDelegate
-  moduleTemplate: HandlebarsTemplateDelegate
-  schemaTemplate: HandlebarsTemplateDelegate
+  basicTemplate: Handlebars.TemplateDelegate
+  applicationTemplate: Handlebars.TemplateDelegate
+  moduleTemplate: Handlebars.TemplateDelegate
+  schemaTemplate: Handlebars.TemplateDelegate
 }
 
 export function htmlWriter (outputFolder: string, options?: HtmlWriterOptions): Writer {

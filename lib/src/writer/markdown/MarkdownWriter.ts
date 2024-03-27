@@ -8,9 +8,9 @@ import { relativeLink } from '../../reader/helper/InputHelper'
 
 export interface MarkdownWriterOptions {
   write: (output: string, relativeFilename: string) => Promise<void>
-  applicationTemplate: HandlebarsTemplateDelegate
-  moduleTemplate: HandlebarsTemplateDelegate
-  schemaTemplate: HandlebarsTemplateDelegate
+  applicationTemplate: Handlebars.TemplateDelegate
+  moduleTemplate: Handlebars.TemplateDelegate
+  schemaTemplate: Handlebars.TemplateDelegate
 }
 
 export function markdownWriter (outputFolder: string, options?: MarkdownWriterOptions): Writer {
