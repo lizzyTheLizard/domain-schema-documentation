@@ -13,9 +13,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 21
+          cache: 'yarn'
+      - run: corepack enable
 
       # Check and build project
-      - run: yarn install
+      - run: yarn install --immutable
       - run: yarn run check
       - run: yarn run build
 
