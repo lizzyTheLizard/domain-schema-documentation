@@ -1,0 +1,10 @@
+{
+  "dependencyTypes": ["dev", "overrides", "prod", "peer"],
+  "sortFirst": ["name", "version", "scripts"],
+  "semverGroups": [
+      {
+        "label": "Use latest compatible version",
+        "range": "^"
+      }
+    ]
+}

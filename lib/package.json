@@ -1,0 +1,37 @@
+{
+  "name": "lib",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc && cpy 'src/**/*.hbs' ../dist && cpy 'src/**/*.yaml' ../dist",
+    "check": "yarn run check:types && yarn run check:lint && yarn run check:test",
+    "check:lint": "eslint --fix src/**/*.ts",
+    "check:test": "jest src/**/*.spec.ts",
+    "check:types": "tsc --noEmit --skipLibCheck",
+    "lint": "eslint --fix src/**/*.ts",
+    "test": "jest --watch src/**/*.spec.ts"
+  },
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "ajv-formats": "^2.1.1",
+    "handlebars": "^4.7.8",
+    "yaml": "^2.3.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.30",
+    "@types/tmp": "^0.2.6",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "cpy-cli": "^5.0.0",
+    "eslint": "^8.0.1",
+    "eslint-config-love": "^43.1.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-n": "^15.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "jest": "^29.7.0",
+    "tmp": "^0.2.1",
+    "ts-jest": "^29.1.2",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.0"
+  }
+}

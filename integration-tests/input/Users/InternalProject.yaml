@@ -1,0 +1,19 @@
+$id: /Users/InternalProject.yaml
+title: Internal Project
+description: An internal project
+x-schema-type: ReferenceData
+examples:
+  - projectId: "1"
+    projectName: "Project 1"
+    projectDescription: "Description of project 1"
+type: object
+properties:
+  projectId:
+    type: string
+    description: The id of the project
+  projectName:
+    type: string
+    description: The name of the project
+  projectDescription:
+    type: string
+    description: The description of the project
