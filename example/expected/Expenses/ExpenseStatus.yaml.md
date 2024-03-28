@@ -12,6 +12,8 @@ click _Expenses_Expense_yaml href "./Expense.yaml.html" "Expense"
 click _Expenses_ExpenseJournal_yaml href "./ExpenseJournal.yaml.html" "Expense Journal Entry"
 ```
 
+
+
 ## Enum-Values
 | Name | Description |
 |------|-------------|
@@ -20,6 +22,8 @@ click _Expenses_ExpenseJournal_yaml href "./ExpenseJournal.yaml.html" "Expense J
 | Approved | The expense has been approved |
 | Rejected | The expense has been rejected |
 | Paid | The expense has been paid |
+
+
 
 ## Links
 1. [Java-File](./java/ExpenseStatus.java)

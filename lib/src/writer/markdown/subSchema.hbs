@@ -1,21 +1,21 @@
 ### {{{name}}}{{#if oneOf}} (OneOf){{/if}}{{#if enum}} (Enum){{/if}}{{#if properties}} (Object){{/if}}
 {{{mdMultiline description}}}
-{{#if oneOf}}
 
+{{#if oneOf}}
 {{#each oneOf}}
 1. {{{mdGetType ../schema this}}}
 {{/each}}
 {{/if}}
-{{#if enum}}
 
+{{#if enum}}
 | Name | Description |
 |------|-------------|
 {{#each enum}}
 | {{this}} | {{{mdMultiline (mdGetProperty ../[x-enum-description] this)}}} |
 {{/each}}
 {{/if}}
-{{#if properties}}
 
+{{#if properties}}
 | Name | Type | Description |
 |------|------|-------------|
 {{#each properties}}

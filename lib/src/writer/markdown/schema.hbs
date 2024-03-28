@@ -1,49 +1,13 @@
 # {{{title}}}
-{{#if x-todos.length}}
-> ### Todos
 {{#each x-todos}}
-> 1. {{this}}
+> - [ ] {{this}}
 {{/each}}
-
-{{/if}}
 {{{mdMultiline description}}}
 ```mermaid
 {{{classDiagram}}}
 ```
-{{#if oneOf}}
 
-## One Of
-{{#each oneOf}}
-1. {{mdGetType .. this}}
-{{/each}}
-{{/if}}
-{{#if enum}}
-
-## Enum-Values
-| Name | Description |
-|------|-------------|
-{{#each enum}}
-| {{this}} | {{{mdMultiline (mdGetProperty ../[x-enum-description] this)}}} |
-{{/each}}
-{{/if}}
-{{#if properties}}
-
-## Properties
-| Name | Type | Description |
-|------|------|-------------|
-{{#each properties}}
-| {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{mdGetType .. this}} | {{{mdMultiline description}}} |
-{{/each}}
-{{/if}}
-{{#if hasDefinitions}}
-
-## Subschemas
-{{#each definitions}}
-{{> mdSubSchema this schema=.. name=@key}}
-{{/each}}
-{{/if}}
 {{#if examples}}
-
 ## Examples
 {{#each examples}}
 ```json
@@ -51,8 +15,40 @@
 ```
 {{/each}}
 {{/if}}
-{{#if x-links}}
 
+{{#if oneOf}}
+## One Of
+{{#each oneOf}}
+1. {{mdGetType .. this}}
+{{/each}}
+{{/if}}
+
+{{#if enum}}
+## Enum-Values
+| Name | Description |
+|------|-------------|
+{{#each enum}}
+| {{this}} | {{{mdMultiline (mdGetProperty ../[x-enum-description] this)}}} |
+{{/each}}
+{{/if}}
+
+{{#if properties}}
+## Properties
+| Name | Type | Description |
+|------|------|-------------|
+{{#each properties}}
+| {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{mdGetType .. this}} | {{{mdMultiline description}}} |
+{{/each}}
+{{/if}}
+
+{{#if hasDefinitions}}
+## Subschemas
+{{#each definitions}}
+{{> mdSubSchema this schema=.. name=@key}}
+{{/each}}
+{{/if}}
+
+{{#if x-links}}
 ## Links
 {{#each x-links}}
 1. [{{{text}}}]({{href}})

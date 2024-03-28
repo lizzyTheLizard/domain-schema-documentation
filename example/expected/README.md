@@ -1,8 +1,6 @@
 # Test Application
-> ### Todos
-> 1. Make sure Markdown works as well
-> 1. Fix subschemas
-
+> - [ ] Make sure Markdown works as well
+> - [ ] Fix subschemas
 This is a example for a domain model. It contains an expenses management system consisting of users, groups, expenses and a lot of other stuff.
 
 ## Modules

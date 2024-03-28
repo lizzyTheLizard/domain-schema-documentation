@@ -18,6 +18,9 @@ click _Expenses_ExpenseStatus_yaml href "./ExpenseStatus.yaml.html" "Expense Sta
 click _Users_User_yaml href "./../Users/User.yaml.html" "User"
 ```
 
+
+
+
 ## Properties
 | Name | Type | Description |
 |------|------|-------------|
@@ -26,6 +29,7 @@ click _Users_User_yaml href "./../Users/User.yaml.html" "User"
 | newStatus* | [Expense Status](./ExpenseStatus.yaml.md) |  |
 | userId* | References [User](./../Users/User.yaml.md) | The user who changed the expense |
 | comment | string | Description of the change |
+
 
 ## Links
 1. [Java-File](./java/ExpenseJournal.java)

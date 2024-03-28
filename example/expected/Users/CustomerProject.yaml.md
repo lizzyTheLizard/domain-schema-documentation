@@ -17,12 +17,16 @@ click _Users_Project_yaml href "./Project.yaml.html" "Project"
 click CustomerProjects href "./User.yaml.html" "User"
 ```
 
+
+
+
 ## Properties
 | Name | Type | Description |
 |------|------|-------------|
 | projectId* | string | The id of the project |
 | projectName* | string | The name of the project |
 | projectDescription* | string | The description of the project |
+
 
 ## Links
 1. [Java-File](./java/CustomerProject.java)
