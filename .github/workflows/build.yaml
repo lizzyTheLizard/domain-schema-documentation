@@ -31,3 +31,5 @@ jobs:
 
       # publish library
       - run: yarn npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
