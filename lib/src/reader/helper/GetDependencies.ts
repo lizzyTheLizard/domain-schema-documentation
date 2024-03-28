@@ -78,7 +78,7 @@ function getDependencyType (fromSchema: Schema, toSchema: Schema, toDefinition: 
   if ('enum' in toDefinition) {
     return 'ENUM'
   }
-  // If this is within the same schema, the type does not matter and it is contains
+  // If this is within the same schema, the type does not matter => always CONTAINS
   if (fromSchema === toSchema) {
     return 'CONTAINS'
   }
@@ -91,7 +91,7 @@ function getDependencyType (fromSchema: Schema, toSchema: Schema, toDefinition: 
 
   switch (toType) {
     case 'Aggregate':
-      console.error(`Aggregate ${toSchema.$id} is included in ${fromSchema.$id} using $ref. This is unusual, normally you want to reference another aggreate using x-references`)
+      console.error(`Aggregate ${toSchema.$id} is included in ${fromSchema.$id} using $ref. This is unusual, normally you want to reference another aggregate using x-references`)
       return 'REFERENCES'
     case 'ReferenceData':
       console.error(`ReferenceData ${toSchema.$id} is included in ${fromSchema.$id} using $ref. This is unusual, normally you want to reference reference data using x-references`)
@@ -100,7 +100,7 @@ function getDependencyType (fromSchema: Schema, toSchema: Schema, toDefinition: 
       return 'CONTAINS'
     case 'Entity':
       if (fromType === 'ValueObject' || fromType === 'ReferenceData') {
-        console.error(`Entity ${toSchema.$id} is included in ${fromSchema.$id} using $ref. This is unusual, normally you want to reference entitites using x-references`)
+        console.error(`Entity ${toSchema.$id} is included in ${fromSchema.$id} using $ref. This is unusual, normally you want to reference entities using x-references`)
         return 'REFERENCES'
       }
       return 'CONTAINS'

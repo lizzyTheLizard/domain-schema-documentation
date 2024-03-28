@@ -1,6 +1,6 @@
 $id: _Keywords.yaml
 $schema: http://json-schema.org/draft-07/schema#
-title: Keywods Definition
+title: Keywords Definition
 type: object
 properties:
   x-schema-type:

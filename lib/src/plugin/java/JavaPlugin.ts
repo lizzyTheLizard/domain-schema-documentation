@@ -57,8 +57,8 @@ function getFileName (schema: Schema): string {
   return `/java/${path.basename(schema.$id).replace(path.extname(schema.$id), '.java')}`
 }
 
-function javaComment (text: string, intendation: number): string {
-  const intendString = ' '.repeat(intendation)
+function javaComment (text: string, indentation: number): string {
+  const intendString = ' '.repeat(indentation)
   if (text.includes('\n')) {
     const split = text.trim().split('\n')
     return `${intendString}/* ${split.join('\n' + intendString)} */`
