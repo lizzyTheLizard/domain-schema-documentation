@@ -1,6 +1,5 @@
 {
   "name": "lib",
-  "version": "1.0.0",
   "scripts": {
     "build": "tsc && cpy 'src/**/*.hbs' ../dist && cpy 'src/**/*.yaml' ../dist",
     "check": "yarn run check:types && yarn run check:lint && yarn run check:test",

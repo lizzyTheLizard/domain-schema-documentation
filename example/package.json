@@ -1,6 +1,5 @@
 {
   "name": "example",
-  "version": "1.0.0",
   "scripts": {
     "generate": "tsx --watch --watch-path=./input --watch-path=./src src/main.ts",
     "generate:ci": "tsx main.ts",
