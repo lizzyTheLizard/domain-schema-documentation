@@ -1,6 +1,6 @@
 {
   "name": "domain-schema-documentation",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "scripts": {
     "build": "yarn workspaces foreach -A run build",
     "check": "yarn workspaces foreach -A run check && syncpack lint && syncpack format",
@@ -44,7 +44,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "packageManager": "yarn@4.1.1",
-  "repository": "lizzyTheLizard/domain-schema-documentation.git",
+  "repository": "lizzyTheLizard/domain-schema-documentation",
   "type": "module",
   "types": "dist/index.d.ts",
   "workspaces": [
