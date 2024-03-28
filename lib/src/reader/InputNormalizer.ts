@@ -72,7 +72,6 @@ export class InputNormalizer {
     this.#ajv.addSchema(this.readYamlFile(path.join(__dirname, 'inputDefinition', '_Application.yaml')))
     this.#ajv.addSchema(this.readYamlFile(path.join(__dirname, 'inputDefinition', '_Module.yaml')))
     this.#ajv.addSchema(this.readYamlFile(path.join(__dirname, 'inputDefinition', '_Schema.yaml')))
-    this.#ajv.addSchema(this.readYamlFile(path.join(__dirname, 'inputDefinition', '_Keywords.yaml')))
     const allowedFormats = options?.allowedFormats ?? defaultFormats
     allowedFormats.forEach(f => this.#ajv.addFormat(f.name, f.avjFormat))
     this.#ajv.addKeyword('x-schema-type')

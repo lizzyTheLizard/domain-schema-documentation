@@ -1,14 +1,10 @@
 # {{{title}}}
-{{#if x-todos.length}}
-> ### Todos
-{{#each x-todos}}
-> 1. {{this}}
+{{#each todos}}
+> - [ ] {{this}}
 {{/each}}
-
-{{/if}}
 {{{mdMultiline description}}}
-{{#if schemas}}
 
+{{#if schemas}}
 ## Schemas
 ```mermaid
 {{{classDiagram}}}
@@ -19,10 +15,10 @@
 | [{{title}}]({{mdRelativeLink ../$id $id}}.md) | {{x-schema-type}} | {{{mdMultiline description}}} |
 {{/each}}
 {{/if}}
-{{#if x-links}}
 
+{{#if links}}
 ## Links
-{{#each x-links}}
+{{#each links}}
 1. [{{{text}}}]({{href}})
 {{/each}}
 {{/if}}

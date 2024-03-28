@@ -11,6 +11,10 @@ import * as path from "path";
 const inputDir = path.join(__dirname, '/input');
 const outputDir = path.join(__dirname, '/out');
 
+// TODO: Separate example and integration tests
+// TODO: Better integration test with all the features
+// TODO: Move GitHub-Pages template to here
+
 run({
   cleanOutput: outputDir,
   reader: defaultReader(inputDir),

@@ -9,8 +9,8 @@ export interface Model {
 export interface Application {
   title: string
   description: string
-  'x-todos'?: string[]
-  'x-links'?: Link[]
+  todos?: string[]
+  links?: Link[]
 }
 
 export interface Module {
@@ -18,8 +18,8 @@ export interface Module {
   title: string
   description: string
   operations?: unknown
-  'x-todos'?: string[]
-  'x-links'?: Link[]
+  todos?: string[]
+  links?: Link[]
 }
 
 export interface Link {

@@ -77,8 +77,8 @@ describe('writerHelpers', () => {
     expect(result).toEqual({
       ...application,
       classDiagram: 'classDiagram\nclass _test["Test Module"]\nclick _test href "./test/index.html" "Test Module"',
-      'x-links': [],
-      'x-todos': ['1 validation error'],
+      links: [],
+      todos: ['1 validation error'],
       modules: [module],
       errors: [applicationError]
     })
@@ -92,8 +92,8 @@ describe('writerHelpers', () => {
     expect(result).toEqual({
       ...module,
       classDiagram: result.classDiagram,
-      'x-links': [],
-      'x-todos': ['1 validation error'],
+      links: [],
+      todos: ['1 validation error'],
       schemas: [schema],
       errors: [moduleError]
     })

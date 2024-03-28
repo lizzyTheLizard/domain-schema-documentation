@@ -11,15 +11,6 @@ click _Users_Customer_yaml href "./Customer.yaml.html" "Customer"
 click _Users_CustomerProject_yaml href "./CustomerProject.yaml.html" "Customer Project"
 ```
 
-## Properties
-| Name | Type | Description |
-|------|------|-------------|
-| customerId* | string | The id of the customer |
-| customerName* | string | The name of the customer |
-| customerProjects* | [[Customer Project](./CustomerProject.yaml.md)] |  |
-| customerContact* | string | The contact person of the customer |
-| customerEmail* | email | The email of the customer |
-
 ## Examples
 ```json
 {
@@ -41,6 +32,18 @@ click _Users_CustomerProject_yaml href "./CustomerProject.yaml.html" "Customer P
   ]
 }
 ```
+
+
+
+## Properties
+| Name | Type | Description |
+|------|------|-------------|
+| customerId* | string | The id of the customer |
+| customerName* | string | The name of the customer |
+| customerProjects* | [[Customer Project](./CustomerProject.yaml.md)] |  |
+| customerContact* | string | The contact person of the customer |
+| customerEmail* | email | The email of the customer |
+
 
 ## Links
 1. [Java-File](./java/Customer.java)

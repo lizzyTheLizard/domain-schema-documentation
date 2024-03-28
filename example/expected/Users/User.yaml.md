@@ -26,40 +26,6 @@ click _Expenses_ExpenseJournal_yaml href "./../Expenses/ExpenseJournal.yaml.html
 click _Users_CustomerProject_yaml href "./CustomerProject.yaml.html" "Customer Project"
 ```
 
-## Properties
-| Name | Type | Description |
-|------|------|-------------|
-| firstName* | string | The first name of the user |
-| lastName* | string | The last name of the user |
-| email* | email | The email of the user |
-| customerProjects | [[CustomerProjects](#CustomerProjects)] |  |
-| role | [[Role](#Role)] |  |
-
-## Subschemas
-### CustomerProjects (Object)
-
-
-| Name | Type | Description |
-|------|------|-------------|
-| projectId | References [Customer Project](./CustomerProject.yaml.md) | The id of the project |
-| roleInProject | [[RoleInProject](#RoleInProject)] |  |
-### RoleInProject (Enum)
-
-
-| Name | Description |
-|------|-------------|
-| admin | Administrator of the project |
-| member | Regular member of the project |
-| leader | Project-leader, can accept expenses |
-### Role (Enum)
-
-
-| Name | Description |
-|------|-------------|
-| admin | Administrator |
-| user | Regular user |
-| finance | Employee in the finance department |
-
 ## Examples
 ```json
 {
@@ -85,6 +51,48 @@ click _Users_CustomerProject_yaml href "./CustomerProject.yaml.html" "Customer P
   ]
 }
 ```
+
+
+
+## Properties
+| Name | Type | Description |
+|------|------|-------------|
+| firstName* | string | The first name of the user |
+| lastName* | string | The last name of the user |
+| email* | email | The email of the user |
+| customerProjects | [[CustomerProjects](#CustomerProjects)] |  |
+| role | [[Role](#Role)] |  |
+
+## Subschemas
+### CustomerProjects (Object)
+
+
+
+
+| Name | Type | Description |
+|------|------|-------------|
+| projectId | References [Customer Project](./CustomerProject.yaml.md) | The id of the project |
+| roleInProject | [[RoleInProject](#RoleInProject)] |  |
+### RoleInProject (Enum)
+
+
+
+| Name | Description |
+|------|-------------|
+| admin | Administrator of the project |
+| member | Regular member of the project |
+| leader | Project-leader, can accept expenses |
+
+### Role (Enum)
+
+
+
+| Name | Description |
+|------|-------------|
+| admin | Administrator |
+| user | Regular user |
+| finance | Employee in the finance department |
+
 
 ## Links
 1. [Java-File](./java/User.java)
