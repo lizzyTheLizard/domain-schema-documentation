@@ -1,5 +1,5 @@
 # {{{title}}}
-{{#each x-todos}}
+{{#each todos}}
 > - [ ] {{this}}
 {{/each}}
 {{{mdMultiline description}}}
@@ -16,9 +16,9 @@
 {{/each}}
 {{/if}}
 
-{{#if x-links}}
+{{#if links}}
 ## Links
-{{#each x-links}}
+{{#each links}}
 1. [{{{text}}}]({{href}})
 {{/each}}
 {{/if}}

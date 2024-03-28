@@ -1,26 +1,20 @@
 {
   "name": "domain-schema-documentation",
   "version": "1.0.0",
-  "description": "Generate Documentation from JSON Schema, generate stubs in Java and TypeScript and check existing implementations for compliance",
-  "keywords": ["document", "documentation", "domain-model", "domain-driven-design", "json", "schema", "jsonschema", "json-schema", "markdown", "html", "generate", "codegen", "java", "typescript", "openapi"],
-  "homepage": "https://github.com/lizzyTheLizard/domain-schema-documentation",
-  "bugs": "https://github.com/lizzyTheLizard/domain-schema-documentation/issues",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/lizzyTheLizard/domain-schema-documentation.git"
-  },
   "scripts": {
     "build": "yarn workspaces foreach -A run build",
     "check": "yarn workspaces foreach -A run check && syncpack lint && syncpack format",
     "integration-test": "yarn workspaces foreach -A run integration-test"
   },
   "author": "Matthias Graf <matthias.graf@gutschi.site> (https://github.com/lizzyTheLizard/)",
+  "bugs": "https://github.com/lizzyTheLizard/domain-schema-documentation/issues",
   "dependencies": {
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
     "handlebars": "^4.7.8",
     "yaml": "^2.3.4"
   },
+  "description": "Generate Documentation from JSON Schema, generate stubs in Java and TypeScript and check existing implementations for compliance",
   "devDependencies": {
     "syncpack": "^12.3.0"
   },
@@ -29,9 +23,28 @@
     "README.md",
     "LICENSE"
   ],
+  "homepage": "https://github.com/lizzyTheLizard/domain-schema-documentation",
+  "keywords": [
+    "codegen",
+    "document",
+    "documentation",
+    "domain-driven-design",
+    "domain-model",
+    "generate",
+    "html",
+    "java",
+    "json",
+    "json-schema",
+    "jsonschema",
+    "markdown",
+    "openapi",
+    "schema",
+    "typescript"
+  ],
   "license": "MIT",
   "main": "dist/index.js",
   "packageManager": "yarn@4.1.1",
+  "repository": "lizzyTheLizard/domain-schema-documentation.git",
   "type": "module",
   "types": "dist/index.d.ts",
   "workspaces": [

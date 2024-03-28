@@ -21,7 +21,7 @@ export function openApiPlugin (outputFolder: string, options?: OpenApiPluginOpti
 function addLinks (model: Model): Model {
   return {
     application: model.application,
-    modules: model.modules.map(m => ({ ...m, 'x-links': [...m['x-links'] ?? [], { text: 'OpenApiSpec', href: `./${getFileName(m)}` }] })),
+    modules: model.modules.map(m => ({ ...m, links: [...m.links ?? [], { text: 'OpenApiSpec', href: `./${getFileName(m)}` }] })),
     schemas: model.schemas
   }
 }

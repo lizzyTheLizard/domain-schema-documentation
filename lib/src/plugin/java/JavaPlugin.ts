@@ -24,7 +24,7 @@ export function javaPlugin (outputFolder: string): Plugin {
 function addLinks (model: Model): Model {
   return {
     application: model.application,
-    modules: model.modules.map(m => ({ ...m, 'x-links': [...m['x-links'] ?? [], { text: 'Java-Files', href: './java' }] })),
+    modules: model.modules.map(m => ({ ...m, links: [...m.links ?? [], { text: 'Java-Files', href: './java' }] })),
     schemas: model.schemas.map(s => ({ ...s, 'x-links': [...s['x-links'] ?? [], { text: 'Java-File', href: `.${getFileName(s)}` }] }))
   }
 }

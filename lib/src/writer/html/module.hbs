@@ -7,10 +7,10 @@
 
 <h1>{{{title}}}</h1>
 
-{{#if x-todos}}
+{{#if todos}}
 <div class="alert alert-danger" role="alert">
   <ul>
-{{#each x-todos}}
+{{#each todos}}
     <li>{{this}}</li>
 {{/each}}
   </ul>
@@ -50,11 +50,11 @@
 </section>
 {{/if}}
 
-{{#if x-links}}
+{{#if links}}
 <section>
   <h2>Links</h2>
   <ul>
-  {{#each x-links}}
+  {{#each links}}
     <li><a href="{{href}}">{{text}}</a></li>
   {{/each}}
   </ul>

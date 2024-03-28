@@ -5,10 +5,28 @@ type: object
 allOf:
   - $ref: "#/definitions/Schema"
   # On top level, we want to enforce additional properties
-  # First keywords must be valid
-  - $ref: _Keywords.yaml
-  # Some things are required
   - type: object
+    x-schema-type:
+      type: string
+      enum:
+        - Aggregate
+        - Entity
+        - ValueObject
+        - ReferenceData
+        - Other
+    x-todos:
+      type: array
+      items:
+        type: string
+    x-links:
+      type: array
+      items:
+        type: object
+        properties:
+          text:
+            type: string
+          href:
+            type: string
     required:
     - $id
     - x-schema-type

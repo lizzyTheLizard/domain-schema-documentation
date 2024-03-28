@@ -36,8 +36,8 @@ export function enhanceModule (model: Model, module: Module, verificationErrors:
   const errors = verificationErrors.filter(e => 'module' in e && e.module === module)
   return {
     ...module,
-    'x-links': module['x-links'] ?? [],
-    'x-todos': [...module['x-todos'] ?? [], ...getErrorTodos(errors)],
+    links: module.links ?? [],
+    todos: [...module.todos ?? [], ...getErrorTodos(errors)],
     errors,
     classDiagram: moduleDiagram(model, module),
     schemas: model.schemas.filter(s => s.$id.startsWith(module.$id))
@@ -55,8 +55,8 @@ export function enhanceApplication (model: Model, verificationErrors: Verificati
   const errors = verificationErrors.filter(e => 'application' in e && e.application === application)
   return {
     ...application,
-    'x-links': application['x-links'] ?? [],
-    'x-todos': [...application['x-todos'] ?? [], ...getErrorTodos(errors)],
+    links: application.links ?? [],
+    todos: [...application.todos ?? [], ...getErrorTodos(errors)],
     errors,
     classDiagram: applicationDiagram(model),
     modules: model.modules
