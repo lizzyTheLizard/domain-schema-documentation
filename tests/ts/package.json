@@ -1,5 +1,5 @@
 {
-  "name": "ts",
+  "name": "test-ts",
   "scripts": {
     "test": "tsx main.ts"
   },
