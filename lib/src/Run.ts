@@ -18,6 +18,7 @@ export async function run (options?: RunOptions): Promise<void> {
   const writers = options?.writers ?? [htmlWriter('./out')]
   const cleanOutput = typeof options?.cleanOutput === 'string' ? [options.cleanOutput] : options?.cleanOutput ?? []
 
+  // TODO: Remove clean output
   // clean old output, can be executed in parallel
   await Promise.all(cleanOutput.map(async d => { await fs.rm(d, { recursive: true, force: true }) }))
 

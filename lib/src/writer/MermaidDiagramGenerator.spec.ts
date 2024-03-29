@@ -49,7 +49,7 @@ namespace Test 2 {
 }
 _test2_Schema_yaml ..> _test_Schema_yaml :ref
 click _test_Schema_yaml href "./Schema.yaml.html" "Test Schema"
-click _test2_Schema_yaml href "./../test2/Schema.yaml.html" "Test Schema"`)
+click _test2_Schema_yaml href "../test2/Schema.yaml.html" "Test Schema"`)
   })
 
   test('schemaDiagramm with dependencies', () => {
@@ -65,6 +65,6 @@ namespace Test 2 {
 }
 _test2_Schema_yaml ..> _test_Schema_yaml :ref
 click _test_Schema_yaml href "./Schema.yaml.html" "Test Schema"
-click _test2_Schema_yaml href "./../test2/Schema.yaml.html" "Test Schema"`)
+click _test2_Schema_yaml href "../test2/Schema.yaml.html" "Test Schema"`)
   })
 })

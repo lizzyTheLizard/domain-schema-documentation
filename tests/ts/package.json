@@ -1,0 +1,14 @@
+{
+  "name": "ts",
+  "scripts": {
+    "test": "tsx main.ts"
+  },
+  "dependencies": {
+    "domain-schema-documentation": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "test-shared": "workspace:*",
+    "tsx": "^4.7.1"
+  }
+}
