@@ -1,9 +1,10 @@
 {
   "name": "domain-schema-documentation",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "scripts": {
     "build": "yarn workspaces foreach -A run build",
-    "check": "yarn lint:nofix && yarn syncpack:nofix && yarn workspaces foreach -A run check",
+    "check": "yarn lint:nofix && yarn audit && yarn syncpack:nofix && yarn workspaces foreach -A run check",
+    "audit": "yarn workspaces foreach -A npm audit",
     "lint": "eslint --fix .",
     "lint:nofix": "eslint .",
     "syncpack": "syncpack format && syncpack fix-mismatches",
