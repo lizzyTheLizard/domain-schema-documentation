@@ -1,25 +1,12 @@
-import { type Plugin } from './plugin/Plugin'
 import { defaultReader } from './reader/DefaultReader'
 import { htmlWriter } from './writer/html/HtmlWriter'
-import { type Reader } from './reader/Reader'
-import { type Writer } from './writer/Writer'
-import { promises as fs } from 'fs'
+import { type RunOptions } from './RunOptions'
 
-export interface RunOptions {
-  cleanOutput?: string[] | string
-  plugins?: Plugin[]
-  reader?: Reader
-  writers?: Writer[]
-}
-
+// TODO: Document Run and Options
 export async function run (options?: RunOptions): Promise<void> {
   const reader = options?.reader ?? defaultReader('./input')
   const plugins = options?.plugins ?? []
   const writers = options?.writers ?? [htmlWriter('./out')]
-  const cleanOutput = typeof options?.cleanOutput === 'string' ? [options.cleanOutput] : options?.cleanOutput ?? []
-
-  // clean old output, can be executed in parallel
-  await Promise.all(cleanOutput.map(async d => { await fs.rm(d, { recursive: true, force: true }) }))
 
   let model = await reader()
 

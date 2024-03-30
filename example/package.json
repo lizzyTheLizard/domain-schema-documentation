@@ -1,16 +1,10 @@
 {
   "name": "example",
   "scripts": {
-    "generate": "tsx --watch --watch-path=./input --watch-path=./src src/main.ts",
-    "generate:ci": "tsx main.ts",
-    "integration-test": "tsx main.ts && dircompare -lrd expected out"
+    "generate": "node --watch --watch-path=./input main.js",
+    "generate:ci": "node main.js"
   },
   "dependencies": {
     "domain-schema-documentation": "workspace:*"
-  },
-  "devDependencies": {
-    "@types/node": "^20.11.30",
-    "dir-compare-cli": "^1.0.1",
-    "tsx": "^4.7.1"
   }
 }

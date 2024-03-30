@@ -1,0 +1,19 @@
+{
+  "name": "test-shared",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "diff": "^5.2.0",
+    "dir-compare": "^4.2.0"
+  },
+  "devDependencies": {
+    "@types/diff": "^5.0.9",
+    "typescript": "^5.4.3"
+  },
+  "files": [
+    "src/index.ts"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts"
+}

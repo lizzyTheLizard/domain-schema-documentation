@@ -7,7 +7,7 @@ import {
   type Property,
   type Schema,
   type Model
-} from '../../reader/Reader'
+} from '../../reader/Model'
 import { type VerificationError } from '../../writer/Writer'
 
 const classTemplate = loadTemplate(path.join(__dirname, 'class.hbs'))

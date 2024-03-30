@@ -1,5 +1,5 @@
 import { applicationDiagram, moduleDiagram, schemaDiagramm } from './MermaidDiagramGenerator'
-import { type Application, type Model, type Module, type Schema } from '../reader/Reader'
+import { type Application, type Model, type Module, type Schema } from '../reader/Model'
 
 describe('mermaidDiagramGenerator', () => {
   const application: Application = {
@@ -49,7 +49,7 @@ namespace Test 2 {
 }
 _test2_Schema_yaml ..> _test_Schema_yaml :ref
 click _test_Schema_yaml href "./Schema.yaml.html" "Test Schema"
-click _test2_Schema_yaml href "./../test2/Schema.yaml.html" "Test Schema"`)
+click _test2_Schema_yaml href "../test2/Schema.yaml.html" "Test Schema"`)
   })
 
   test('schemaDiagramm with dependencies', () => {
@@ -65,6 +65,6 @@ namespace Test 2 {
 }
 _test2_Schema_yaml ..> _test_Schema_yaml :ref
 click _test_Schema_yaml href "./Schema.yaml.html" "Test Schema"
-click _test2_Schema_yaml href "./../test2/Schema.yaml.html" "Test Schema"`)
+click _test2_Schema_yaml href "../test2/Schema.yaml.html" "Test Schema"`)
   })
 })

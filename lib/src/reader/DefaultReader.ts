@@ -1,16 +1,14 @@
-import { type Model, type Reader } from './Reader'
+import { type Model } from './Model'
 import { promises as fs } from 'fs'
 import path from 'path'
 import * as yaml from 'yaml'
 import { InputNormalizer } from './InputNormalizer'
+import { type Reader } from './Reader'
+import { type DefaultReaderOptions } from './DefaultReaderOptions'
 
 export type FileReader = (filePath: string) => Promise<unknown>
 
-export interface DefaultReaderOptions {
-  inputNormalizer: InputNormalizer
-  fileReader?: FileReader
-}
-
+// TODO Document Reader, DefaultReader and Options
 export function defaultReader (inputFolder: string, options?: DefaultReaderOptions): Reader {
   return async function (): Promise<Model> {
     const inputNormalizer = options?.inputNormalizer ?? new InputNormalizer()

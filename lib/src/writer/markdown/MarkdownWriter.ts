@@ -1,18 +1,19 @@
 import { type VerificationError, type Writer } from '../Writer'
-import { type Property, type Schema, type Model } from '../../reader/Reader'
+import { type Model, type Property, type Schema } from '../../reader/Model'
 import path from 'path'
 import Handlebars from 'handlebars'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
-import { loadTemplate, writeOutput, enhanceApplication, enhanceModule, enhanceSchema } from '../WriterHelpers'
+import {
+  enhanceApplication,
+  enhanceModule,
+  enhanceSchema,
+  loadTemplate,
+  writeOutput
+} from '../WriterHelpers'
 import { relativeLink } from '../../reader/helper/InputHelper'
+import { type MarkdownWriterOptions } from './MarkdownWriterOptions'
 
-export interface MarkdownWriterOptions {
-  write: (output: string, relativeFilename: string) => Promise<void>
-  applicationTemplate: Handlebars.TemplateDelegate
-  moduleTemplate: Handlebars.TemplateDelegate
-  schemaTemplate: Handlebars.TemplateDelegate
-}
-
+// TODO Document MarkdownWriter and Options
 export function markdownWriter (outputFolder: string, options?: MarkdownWriterOptions): Writer {
   return async function (model: Model, verificationErrors: VerificationError[]): Promise<void> {
     Handlebars.registerHelper('mdMultiline', (input: string) => mdMultiline(input))

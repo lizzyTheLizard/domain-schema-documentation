@@ -1,19 +1,19 @@
 import { type VerificationError, type Writer } from '../Writer'
-import { type Model, type Property, type Schema } from '../../reader/Reader'
+import { type Model, type Property, type Schema } from '../../reader/Model'
 import path from 'path'
-import { loadTemplate, writeOutput, enhanceApplication, enhanceModule, enhanceSchema } from '../WriterHelpers'
+import {
+  enhanceApplication,
+  enhanceModule,
+  enhanceSchema,
+  loadTemplate,
+  writeOutput
+} from '../WriterHelpers'
 import Handlebars from 'handlebars'
 import { relativeLink } from '../../reader/helper/InputHelper'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
+import { type HtmlWriterOptions } from './HtmlWriterOptions'
 
-export interface HtmlWriterOptions {
-  write: (output: string, relativeFilename: string) => Promise<void>
-  basicTemplate: Handlebars.TemplateDelegate
-  applicationTemplate: Handlebars.TemplateDelegate
-  moduleTemplate: Handlebars.TemplateDelegate
-  schemaTemplate: Handlebars.TemplateDelegate
-}
-
+// TODO Document HTMLWriter and Options
 export function htmlWriter (outputFolder: string, options?: HtmlWriterOptions): Writer {
   return async function (model: Model, verificationErrors: VerificationError[]): Promise<void> {
     Handlebars.registerHelper('htmlRelativeLink', (fromId: string, toId: string) => relativeLink(fromId, toId))

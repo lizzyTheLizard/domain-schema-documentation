@@ -1,4 +1,4 @@
-import { type Property, type Schema, type BasicProperty, type Model } from '../Reader'
+import { type Property, type Schema, type BasicProperty, type Model } from '../Model'
 import path from 'path'
 
 export type PropertyType = PropertyReferenceType | PropertyLocalType | PropertyArrayType

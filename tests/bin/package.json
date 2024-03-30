@@ -1,0 +1,10 @@
+{
+  "name": "test-bin",
+  "scripts": {
+    "test": "domain-schema-documentation --in ../shared/input --html && dircompare -lrd out ../shared/expected"
+  },
+  "dependencies": {
+    "dir-compare-cli": "^1.0.1",
+    "domain-schema-documentation": "workspace:*"
+  }
+}

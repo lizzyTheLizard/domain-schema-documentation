@@ -1,5 +1,5 @@
 import path from 'path'
-import { type Schema, type SchemaType, type Module, type Model } from '../Reader'
+import { type Schema, type SchemaType, type Module, type Model } from '../Model'
 
 export function getSchemasForModule (model: Model, moduleOrModuleId: Module | string): Schema[] {
   const moduleId = typeof moduleOrModuleId === 'string' ? moduleOrModuleId : moduleOrModuleId.$id
@@ -29,7 +29,8 @@ export function resolveRelativeId (from: Schema | string, relativeId: string): s
 export function relativeLink (fromSchemaOrId: Schema | string, toSchemaOrId: Schema | string): string {
   const fromId = typeof fromSchemaOrId === 'string' ? fromSchemaOrId : fromSchemaOrId.$id
   const toId = typeof toSchemaOrId === 'string' ? toSchemaOrId : toSchemaOrId.$id
-  return `./${path.relative(fromId, toId)}`
+  const relative = path.relative(fromId, toId)
+  return relative.startsWith('..') ? relative : './' + relative
 }
 
 export function getModuleForSchema (model: Model, schemaOrSchemaId: string | Schema): Module {
