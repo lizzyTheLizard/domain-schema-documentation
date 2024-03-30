@@ -1,0 +1,13 @@
+{
+  "name": "test-js-module",
+  "scripts": {
+    "test": "node main.js"
+  },
+  "dependencies": {
+    "domain-schema-documentation": "workspace:*"
+  },
+  "devDependencies": {
+    "test-shared": "workspace:*"
+  },
+  "type": "module"
+}

@@ -1,6 +1,6 @@
 {
   "name": "domain-schema-documentation",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "scripts": {
     "build": "yarn workspaces foreach -A run build",
     "check": "yarn lint:nofix && yarn syncpack:nofix && yarn workspaces foreach -A run check",
@@ -14,7 +14,6 @@
   "bin": "dist/cli.js",
   "bugs": "https://github.com/lizzyTheLizard/domain-schema-documentation/issues",
   "dependencies": {
-    "@eslint/js": "^8.57.0",
     "ajv": "^8.12.0",
     "ajv-formats": "^2.1.1",
     "handlebars": "^4.7.8",
@@ -36,7 +35,7 @@
     "typescript": "^5.4.3"
   },
   "files": [
-    "dist",
+    "dist/*",
     "README.md",
     "LICENSE"
   ],
@@ -62,7 +61,6 @@
   "main": "dist/index.js",
   "packageManager": "yarn@4.1.1",
   "repository": "lizzyTheLizard/domain-schema-documentation",
-  "type": "commonjs",
   "types": "dist/index.d.ts",
   "workspaces": [
     "lib",

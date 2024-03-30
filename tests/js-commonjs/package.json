@@ -1,5 +1,5 @@
 {
-  "name": "test-js",
+  "name": "test-js-commonjs",
   "scripts": {
     "test": "node main.js"
   },

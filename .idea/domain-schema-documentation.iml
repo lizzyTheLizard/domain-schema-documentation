@@ -8,8 +8,8 @@
       <excludeFolder url="file://$MODULE_DIR$/example-js/expected" />
       <excludeFolder url="file://$MODULE_DIR$/example-js/out" />
       <excludeFolder url="file://$MODULE_DIR$/tests/bin/out" />
-      <excludeFolder url="file://$MODULE_DIR$/tests/js/expected" />
-      <excludeFolder url="file://$MODULE_DIR$/tests/js/out" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/js-commonjs/expected" />
+      <excludeFolder url="file://$MODULE_DIR$/tests/js-commonjs/out" />
       <excludeFolder url="file://$MODULE_DIR$/tests/shared/dist" />
       <excludeFolder url="file://$MODULE_DIR$/tests/shared/expected" />
       <excludeFolder url="file://$MODULE_DIR$/tests/ts/out" />
