@@ -7,7 +7,7 @@ import {
   writeOutput
 } from './WriterHelpers'
 import path from 'path'
-import { type Application, type Model, type Module, type Schema } from '../reader/Reader'
+import { type Application, type Model, type Module, type Schema } from '../reader/Model'
 import { type VerificationError } from './Writer'
 
 describe('writerHelpers', () => {

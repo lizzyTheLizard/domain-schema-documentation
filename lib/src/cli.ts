@@ -9,6 +9,7 @@ import { markdownWriter } from './writer/markdown/MarkdownWriter'
 import { javaPlugin } from './plugin/java/JavaPlugin'
 import { type Plugin } from './plugin/Plugin'
 import * as process from 'process'
+
 import { type Reader } from './reader/Reader'
 
 const options = {

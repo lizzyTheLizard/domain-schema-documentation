@@ -1,5 +1,5 @@
 import path from 'path'
-import { type Schema, type SchemaType, type Module, type Model } from '../Reader'
+import { type Schema, type SchemaType, type Module, type Model } from '../Model'
 
 export function getSchemasForModule (model: Model, moduleOrModuleId: Module | string): Schema[] {
   const moduleId = typeof moduleOrModuleId === 'string' ? moduleOrModuleId : moduleOrModuleId.$id

@@ -6,8 +6,6 @@ const outputDir = path.join(__dirname, '/out')
 // TODO: Move GitHub-Pages template to here
 
 run({
-
-  cleanOutput: outputDir,
   reader: defaultReader(inputDir),
   plugins: [openApiPlugin(outputDir), javaPlugin(outputDir)],
   writers: [htmlWriter(outputDir), markdownWriter(outputDir)]

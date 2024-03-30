@@ -1,4 +1,4 @@
-import { type Application, type Module, type Schema } from '../Reader'
+import { type Application, type Module, type Schema } from '../Model'
 import { getDependencies } from './GetDependencies'
 
 describe('GetDependencies', () => {

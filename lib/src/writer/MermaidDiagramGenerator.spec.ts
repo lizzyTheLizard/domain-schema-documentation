@@ -1,5 +1,5 @@
 import { applicationDiagram, moduleDiagram, schemaDiagramm } from './MermaidDiagramGenerator'
-import { type Application, type Model, type Module, type Schema } from '../reader/Reader'
+import { type Application, type Model, type Module, type Schema } from '../reader/Model'
 
 describe('mermaidDiagramGenerator', () => {
   const application: Application = {

@@ -1,4 +1,4 @@
-import { type Module, type Schema, type Model } from '../reader/Reader'
+import { type Module, type Schema, type Model } from '../reader/Model'
 import {
   getModuleForSchema,
   getModuleId,

@@ -13,7 +13,7 @@ import {
   type Schema,
   type SchemaType,
   type Model
-} from './Reader'
+} from './Model'
 import * as fs from 'fs'
 import * as yaml from 'yaml'
 import { cleanName, resolveRelativeId } from './helper/InputHelper'

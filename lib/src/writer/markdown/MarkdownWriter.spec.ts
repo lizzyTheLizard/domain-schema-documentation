@@ -1,7 +1,7 @@
 import { markdownWriter } from './MarkdownWriter'
 import * as tmp from 'tmp'
 import { promises as fs } from 'fs'
-import { type Schema, type Application, type Module } from '../../reader/Reader'
+import { type Schema, type Application, type Module } from '../../reader/Model'
 
 describe('markdownWriter', () => {
   const application: Application = {

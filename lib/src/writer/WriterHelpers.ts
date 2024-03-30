@@ -1,4 +1,4 @@
-import { type Application, type Model, type Module, type Schema } from '../reader/Reader'
+import { type Application, type Model, type Module, type Schema } from '../reader/Model'
 import { applicationDiagram, moduleDiagram, schemaDiagramm } from './MermaidDiagramGenerator'
 import path from 'path'
 import fs from 'fs'

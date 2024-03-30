@@ -1,5 +1,5 @@
 import { getType } from './GetType'
-import { type Application, type Module, type Schema, type Model } from '../Reader'
+import { type Application, type Module, type Schema, type Model } from '../Model'
 
 describe('GetType', () => {
   const application: Application = { title: 'Application', description: 'Application description' }
