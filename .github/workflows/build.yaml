@@ -6,6 +6,7 @@ permissions:
   id-token: write
 jobs:
   Build:
+    name: Build and Test the application
     runs-on: ubuntu-latest
     steps:
       # Setup stuff
@@ -35,6 +36,7 @@ jobs:
           overwrite: false
 
   Example:
+    name: Generate Example-Documentation
     runs-on: ubuntu-latest
     needs: Build
     steps:
@@ -62,6 +64,7 @@ jobs:
       - uses: actions/deploy-pages@v4
 
   Publish:
+    name: Publish to NPM registry
     runs-on: ubuntu-latest
     needs: Build
     if: github.ref == 'refs/heads/main'
@@ -75,6 +78,7 @@ jobs:
         with:
           node-version: 21
           cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
       - name: Download dist folder
         uses: actions/download-artifact@v4
         with:

@@ -3,8 +3,6 @@ const { run, openApiPlugin, javaPlugin, htmlWriter, markdownWriter, defaultReade
 const inputDir = path.join(__dirname, '/input')
 const outputDir = path.join(__dirname, '/out')
 
-// TODO: Move GitHub-Pages template to here
-
 run({
   reader: defaultReader(inputDir),
   plugins: [openApiPlugin(outputDir), javaPlugin(outputDir)],
