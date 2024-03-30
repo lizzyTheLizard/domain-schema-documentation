@@ -7,9 +7,9 @@ import { InputNormalizer } from './InputNormalizer'
 import * as yaml from 'yaml'
 
 /**
- * Default input reader, reads the input folder as defined in the Readme and returns the model
+ * Create a default reader, reads the input folder as defined in the Readme and returns the model
  * @param {string} inputFolder The folder to read from
- * @param optionsOrUndefined Additional options for the reader (optional)
+ * @param {DefaultReaderOptions} optionsOrUndefined Additional options for the reader (optional)
  * @see DefaultReaderOptions
  * @returns {() => Promise<Model>} Returns the reader function
  */

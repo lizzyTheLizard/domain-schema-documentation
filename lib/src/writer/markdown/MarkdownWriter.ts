@@ -13,38 +13,39 @@ import {
 import { relativeLink } from '../../reader/helper/InputHelper'
 import { type MarkdownWriterOptions } from './MarkdownWriterOptions'
 
-// TODO Document MarkdownWriter and Options
-export function markdownWriter (outputFolder: string, options?: MarkdownWriterOptions): Writer {
+/**
+ * Create a new Markdown writer. This writer will write a documentation of the model to the output folder in Markdown format.
+ * @param {string} outputFolder The folder to write the documentation to (required)
+ * @param {MarkdownWriterOptions} optionsOrUndefined Additional options for the writer (optional)
+ * @see MarkdownWriterOptions
+ */
+export function markdownWriter (outputFolder: string, optionsOrUndefined?: MarkdownWriterOptions): Writer {
   return async function (model: Model, verificationErrors: VerificationError[]): Promise<void> {
-    Handlebars.registerHelper('mdMultiline', (input: string) => mdMultiline(input))
-    Handlebars.registerHelper('mdRelativeLink', (fromId: string, toId: string) => relativeLink(fromId, toId))
-    Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, getType(model, schema, property)))
-    Handlebars.registerHelper('mdGetProperty', (obj: any | undefined, property: string) => obj?.[property])
-    Handlebars.registerHelper('mdHasValue', (obj: any[] | undefined, property: any) => obj?.includes(property))
-    Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input, null, 2))
-    Handlebars.registerPartial('mdSubSchema', loadTemplate(path.join(__dirname, 'subSchema.hbs')))
-
-    const schemaTemplate = options?.schemaTemplate ?? loadTemplate(path.join(__dirname, 'schema.hbs'))
-    const moduleTemplate = options?.moduleTemplate ?? loadTemplate(path.join(__dirname, 'module.hbs'))
-    const applicationTemplate = options?.applicationTemplate ?? loadTemplate(path.join(__dirname, 'application.hbs'))
-    const write = options?.write ?? (async (o, f) => { await writeOutput(o, f, outputFolder) })
-
-    for (const schema of model.schemas) {
-      const context = enhanceSchema(model, schema, verificationErrors)
-      const output = schemaTemplate(context)
-      await write(output, `${schema.$id}.md`)
-    }
-
-    for (const module of model.modules) {
-      const context = enhanceModule(model, module, verificationErrors)
-      const output = moduleTemplate(context)
-      await write(output, path.join(module.$id, 'README.md'))
-    }
-
-    const context = enhanceApplication(model, verificationErrors)
-    const output = applicationTemplate(context)
-    await write(output, 'README.md')
+    const options = applyDefaults(outputFolder, optionsOrUndefined)
+    registerHandlebarsHelpers(model)
+    await writeSchemaFiles(model, verificationErrors, options)
+    await writeModuleFiles(model, verificationErrors, options)
+    await writeApplicationFile(model, verificationErrors, options)
   }
+}
+
+function applyDefaults (outputFolder: string, options?: Partial<MarkdownWriterOptions>): MarkdownWriterOptions {
+  return {
+    schemaTemplate: options?.schemaTemplate ?? loadTemplate(path.join(__dirname, 'schema.hbs')),
+    moduleTemplate: options?.moduleTemplate ?? loadTemplate(path.join(__dirname, 'module.hbs')),
+    applicationTemplate: options?.applicationTemplate ?? loadTemplate(path.join(__dirname, 'application.hbs')),
+    write: options?.write ?? (async (o, f) => { await writeOutput(o, f, outputFolder) })
+  }
+}
+
+function registerHandlebarsHelpers (model: Model): void {
+  Handlebars.registerHelper('mdMultiline', (input: string) => mdMultiline(input))
+  Handlebars.registerHelper('mdRelativeLink', (fromId: string, toId: string) => relativeLink(fromId, toId))
+  Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, getType(model, schema, property)))
+  Handlebars.registerHelper('mdGetProperty', (obj: any | undefined, property: string) => obj?.[property])
+  Handlebars.registerHelper('mdHasValue', (obj: any[] | undefined, property: any) => obj?.includes(property))
+  Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input, null, 2))
+  Handlebars.registerPartial('mdSubSchema', loadTemplate(path.join(__dirname, 'subSchema.hbs')))
 }
 
 function mdMultiline (input: string): string {
@@ -65,4 +66,26 @@ function mdGetType (schema: Schema, type: PropertyType): string {
         return type.name
       }
   }
+}
+
+async function writeSchemaFiles (model: Model, verificationErrors: VerificationError[], options: MarkdownWriterOptions): Promise<void> {
+  await Promise.all(model.schemas.map(async (schema) => {
+    const context = enhanceSchema(model, schema, verificationErrors)
+    const output = options.schemaTemplate(context)
+    await options.write(output, `${schema.$id}.md`)
+  }))
+}
+
+async function writeModuleFiles (model: Model, verificationErrors: VerificationError[], options: MarkdownWriterOptions): Promise<void> {
+  await Promise.all(model.modules.map(async (module) => {
+    const context = enhanceModule(model, module, verificationErrors)
+    const output = options.moduleTemplate(context)
+    await options.write(output, path.join(module.$id, 'README.md'))
+  }))
+}
+
+async function writeApplicationFile (model: Model, verificationErrors: VerificationError[], options: MarkdownWriterOptions): Promise<void> {
+  const context = enhanceApplication(model, verificationErrors)
+  const output = options.applicationTemplate(context)
+  await options.write(output, 'README.md')
 }
