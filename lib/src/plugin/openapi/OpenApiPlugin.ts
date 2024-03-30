@@ -37,7 +37,7 @@ async function validateOpenApiSpec (): Promise<VerificationError[]> {
 
 async function generateOpenApiSpecs (model: Model, outputFolder: string, options?: OpenApiPluginOptions): Promise<void> {
   await Promise.all(model.modules.map(async module => {
-    if (module.operations === undefined) return
+    // TODO: If no operations, skip
     const relativeFilename = path.join(module.$id, getFileName(module))
     const output = generateOpenApiSpec(model, module, options)
     const yamlOutput = yaml.stringify(output)
@@ -53,7 +53,8 @@ function generateOpenApiSpec (model: Model, module: Module, options?: OpenApiPlu
       description: module.description
     },
     servers: options?.servers?.map(server => ({ url: server })) ?? [],
-    paths: module.operations,
+    // TODO: Use operations from the input?
+    paths: {},
     components: {
       // TODO: Get all relevant schemas
       schemas: {},

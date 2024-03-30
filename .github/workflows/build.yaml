@@ -1,4 +1,4 @@
-name: Test, Build and Deploy Example to GitHub-Pages
+name: Test and Build and Deploy Example to GitHub-Pages
 on: [ push ]
 permissions:
   contents: read
@@ -6,15 +6,18 @@ permissions:
   id-token: write
 jobs:
   Build:
+    name: Build and Test the application
     runs-on: ubuntu-latest
     steps:
       # Setup stuff
-      - uses: actions/checkout@v4
-      - run: corepack enable
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Enable corepack
+        run: corepack enable
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 21
-          registry-url: 'https://registry.npmjs.org'
           cache: 'yarn'
 
       # Check and build project
@@ -23,15 +26,66 @@ jobs:
       - run: yarn build
       - run: yarn test
 
-      # Generate example
-      - run: yarn workspace example generate:ci
-      - uses: actions/upload-pages-artifact@v3
+      - name: Store dist folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          if-no-files-found: error
+          retention-days: 1
+          overwrite: false
+
+  Example:
+    name: Generate Example-Documentation
+    runs-on: ubuntu-latest
+    needs: Build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Enable corepack
+        run: corepack enable
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21
+          cache: 'yarn'
+      - name: Download dist folder
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Generate documentation for example
+        run: yarn workspace example generate:ci
+      - name: Upload generated documentation to github pages
+        uses: actions/upload-pages-artifact@v3
         with:
           path: "./example/out"
       - uses: actions/deploy-pages@v4
 
-      # publish library
-      - run: yarn npm publish
-        if: github.ref == 'refs/heads/main'
+  Publish:
+    name: Publish to NPM registry
+    runs-on: ubuntu-latest
+    needs: Build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Enable corepack
+        run: corepack enable
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21
+          cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Download dist folder
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Publish
+        run: yarn npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

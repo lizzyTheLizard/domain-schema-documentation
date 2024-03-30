@@ -26,8 +26,12 @@ const RAW_RUNTIME_STATE =
       "reference": "workspace:tests/bin"\
     },\
     {\
-      "name": "test-js",\
-      "reference": "workspace:tests/js"\
+      "name": "test-js-commonjs",\
+      "reference": "workspace:tests/js-commonjs"\
+    },\
+    {\
+      "name": "test-js-module",\
+      "reference": "workspace:tests/js-module"\
     },\
     {\
       "name": "test-shared",\
@@ -45,7 +49,8 @@ const RAW_RUNTIME_STATE =
     ["example", ["workspace:example"]],\
     ["lib", ["workspace:lib"]],\
     ["test-bin", ["workspace:tests/bin"]],\
-    ["test-js", ["workspace:tests/js"]],\
+    ["test-js-commonjs", ["workspace:tests/js-commonjs"]],\
+    ["test-js-module", ["workspace:tests/js-module"]],\
     ["test-shared", ["workspace:tests/shared"]],\
     ["test-ts", ["workspace:tests/ts"]]\
   ],\
@@ -56,7 +61,6 @@ const RAW_RUNTIME_STATE =
       [null, {\
         "packageLocation": "./",\
         "packageDependencies": [\
-          ["@eslint/js", "npm:8.57.0"],\
           ["@types/node", "npm:20.11.30"],\
           ["@typescript-eslint/eslint-plugin", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:6.21.0"],\
           ["@typescript-eslint/parser", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:6.21.0"],\
@@ -3261,7 +3265,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./",\
         "packageDependencies": [\
           ["domain-schema-documentation", "workspace:."],\
-          ["@eslint/js", "npm:8.57.0"],\
           ["@types/node", "npm:20.11.30"],\
           ["@typescript-eslint/eslint-plugin", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:6.21.0"],\
           ["@typescript-eslint/parser", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:6.21.0"],\
@@ -7335,11 +7338,22 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["test-js", [\
-      ["workspace:tests/js", {\
-        "packageLocation": "./tests/js/",\
+    ["test-js-commonjs", [\
+      ["workspace:tests/js-commonjs", {\
+        "packageLocation": "./tests/js-commonjs/",\
         "packageDependencies": [\
-          ["test-js", "workspace:tests/js"],\
+          ["test-js-commonjs", "workspace:tests/js-commonjs"],\
+          ["domain-schema-documentation", "workspace:."],\
+          ["test-shared", "workspace:tests/shared"]\
+        ],\
+        "linkType": "SOFT"\
+      }]\
+    ]],\
+    ["test-js-module", [\
+      ["workspace:tests/js-module", {\
+        "packageLocation": "./tests/js-module/",\
+        "packageDependencies": [\
+          ["test-js-module", "workspace:tests/js-module"],\
           ["domain-schema-documentation", "workspace:."],\
           ["test-shared", "workspace:tests/shared"]\
         ],\

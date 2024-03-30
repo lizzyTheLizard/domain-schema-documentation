@@ -1,4 +1,6 @@
 import { type Model } from './Model'
 
-// TODO Document Reader, DefaultReader and Options
+/**
+ * A reader is a function that reads a model from a source.
+ */
 export type Reader = () => Promise<Model>

@@ -622,7 +622,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:8.57.0, @eslint/js@npm:^8.57.0":
+"@eslint/js@npm:8.57.0":
   version: 8.57.0
   resolution: "@eslint/js@npm:8.57.0"
   checksum: 10c0/9a518bb8625ba3350613903a6d8c622352ab0c6557a59fe6ff6178bf882bf57123f9d92aa826ee8ac3ee74b9c6203fe630e9ee00efb03d753962dcf65ee4bd94
@@ -2332,7 +2332,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "domain-schema-documentation@workspace:."
   dependencies:
-    "@eslint/js": "npm:^8.57.0"
     "@types/node": "npm:^20.11.30"
     "@typescript-eslint/eslint-plugin": "npm:^6.4.0"
     "@typescript-eslint/parser": "npm:^6.4.0"
@@ -5923,9 +5922,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"test-js@workspace:tests/js":
+"test-js-commonjs@workspace:tests/js-commonjs":
   version: 0.0.0-use.local
-  resolution: "test-js@workspace:tests/js"
+  resolution: "test-js-commonjs@workspace:tests/js-commonjs"
+  dependencies:
+    domain-schema-documentation: "workspace:*"
+    test-shared: "workspace:*"
+  languageName: unknown
+  linkType: soft
+
+"test-js-module@workspace:tests/js-module":
+  version: 0.0.0-use.local
+  resolution: "test-js-module@workspace:tests/js-module"
   dependencies:
     domain-schema-documentation: "workspace:*"
     test-shared: "workspace:*"
