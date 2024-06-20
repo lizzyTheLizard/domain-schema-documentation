@@ -1,6 +1,6 @@
 {
   "name": "domain-schema-documentation",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "scripts": {
     "audit": "yarn workspaces foreach -A npm audit",
     "build": "yarn workspaces foreach -A run build",
