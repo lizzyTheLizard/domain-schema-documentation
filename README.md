@@ -86,7 +86,6 @@ run({ reader: yourreader}).catch(console.error)
 
 By default, the [DefaultReader](./lib/src/reader/DefaultReader.ts) is used.
 
-
 ## Writers
 Writers are used to generate the documentation. An HTML and a Markdown writer is already included, but you can also define your own writers.
 You can use multiple writers at the same time.
@@ -136,6 +135,27 @@ run({ plugins: [yourPlugin]}).catch(console.error)
 
 ## Examples
 In the folder [example](./example) you can find a full example of how to use this package. The example contains a domain model defined in JSON Schema in the folder [input](./example/input), a configuration script at [main.js](./example/main.js) and a [package.json](./example/package.json) file defining the script `generate` to run the example. In will generate HTML and Markdown documentation in the folder [out](./example/out) as well as Java and TypeScript stubs. The documentation is automatically published to [GitHub Pages](https://lizzythelizard.github.io/domain-schema-documentation/) using the GitHub Action defined in [build.yaml](./.github/workflows/build.yaml).
+
+## Development
+The source code can be found in the [lib/src](./lib/src) folder. It is organized in the following parts: 
+* The [plugin](./lib/src/plugin) folder contains the plugin definitions as well as the default plugins for Java and OpenAPI.
+* The  [reader](./lib/src/reader) folder container the input model reader
+* The [writer](./lib/src/writer) folder contains the writer definition as well as the default writers for HTML and Markdown
+* The [Run.ts](./lib/src/Run.ts) file contains the main function to run the documentation generation, [RunOptions.ts](./lib/src/RunOptions.ts) contains the options for the run function.
+* The [cli.js](./lib/src/cli.js) file contains the command line interface.
+* The [index.ts](./lib/src/index.ts) file exports all functions and classes.
+
+Besides the lib, there are also subfolders for the [example](./example) and the [tests](./tests)
+
+The following commands can be handy during development:
+* `yarn build` to build the project
+* `yarn test` to run the tests
+* `yarn lint` to lint the project
+* `yarn check` to run all checks and tests in the project
+* `yarn workspace tests` to run the unit tests in watch mode
+* `yarn workspace example` to run the example
+
+The GitHub Action Pipeline at [.github/workflows/build.yaml](./.github/workflows/build.yaml) is used to run the tests and checks on every push. After a merge to main, a new version is build and published to NPM. Make sure to increase the version number before merging to main!
 
 ## Credits
 This software uses the following open source packages:
