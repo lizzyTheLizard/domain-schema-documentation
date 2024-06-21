@@ -152,8 +152,10 @@ The following commands can be handy during development:
 * `yarn test` to run the tests
 * `yarn lint` to lint the project
 * `yarn check` to run all checks and tests in the project
-* `yarn workspace tests` to run the unit tests in watch mode
-* `yarn workspace example` to run the example
+* `yarn integration-tests` to run the integration tests
+* `yarn unit-tests` to run the unit tests
+* `yarn workspace example generate` to run the example
+* `yarn workspace example generate:watch` to run the example in watch mode
 
 The GitHub Action Pipeline at [.github/workflows/build.yaml](./.github/workflows/build.yaml) is used to run the tests and checks on every push. After a merge to main, a new version is build and published to NPM. Make sure to increase the version number before merging to main!
 

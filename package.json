@@ -1,15 +1,16 @@
 {
   "name": "domain-schema-documentation",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "scripts": {
     "audit": "yarn workspaces foreach -A npm audit",
     "build": "yarn workspaces foreach -A run build",
     "check": "yarn lint:nofix && yarn audit && yarn syncpack:nofix && yarn workspaces foreach -A run check",
+    "integration-tests": "yarn workspaces foreach -A run integration-tests",
     "lint": "eslint --fix .",
     "lint:nofix": "eslint .",
     "syncpack": "syncpack format && syncpack fix-mismatches",
     "syncpack:nofix": " syncpack lint && syncpack format",
-    "test": "yarn workspaces foreach -A run test"
+    "unit-tests": "yarn workspaces foreach -A run unit-tests"
   },
   "author": "Matthias Graf <matthias.graf@gutschi.site> (https://github.com/lizzyTheLizard/)",
   "bin": "dist/cli.js",
@@ -61,7 +62,7 @@
   ],
   "license": "MIT",
   "main": "dist/index.js",
-  "packageManager": "yarn@4.1.1",
+  "packageManager": "yarn@4.3.1",
   "repository": "lizzyTheLizard/domain-schema-documentation",
   "types": "dist/index.d.ts",
   "workspaces": [

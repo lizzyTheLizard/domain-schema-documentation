@@ -1,8 +1,8 @@
 {
   "name": "example",
   "scripts": {
-    "generate": "node --watch --watch-path=./input main.js",
-    "generate:ci": "node main.js"
+    "generate": "node main.js",
+    "generate:watch": "node --watch --watch-path=./input main.js"
   },
   "dependencies": {
     "domain-schema-documentation": "workspace:*"
