@@ -1,0 +1,11 @@
+package {{javaPackageName this}};
+
+{{#each (javaImplementedInterfaces this)}} 
+import {{this}};
+{{/each}}
+
+{{#if description}}
+{{javaComment description 0}}
+{{/if}}
+public interface {{javaClassName this}}{{#each (javaImplementedInterfaces this)}}{{#if @first}} extends {{/if}}{{javaShortName this}}{{#unless @last}}, {{/unless}}{{/each}} {
+}

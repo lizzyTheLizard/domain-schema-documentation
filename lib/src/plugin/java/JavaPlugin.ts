@@ -1,86 +1,79 @@
 import { type Plugin } from '../Plugin'
+import { javaGenerator } from './JavaGenerator'
+import { javaValidator } from './JavaValidator'
+import { javaUpdator } from './JavaUpdator'
+import { loadTemplate } from '../../writer/WriterHelpers'
 import path from 'path'
-import Handlebars from 'handlebars'
-import { loadTemplate, writeOutput } from '../../writer/WriterHelpers'
-import {
-  type EnumDefinition,
-  type Property,
-  type Schema,
-  type Model
-} from '../../reader/Model'
-import { type VerificationError } from '../../writer/Writer'
+import { type FormatName } from 'ajv-formats'
 
-const classTemplate = loadTemplate(path.join(__dirname, 'class.hbs'))
-const enumTemplate = loadTemplate(path.join(__dirname, 'enum.hbs'))
+// TODO: Document
 
-export function javaPlugin (outputFolder: string): Plugin {
+export interface JavaPluginOptions {
+  mainPackageName: string | undefined
+  modelPackageName: string | undefined
+  useLombok: boolean
+  basicTypeMap: Record<string, string>
+  classTemplate: HandlebarsTemplateDelegate
+  enumTemplate: HandlebarsTemplateDelegate
+  interfaceTemplate: HandlebarsTemplateDelegate
+}
+
+export function javaPlugin (outputFolder: string, optionsOrUndefined?: JavaPluginOptions): Plugin {
+  const options = applyDefaults(optionsOrUndefined)
   return {
-    updateModel: async (model) => addLinks(model),
-    validate: async () => await validateJava(),
-    generateOutput: async (model) => { await generateJavaOutput(model, outputFolder) }
+    updateModel: javaUpdator(),
+    validate: javaValidator(),
+    generateOutput: javaGenerator(outputFolder, options)
   }
 }
 
-function addLinks (model: Model): Model {
+function applyDefaults (optionsOrUndefined?: JavaPluginOptions): JavaPluginOptions {
   return {
-    application: model.application,
-    modules: model.modules.map(m => ({ ...m, links: [...m.links ?? [], { text: 'Java-Files', href: './java' }] })),
-    schemas: model.schemas.map(s => ({ ...s, 'x-links': [...s['x-links'] ?? [], { text: 'Java-File', href: `.${getFileName(s)}` }] }))
+    mainPackageName: optionsOrUndefined?.mainPackageName ?? 'com.example',
+    modelPackageName: optionsOrUndefined?.modelPackageName ?? 'model',
+    useLombok: optionsOrUndefined?.useLombok ?? true,
+    basicTypeMap: optionsOrUndefined?.basicTypeMap ?? { ...defaultBasicTypeMap, ...defaultAjvFormatMap },
+    classTemplate: optionsOrUndefined?.classTemplate ?? loadTemplate(path.join(__dirname, 'class.hbs')),
+    enumTemplate: optionsOrUndefined?.enumTemplate ?? loadTemplate(path.join(__dirname, 'enum.hbs')),
+    interfaceTemplate: optionsOrUndefined?.interfaceTemplate ?? loadTemplate(path.join(__dirname, 'interface.hbs'))
   }
 }
 
-async function validateJava (): Promise<VerificationError[]> {
-  return []
+// Basic JSON Schema types, must be present in basicTypeMap
+export const defaultBasicTypeMap = {
+  string: 'String',
+  integer: 'Integer',
+  number: 'Double',
+  boolean: 'Boolean',
+  null: 'Void'
 }
 
-async function generateJavaOutput (model: Model, outputFolder: string): Promise<void> {
-  Handlebars.registerHelper('javaComment', (text: string, indentation: number) => javaComment(text, indentation))
-  Handlebars.registerHelper('javaClassName', (schema: Schema) => className(schema))
-  Handlebars.registerHelper('javaEnumDoc', (schema: EnumDefinition, key: string) => enumDoc(schema, key))
-  Handlebars.registerHelper('javaPropertyType', (property: Property) => propertyType(property))
-
-  for (const schema of model.schemas) {
-    const relativeFilename = path.join(path.dirname(schema.$id), getFileName(schema))
-    if (schema.type === 'object') {
-      // TODO Implement template and test
-      const output = classTemplate({ ...schema, imports: getImports(schema) })
-      await writeOutput(output, relativeFilename, outputFolder)
-    } else {
-      // TODO Implement template and test
-      const output = enumTemplate(schema)
-      await writeOutput(output, relativeFilename, outputFolder)
-    }
-  }
-}
-
-function getFileName (schema: Schema): string {
-  return `/java/${path.basename(schema.$id).replace(path.extname(schema.$id), '.java')}`
-}
-
-function javaComment (text: string, indentation: number): string {
-  const intendString = ' '.repeat(indentation)
-  if (text.includes('\n')) {
-    const split = text.trim().split('\n')
-    return `${intendString}/* ${split.join('\n' + intendString)} */`
-  } else {
-    return `${intendString}// ${text}`
-  }
-}
-
-function className (schema: Schema): string {
-  return path.basename(schema.$id).replace(path.extname(schema.$id), '')
-}
-
-function enumDoc (schema: EnumDefinition, key: string): string {
-  return schema['x-enum-description']?.[key] ?? ''
-}
-
-function propertyType (_: Property): string {
-  // TODO: Implement type mapping
-  return 'String'
-}
-
-function getImports (_: Property | Schema): string[] {
-  // TODO: Implement type mapping
-  return []
+// Mapping for all ajv-formats. As this is the default list of all formats, these should be included in the basicTypeMap
+export const defaultAjvFormatMap: Record<FormatName, string> = {
+  date: 'java.time.LocalDate',
+  time: 'java.time.OffsetTime',
+  'date-time': 'java.time.OffsetDateTime',
+  'iso-time': 'java.time.LocalTime',
+  'iso-date-time': 'java.time.LocalDateTime',
+  duration: 'java.time.Duration',
+  uri: 'java.net.URI',
+  'uri-reference': 'String',
+  'uri-template': 'String',
+  url: 'java.net.URL',
+  email: 'String',
+  hostname: 'String',
+  ipv4: 'java.net.Inet4Address',
+  ipv6: 'java.net.Inet6Address',
+  regex: 'String',
+  uuid: ' java.util.UUID',
+  'json-pointer': 'String',
+  'json-pointer-uri-fragment': 'String',
+  'relative-json-pointer': 'String',
+  byte: 'Byte',
+  float: 'Float',
+  double: 'Double',
+  password: 'String',
+  binary: 'byte[]',
+  int32: 'Integer',
+  int64: 'Long'
 }

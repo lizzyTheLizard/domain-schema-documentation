@@ -1,4 +1,9 @@
-public enum {{javaClassName this}} {
+package {{javaPackageName this}};
+
+{{#if description}}
+{{javaComment description 0}}
+{{/if}}
+public enum {{javaClassName this}}{{#each (javaImplementedInterfaces this)}}{{#if @first}} implements {{/if}}{{javaShortName this}}{{#unless @last}}, {{/unless}}{{/each}} {
 {{#each enum}}
 {{#if ../x-enum-description}}
 {{javaComment (javaEnumDoc .. this) 2}}
