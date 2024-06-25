@@ -5967,6 +5967,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"test-java@workspace:tests/java":
+  version: 0.0.0-use.local
+  resolution: "test-java@workspace:tests/java"
+  dependencies:
+    "@types/node": "npm:^20.14.7"
+    domain-schema-documentation: "workspace:*"
+    test-shared: "workspace:*"
+    tsx: "npm:^4.15.7"
+  languageName: unknown
+  linkType: soft
+
 "test-js-commonjs@workspace:tests/js-commonjs":
   version: 0.0.0-use.local
   resolution: "test-js-commonjs@workspace:tests/js-commonjs"

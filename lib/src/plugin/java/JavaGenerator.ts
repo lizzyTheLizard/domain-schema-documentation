@@ -19,8 +19,8 @@ export function javaGenerator (outputFolder: string, options: JavaPluginOptions)
     Handlebars.registerHelper('javaShortName', (name: string) => name.split('.').pop())
     Handlebars.registerHelper('javaEnumDoc', (ctx: HandlebarsContext, key: string) => javaEnumDoc(ctx as EnumDefinition, key))
     Handlebars.registerHelper('javaImplementedInterfaces', (ctx: HandlebarsContext) => implementedInterfaces(model, ctx.schema, options, ctx.definitionName))
-    Handlebars.registerHelper('javaImportedPropertyTypes', (ctx: HandlebarsContext) => importedPropertyTypes(model, ctx.schema, ctx, options))
     Handlebars.registerHelper('javaPropertyType', (ctx: HandlebarsContext, propertyName: string) => propertyType(model, ctx.schema, ctx as ObjectDefinition, propertyName, options))
+    Handlebars.registerHelper('javaImports', (ctx: HandlebarsContext) => collectImports(model, ctx.schema, options, ctx.definitionName))
 
     for (const schema of model.schemas) {
       const output = await generate(schema, options)
@@ -54,12 +54,23 @@ function implementedInterfaces (model: Model, schema: Schema, options: JavaPlugi
     .map(d => getFullJavaClassName(d.fromSchema, options))
 }
 
-function importedPropertyTypes (model: Model, schema: Schema, definition: Definition, options: JavaPluginOptions): string[] {
-  if (!('properties' in definition)) { return [] }
-  return Object.values(definition.properties).flatMap((property) => {
-    const propertyType = getType(model, schema, property)
-    return getJavaPropertyType(propertyType, schema, options).imports
-  })
+function collectImports (model: Model, schema: Schema, options: JavaPluginOptions, definitionName?: string): string[] {
+  const definition = definitionName === undefined ? schema : schema.definitions[definitionName]
+  const result: string[] = []
+  if ('properties' in definition && options.useLombok) { result.push('lombok.*') }
+  if ('properties' in definition) {
+    Object.values(definition.properties).flatMap((property) => {
+      const propertyType = getType(model, schema, property)
+      return getJavaPropertyType(propertyType, schema, options).imports
+    }).forEach(i => result.push(i))
+  }
+  implementedInterfaces(model, schema, options, definitionName).forEach(i => result.push(i))
+  const packageName = getJavaPackageName(schema, options)
+  return [...new Set(result)].filter(x => !isInPackage(x, packageName))
+}
+
+function isInPackage (fullClassName: string, packageName: string): boolean {
+  return fullClassName.split('.').slice(0, -1).join('.') === packageName
 }
 
 const javaBasicTypes = new Map([['Short', 'short'], ['Integer', 'int'], ['Long', 'long'], ['Float', 'float'], ['Double', 'double'], ['Boolean', 'boolean'], ['Character', 'char']])

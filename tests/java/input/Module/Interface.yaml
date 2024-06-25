@@ -1,0 +1,23 @@
+$id: /Module/Interface.yaml
+title: Interface
+description: This is an interface
+type: object
+x-schema-type: Other
+oneOf:
+  - $ref: ./Object.yaml
+  - $ref: '#/definitions/OtherObject'
+  - type: string
+    enum:
+      - "Test"
+      - "Test2"
+    x-enum-description:
+      Test: "Test description"
+      Test2: "Test2 description"
+definitions:
+  OtherObject:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string

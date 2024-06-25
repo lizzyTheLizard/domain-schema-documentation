@@ -114,6 +114,7 @@ describe('JavaGenerator', () => {
     await target(model)
 
     const content = (await fs.readFile(tmpDir.name + '/Module2/java/Schema2SubSchema.java', 'utf-8')).toString()
+    expect(content).not.toContain('import com.example.module2.model.Schema2;')
     expect(content).toContain('public class Schema2SubSchema implements Schema2 {')
   })
 

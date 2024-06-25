@@ -1,4 +1,3 @@
-import path from 'path'
 import { type Link, type Module, type Schema, type Model } from '../../reader/Model'
 import { type Updator } from '../Plugin'
 import { getSimpleJavaClassName } from './JavaHelper'

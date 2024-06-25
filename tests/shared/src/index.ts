@@ -9,8 +9,8 @@ export function handleError (error: unknown): void {
   process.exit(-2)
 }
 
-export async function compareOutput (outputFolder: string): Promise<void> {
-  const expectedFolder = path.join(__dirname, '..', 'expected')
+export async function compareOutput (outputFolder: string, expectedFolder?: string): Promise<void> {
+  expectedFolder = expectedFolder ?? path.join(__dirname, '..', 'expected')
   const result = await compare(outputFolder, expectedFolder, { compareContent: true })
   if (result.same) {
     console.log('Directories are identical')

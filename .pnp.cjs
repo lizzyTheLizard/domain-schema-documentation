@@ -27,6 +27,10 @@ const RAW_RUNTIME_STATE =
       "reference": "workspace:tests/bin"\
     },\
     {\
+      "name": "test-java",\
+      "reference": "workspace:tests/java"\
+    },\
+    {\
       "name": "test-js-commonjs",\
       "reference": "workspace:tests/js-commonjs"\
     },\
@@ -50,6 +54,7 @@ const RAW_RUNTIME_STATE =
     ["example", ["workspace:example"]],\
     ["lib", ["workspace:lib"]],\
     ["test-bin", ["workspace:tests/bin"]],\
+    ["test-java", ["workspace:tests/java"]],\
     ["test-js-commonjs", ["workspace:tests/js-commonjs"]],\
     ["test-js-module", ["workspace:tests/js-module"]],\
     ["test-shared", ["workspace:tests/shared"]],\
@@ -7359,6 +7364,19 @@ const RAW_RUNTIME_STATE =
           ["minimatch", "npm:3.1.2"]\
         ],\
         "linkType": "HARD"\
+      }]\
+    ]],\
+    ["test-java", [\
+      ["workspace:tests/java", {\
+        "packageLocation": "./tests/java/",\
+        "packageDependencies": [\
+          ["test-java", "workspace:tests/java"],\
+          ["@types/node", "npm:20.14.7"],\
+          ["domain-schema-documentation", "workspace:."],\
+          ["test-shared", "workspace:tests/shared"],\
+          ["tsx", "npm:4.15.7"]\
+        ],\
+        "linkType": "SOFT"\
       }]\
     ]],\
     ["test-js-commonjs", [\
