@@ -1,13 +1,28 @@
-{{#each imports}}
-import {{this}};
-{{/each}}
+package {{javaPackageName this}};
 
+{{#each (javaImports this)}} 
+import {{this}};
+{{#if @last}}
+
+{{/if}}
+{{/each}}
+{{#if description}}
 {{javaComment description 0}}
-public class {{javaClassName this}} {
+{{/if}}
+{{#if useLombok}}
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+{{/if}}
+public class {{javaClassName this}}{{#each (javaImplementedInterfaces this)}}{{#if @first}} implements {{/if}}{{javaShortName this}}{{#unless @last}}, {{/unless}}{{/each}} {
 {{#each properties}}
 {{#if description}}
 {{javaComment description 2}}
 {{/if}}
-  private {{javaPropertyType this}} {{@key}};
+  private {{javaPropertyType .. @key}} {{@key}};
 {{/each}}
 }
+
+

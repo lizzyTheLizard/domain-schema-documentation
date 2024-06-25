@@ -1,0 +1,13 @@
+$id: /Module/Object.yaml
+title: Object
+description: This is an integration test for the application
+type: object
+x-schema-type: Aggregate
+examples:
+  - id: "1"
+    name: "Test"
+properties:
+  id:
+    type: string
+  name:
+    type: string

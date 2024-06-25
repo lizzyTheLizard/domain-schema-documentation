@@ -2,10 +2,9 @@
   "name": "lib",
   "scripts": {
     "build": "tsc && cpy 'src/**/*.hbs' ../dist && cpy 'src/**/*.yaml' ../dist",
-    "check": "yarn run check:types && yarn run check:test",
-    "check:test": "jest",
+    "check": "yarn run check:types && yarn run unit-tests",
     "check:types": "tsc --noEmit --skipLibCheck",
-    "tests": "jest --watch"
+    "unit-tests": "jest"
   },
   "dependencies": {
     "ajv": "^8.16.0",
