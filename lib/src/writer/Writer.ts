@@ -1,4 +1,6 @@
-import { type Application, type Model, type Module, type Schema } from '../reader/Model'
+import { type Application, type Model, type Module, type Schema } from '../reader/Reader'
+
+// TODO: Document
 
 export type VerificationError = ApplicationVerificationError | ModuleVerificationError | SchemaVerificationError
 

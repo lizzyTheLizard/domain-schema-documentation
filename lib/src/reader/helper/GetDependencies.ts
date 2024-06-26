@@ -1,5 +1,7 @@
-import { type Definition, type Property, type Schema, type Model } from '../Model'
+import { type Definition, type Property, type Schema, type Model } from '../Reader'
 import { getSchema, resolveRelativeId } from './InputHelper'
+
+// TODO: Document
 
 export interface Dependency {
   fromSchema: Schema

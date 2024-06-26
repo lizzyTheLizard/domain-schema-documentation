@@ -1,10 +1,12 @@
-import { type Application, type Model, type Module, type Schema } from '../reader/Model'
+import { type Application, type Model, type Module, type Schema } from '../reader/Reader'
 import { applicationDiagram, moduleDiagram, schemaDiagramm } from './MermaidDiagramGenerator'
 import path from 'path'
 import fs from 'fs'
 import Handlebars from 'handlebars'
 import { getModuleForSchema } from '../reader/helper/InputHelper'
 import { type VerificationError } from './Writer'
+
+// TODO: Document
 
 export type EnhancedSchema = Schema & {
   hasDefinitions: boolean

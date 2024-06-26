@@ -1,6 +1,6 @@
 import * as tmp from 'tmp'
 import { promises as fs } from 'fs'
-import { type Schema, type Application, type Module } from '../../reader/Model'
+import { type Schema, type Application, type Module } from '../../reader/Reader'
 import { htmlWriter } from './HtmlWriter'
 
 describe('htmlWriter', () => {

@@ -1,4 +1,4 @@
-import { type Application, type Module, type Schema } from '../../reader/Model'
+import { type Application, type Module, type Schema } from '../../reader/Reader'
 import { javaUpdator } from './JavaUpdator'
 
 describe('JavaUpdator', () => {

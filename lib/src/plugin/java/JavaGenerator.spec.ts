@@ -1,7 +1,7 @@
 import * as tmp from 'tmp'
-import { type InterfaceDefinition, type Application, type Module, type Schema, type EnumDefinition } from '../../reader/Model'
+import { type InterfaceDefinition, type Application, type Module, type Schema, type EnumDefinition } from '../../reader/Reader'
 import { javaGenerator } from './JavaGenerator'
-import { type JavaPluginOptions, defaultAjvFormatMap, defaultBasicTypeMap } from './JavaPlugin'
+import { defaultJavaBasicTypeMap, defaultJavaFormatMap, type JavaPluginOptions } from './JavaPlugin'
 import { loadTemplate } from '../../writer/WriterHelpers'
 import { promises as fs } from 'fs'
 import path from 'path'
@@ -41,7 +41,7 @@ describe('JavaGenerator', () => {
     mainPackageName: 'com.example',
     modelPackageName: 'model',
     useLombok: true,
-    basicTypeMap: { ...defaultBasicTypeMap, ...defaultAjvFormatMap },
+    basicTypeMap: { ...defaultJavaBasicTypeMap, ...defaultJavaFormatMap },
     classTemplate: loadTemplate(path.join(__dirname, 'class.hbs')),
     enumTemplate: loadTemplate(path.join(__dirname, 'enum.hbs')),
     interfaceTemplate: loadTemplate(path.join(__dirname, 'interface.hbs'))

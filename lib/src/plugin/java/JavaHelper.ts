@@ -1,8 +1,10 @@
 import path from 'path'
-import { type Schema } from '../../reader/Model'
+import { type Schema } from '../../reader/Reader'
 import { cleanName, getModuleId } from '../../reader/helper/InputHelper'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { type PropertyType } from '../../reader/helper/GetType'
+
+// TODO: Document
 
 export function getJavaPropertyType (propertyType: PropertyType, schema: Schema, options: JavaPluginOptions): { name: string, imports: string[] } {
   switch (propertyType.type) {

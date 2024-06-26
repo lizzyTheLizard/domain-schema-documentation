@@ -9,5 +9,5 @@ import {{this}};
 {{#if description}}
 {{javaComment description 0}}
 {{/if}}
-public interface {{javaClassName this}}{{#each (javaImplementedInterfaces this)}}{{#if @first}} extends {{/if}}{{javaShortName this}}{{#unless @last}}, {{/unless}}{{/each}} {
+public interface {{javaClassName this}}{{#each (javaImplementedInterfaces this)}}{{#if @first}} extends {{/if}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} {
 }

@@ -1,4 +1,4 @@
-import Ajv, { type AnySchema, type Options, type Format as avjFormat } from 'ajv'
+import Ajv, { type Format, type Options, type AnySchema } from 'ajv'
 import {
   type Application,
   type ArrayProperty,
@@ -13,23 +13,30 @@ import {
   type Schema,
   type SchemaType,
   type Model
-} from './Model'
+} from './Reader'
 import * as fs from 'fs'
 import * as yaml from 'yaml'
 import { cleanName, resolveRelativeId } from './helper/InputHelper'
-import { fullFormats } from 'ajv-formats/dist/formats'
-import { type FormatName } from 'ajv-formats'
 import path from 'path'
+import { type FormatName, fullFormats } from 'ajv-formats/dist/formats'
 
-export interface Format { name: string, avjFormat: avjFormat }
-export const defaultFormats: Format[] = Object.keys(fullFormats).map(name => ({ name, avjFormat: fullFormats[name as FormatName] }))
-export const defaultKeywords = ['discriminator']
-
+/**
+ * Options for the InputNormalizer
+ */
 export interface InputNormalizerOptions {
-  ajvOptions?: Options
-  noAdditionalPropertiesInExamples?: boolean
-  allowedFormats?: Array<{ name: string, avjFormat: avjFormat }>
-  allowedKeywords?: string[]
+  /** AjvOptions given to the InputNormalizer. By default {allErrors: true, discriminator: true}
+   * @see https://ajv.js.org/options.html
+   * @see InputNormalizer
+   */
+  ajvOptions: Options
+  /** Allow additional non documented properties in the examples, By default false   */
+  noAdditionalPropertiesInExamples: boolean
+  /** Allowed formats. By default the formats of ajv-formats
+   * @see https://ajv.js.org/packages/ajv-formats.html
+   */
+  allowedFormats: Array<{ name: string, avjFormat: Format }>
+  /** Allowed additional keywords. By default none */
+  allowedKeywords: string[]
 }
 
 interface NonNormalizedSchema {
@@ -59,6 +66,9 @@ interface NormalizerResult<T> {
   definitions: Record<string, NonNormalizedSubSchema>
 }
 
+/**
+ * Normalizes the input to an "DefaultInput" according to @see Model
+ */
 export class InputNormalizer {
   readonly #noAdditionalPropertiesInExamples: boolean
   readonly #applications: Application[] = []
@@ -66,37 +76,52 @@ export class InputNormalizer {
   readonly #modules: Module[] = []
   readonly #ajv: Ajv
 
-  constructor (private readonly options?: InputNormalizerOptions) {
-    this.#noAdditionalPropertiesInExamples = options?.noAdditionalPropertiesInExamples ?? true
-    this.#ajv = new Ajv(options?.ajvOptions ?? { allErrors: true })
+  public constructor (optionsOrUndefined?: Partial<InputNormalizerOptions>) {
+    const options = applyDefaults(optionsOrUndefined)
+    this.#noAdditionalPropertiesInExamples = options.noAdditionalPropertiesInExamples
+    this.#ajv = new Ajv(options.ajvOptions)
     this.#ajv.addSchema(this.readYamlFile(path.join(__dirname, 'inputDefinition', '_Application.yaml')))
     this.#ajv.addSchema(this.readYamlFile(path.join(__dirname, 'inputDefinition', '_Module.yaml')))
     this.#ajv.addSchema(this.readYamlFile(path.join(__dirname, 'inputDefinition', '_Schema.yaml')))
-    const allowedFormats = options?.allowedFormats ?? defaultFormats
-    allowedFormats.forEach(f => this.#ajv.addFormat(f.name, f.avjFormat))
+    options.allowedFormats.forEach(f => this.#ajv.addFormat(f.name, f.avjFormat))
     this.#ajv.addKeyword('x-schema-type')
     this.#ajv.addKeyword('x-references')
     this.#ajv.addKeyword('x-enum-description')
     this.#ajv.addKeyword('x-todos')
     this.#ajv.addKeyword('x-links')
-    const allowedKeywords = options?.allowedKeywords ?? defaultKeywords
-    allowedKeywords?.forEach(f => this.#ajv.addKeyword(f))
+    options.allowedKeywords.forEach(f => this.#ajv.addKeyword(f))
   }
 
-  addApplication (parsed: unknown, fileLocation: string): void {
+  /**
+   * Adds an read application object
+   * @param parsed The read object
+   * @param fileLocation The location of the file, for debug infos only
+   */
+  public addApplication (parsed: unknown, fileLocation: string): void {
     this.ajvValidate(parsed, '_Application.yaml', fileLocation)
     const application = parsed as Application
     this.#applications.push(application)
   }
 
-  addModule (parsed: unknown, fileLocation: string, expectedId?: string): void {
+  /**
+   * Adds an read module object
+   * @param parsed The read object
+   * @param fileLocation The location of the file, for debug infos only
+   */
+  public addModule (parsed: unknown, fileLocation: string, expectedId?: string): void {
     this.ajvValidate(parsed, '_Module.yaml', fileLocation)
     const module = parsed as Module
     this.validateId(module, fileLocation, expectedId)
     this.#modules.push(module)
   }
 
-  addSchema (parsed: unknown, fileLocation: string, expectedId?: string): void {
+  /**
+   * Adds an read schema object
+   * @param parsed The read object
+   * @param fileLocation The location of the file, for debug infos only
+   * @param expectedId The expected ID that should be in this object (e.g. from filename) or none, if no ID is expected
+   */
+  public addSchema (parsed: unknown, fileLocation: string, expectedId?: string): void {
     this.ajvValidate(parsed, '_Schema.yaml', fileLocation)
     const inputSchema = parsed as NonNormalizedSchema
     this.validateId(inputSchema, fileLocation, expectedId)
@@ -107,7 +132,11 @@ export class InputNormalizer {
     this.#schemas.push(schema)
   }
 
-  toModel (): Model {
+  /**
+   * Convert the read in object to a normalized model
+   * @returns The normalized model
+   */
+  public toModel (): Model {
     if (this.#applications.length === 0) throw new Error('No application file found')
     this.#modules.forEach(m => {
       this.verifyReferences(m, m)
@@ -362,3 +391,18 @@ export class InputNormalizer {
     }
   }
 }
+
+function applyDefaults (optionsOrUndefined?: Partial<InputNormalizerOptions>): InputNormalizerOptions {
+  return {
+    noAdditionalPropertiesInExamples: optionsOrUndefined?.noAdditionalPropertiesInExamples ?? true,
+    ajvOptions: optionsOrUndefined?.ajvOptions ?? { allErrors: true, discriminator: true },
+    allowedFormats: optionsOrUndefined?.allowedFormats ?? defaultFormats,
+    allowedKeywords: optionsOrUndefined?.allowedKeywords ?? []
+  }
+}
+
+/**
+ * The default list of formats to support. Basically all from avjFormats
+   * @see https://ajv.js.org/packages/ajv-formats.html
+ */
+export const defaultFormats = Object.keys(fullFormats).map(name => ({ name, avjFormat: fullFormats[name as FormatName] }))

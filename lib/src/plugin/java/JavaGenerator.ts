@@ -1,4 +1,4 @@
-import { type ObjectDefinition, type EnumDefinition, type Schema, type Model, type Definition } from '../../reader/Model'
+import { type ObjectDefinition, type EnumDefinition, type Schema, type Model, type Definition } from '../../reader/Reader'
 import { writeOutput } from '../../writer/WriterHelpers'
 import { getDependencies } from '../../reader/helper/GetDependencies'
 import Handlebars from 'handlebars'
@@ -9,16 +9,17 @@ import { getType } from '../../reader/helper/GetType'
 import { getModuleId } from '../../reader/helper/InputHelper'
 import path from 'path'
 
+// TODO: Document
+
 type HandlebarsContext = Definition & { schema: Schema, definitionName?: string } & JavaPluginOptions
 
 export function javaGenerator (outputFolder: string, options: JavaPluginOptions): Generator {
   return async (model: Model) => {
     Handlebars.registerHelper('javaPackageName', (ctx: HandlebarsContext) => getJavaPackageName(ctx.schema, options))
-    Handlebars.registerHelper('javaComment', (text: string, indentation: number) => javaComment(text, indentation))
+    Handlebars.registerHelper('javaComment', (text: string, indentation: number) => comment(text, indentation))
     Handlebars.registerHelper('javaClassName', (ctx: HandlebarsContext) => getSimpleJavaClassName(ctx.schema, ctx.definitionName))
-    Handlebars.registerHelper('javaShortName', (name: string) => name.split('.').pop())
-    Handlebars.registerHelper('javaEnumDoc', (ctx: HandlebarsContext, key: string) => javaEnumDoc(ctx as EnumDefinition, key))
-    Handlebars.registerHelper('javaImplementedInterfaces', (ctx: HandlebarsContext) => implementedInterfaces(model, ctx.schema, options, ctx.definitionName))
+    Handlebars.registerHelper('javaEnumDoc', (ctx: HandlebarsContext, key: string) => enumDoc(ctx as EnumDefinition, key))
+    Handlebars.registerHelper('javaImplementedInterfaces', (ctx: HandlebarsContext) => implementedInterfaces(model, ctx.schema, ctx.definitionName).map(s => getSimpleJavaClassName(s)))
     Handlebars.registerHelper('javaPropertyType', (ctx: HandlebarsContext, propertyName: string) => propertyType(model, ctx.schema, ctx as ObjectDefinition, propertyName, options))
     Handlebars.registerHelper('javaImports', (ctx: HandlebarsContext) => collectImports(model, ctx.schema, options, ctx.definitionName))
 
@@ -46,12 +47,12 @@ async function generate (schema: Schema, options: JavaPluginOptions, definitionN
   }
 }
 
-function implementedInterfaces (model: Model, schema: Schema, options: JavaPluginOptions, definitionName?: string): string[] {
+function implementedInterfaces (model: Model, schema: Schema, definitionName?: string): Schema[] {
   return model.schemas.flatMap(s => getDependencies(model, s))
     .filter(d => d.type === 'IS_IMPLEMENTED_BY')
     .filter(d => d.toSchema === schema)
     .filter(d => d.toDefinitionName === definitionName)
-    .map(d => getFullJavaClassName(d.fromSchema, options))
+    .map(d => d.fromSchema)
 }
 
 function collectImports (model: Model, schema: Schema, options: JavaPluginOptions, definitionName?: string): string[] {
@@ -64,13 +65,12 @@ function collectImports (model: Model, schema: Schema, options: JavaPluginOption
       return getJavaPropertyType(propertyType, schema, options).imports
     }).forEach(i => result.push(i))
   }
-  implementedInterfaces(model, schema, options, definitionName).forEach(i => result.push(i))
+  implementedInterfaces(model, schema, definitionName).forEach(i => result.push(getFullJavaClassName(i, options)))
   const packageName = getJavaPackageName(schema, options)
+  function isInPackage (fullClassName: string, packageName: string): boolean {
+    return fullClassName.split('.').slice(0, -1).join('.') === packageName
+  }
   return [...new Set(result)].filter(x => !isInPackage(x, packageName))
-}
-
-function isInPackage (fullClassName: string, packageName: string): boolean {
-  return fullClassName.split('.').slice(0, -1).join('.') === packageName
 }
 
 const javaBasicTypes = new Map([['Short', 'short'], ['Integer', 'int'], ['Long', 'long'], ['Float', 'float'], ['Double', 'double'], ['Boolean', 'boolean'], ['Character', 'char']])
@@ -85,7 +85,7 @@ function propertyType (model: Model, schema: Schema, definiion: ObjectDefinition
   return javaType.name
 }
 
-function javaComment (text: string, indentation: number): string {
+function comment (text: string, indentation: number): string {
   const intendString = ' '.repeat(indentation)
   if (text.includes('\n')) {
     const split = text.trim().split('\n')
@@ -95,6 +95,6 @@ function javaComment (text: string, indentation: number): string {
   }
 }
 
-function javaEnumDoc (schema: EnumDefinition, key: string): string {
+function enumDoc (schema: EnumDefinition, key: string): string {
   return schema['x-enum-description']?.[key] ?? ''
 }

@@ -1,6 +1,6 @@
 import path from 'path'
 import { type Plugin } from '../Plugin'
-import { type Module, type Model } from '../../reader/Model'
+import { type Module, type Model } from '../../reader/Reader'
 import { writeOutput } from '../../writer/WriterHelpers'
 import { type VerificationError } from '../../writer/Writer'
 import * as yaml from 'yaml'

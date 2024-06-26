@@ -1,4 +1,4 @@
-import { type Model } from '../reader/Model'
+import { type Model } from '../reader/Reader'
 import { type VerificationError } from '../writer/Writer'
 
 // TODO: Document Plugin

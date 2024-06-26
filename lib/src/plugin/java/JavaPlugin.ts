@@ -32,7 +32,7 @@ function applyDefaults (optionsOrUndefined?: JavaPluginOptions): JavaPluginOptio
     mainPackageName: optionsOrUndefined?.mainPackageName ?? 'com.example',
     modelPackageName: optionsOrUndefined?.modelPackageName ?? 'model',
     useLombok: optionsOrUndefined?.useLombok ?? true,
-    basicTypeMap: optionsOrUndefined?.basicTypeMap ?? { ...defaultBasicTypeMap, ...defaultAjvFormatMap },
+    basicTypeMap: optionsOrUndefined?.basicTypeMap ?? { ...defaultJavaBasicTypeMap, ...defaultJavaFormatMap },
     classTemplate: optionsOrUndefined?.classTemplate ?? loadTemplate(path.join(__dirname, 'class.hbs')),
     enumTemplate: optionsOrUndefined?.enumTemplate ?? loadTemplate(path.join(__dirname, 'enum.hbs')),
     interfaceTemplate: optionsOrUndefined?.interfaceTemplate ?? loadTemplate(path.join(__dirname, 'interface.hbs'))
@@ -40,7 +40,7 @@ function applyDefaults (optionsOrUndefined?: JavaPluginOptions): JavaPluginOptio
 }
 
 // Basic JSON Schema types, must be present in basicTypeMap
-export const defaultBasicTypeMap = {
+export const defaultJavaBasicTypeMap = {
   string: 'String',
   integer: 'Integer',
   number: 'Double',
@@ -49,7 +49,7 @@ export const defaultBasicTypeMap = {
 }
 
 // Mapping for all ajv-formats. As this is the default list of all formats, these should be included in the basicTypeMap
-export const defaultAjvFormatMap: Record<FormatName, string> = {
+export const defaultJavaFormatMap: Record<FormatName, string> = {
   date: 'java.time.LocalDate',
   time: 'java.time.OffsetTime',
   'date-time': 'java.time.OffsetDateTime',

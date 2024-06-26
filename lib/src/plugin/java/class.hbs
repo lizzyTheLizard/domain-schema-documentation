@@ -16,7 +16,7 @@ import {{this}};
 @NoArgsConstructor
 @AllArgsConstructor
 {{/if}}
-public class {{javaClassName this}}{{#each (javaImplementedInterfaces this)}}{{#if @first}} implements {{/if}}{{javaShortName this}}{{#unless @last}}, {{/unless}}{{/each}} {
+public class {{javaClassName this}}{{#each (javaImplementedInterfaces this)}}{{#if @first}} implements {{/if}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} {
 {{#each properties}}
 {{#if description}}
 {{javaComment description 2}}

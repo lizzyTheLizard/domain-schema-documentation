@@ -1,4 +1,4 @@
-import { type Schema } from '../../reader/Model'
+import { type Schema } from '../../reader/Reader'
 import { type PropertyType } from '../../reader/helper/GetType'
 import { getFullJavaClassName, getJavaPackageName, getJavaPropertyType, getSimpleJavaClassName } from './JavaHelper'
 import { type JavaPluginOptions } from './JavaPlugin'

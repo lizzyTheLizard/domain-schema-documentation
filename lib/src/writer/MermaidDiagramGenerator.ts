@@ -1,4 +1,4 @@
-import { type Module, type Schema, type Model } from '../reader/Model'
+import { type Module, type Schema, type Model } from '../reader/Reader'
 import {
   getModuleForSchema,
   getModuleId,
@@ -6,6 +6,8 @@ import {
   relativeLink
 } from '../reader/helper/InputHelper'
 import { type Dependency, type DependencyType, getDependencies } from '../reader/helper/GetDependencies'
+
+// TODO: Document
 
 export function applicationDiagram (model: Model): string {
   const dependencies = model.schemas

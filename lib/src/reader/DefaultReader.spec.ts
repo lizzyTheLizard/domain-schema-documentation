@@ -1,10 +1,9 @@
 import * as tmp from 'tmp'
 import { promises as fs } from 'fs'
 import path from 'path'
-import { type Application, type Module, type Schema } from './Model'
+import { type Reader, type Application, type Module, type Schema } from './Reader'
 import { defaultReader } from './DefaultReader'
 import { type InputNormalizer } from './InputNormalizer'
-import { type Reader } from './Reader'
 
 const inputNormalizer = {
   addApplication: jest.fn(),

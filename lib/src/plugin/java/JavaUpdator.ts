@@ -1,6 +1,8 @@
-import { type Link, type Module, type Schema, type Model } from '../../reader/Model'
+import { type Link, type Module, type Schema, type Model } from '../../reader/Reader'
 import { type Updator } from '../Plugin'
 import { getSimpleJavaClassName } from './JavaHelper'
+
+// TODO: Document
 
 export function javaUpdator (): Updator {
   return async (model: Model) => ({

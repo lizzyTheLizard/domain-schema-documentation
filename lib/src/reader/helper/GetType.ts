@@ -1,5 +1,7 @@
-import { type Property, type Schema, type BasicProperty, type Model } from '../Model'
+import { type Property, type Schema, type BasicProperty, type Model } from '../Reader'
 import path from 'path'
+
+// TODO: Document
 
 export type PropertyType = PropertyReferenceType | PropertyLocalType | PropertyArrayType
 export type PropertyReferenceType = { type: 'self', name: string } | { type: 'definition', name: string } | { type: 'reference', name: string, $id: string }
