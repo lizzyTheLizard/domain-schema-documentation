@@ -18,6 +18,7 @@ export interface JavaPluginOptions {
   enumTemplate: HandlebarsTemplateDelegate
   interfaceTemplate: HandlebarsTemplateDelegate
   srcDir: string | ((module: Module) => string) | undefined
+  ignoreAdditionalFiles: boolean
 }
 
 export function javaPlugin (outputFolder: string, optionsOrUndefined?: JavaPluginOptions): Plugin {
@@ -38,7 +39,8 @@ function applyDefaults (optionsOrUndefined?: JavaPluginOptions): JavaPluginOptio
     classTemplate: optionsOrUndefined?.classTemplate ?? loadTemplate(path.join(__dirname, 'class.hbs')),
     enumTemplate: optionsOrUndefined?.enumTemplate ?? loadTemplate(path.join(__dirname, 'enum.hbs')),
     interfaceTemplate: optionsOrUndefined?.interfaceTemplate ?? loadTemplate(path.join(__dirname, 'interface.hbs')),
-    srcDir: optionsOrUndefined?.srcDir
+    srcDir: optionsOrUndefined?.srcDir,
+    ignoreAdditionalFiles: optionsOrUndefined?.ignoreAdditionalFiles ?? true
   }
 }
 

@@ -36,6 +36,14 @@ describe('JavaParser', () => {
     expect(result).toEqual({ name: { type: 'COLLECTION', items: { type: 'CLASS', fullName: 'String' } } })
   })
 
+  test('Multiple Properties', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const filename = path.join(tmpDir.name, 'ExampleClass.java')
+    await fs.writeFile(filename, 'public class ExampleClass {private String name, name2;}')
+    const result = await getPropertiesFromImplementation(filename)
+    expect(result).toEqual({ name: { type: 'CLASS', fullName: 'String' }, name2: { type: 'CLASS', fullName: 'String' } })
+  })
+
   test('List Property', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const filename = path.join(tmpDir.name, 'ExampleClass.java')

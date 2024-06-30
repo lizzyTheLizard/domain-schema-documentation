@@ -1,6 +1,6 @@
-import { type Module, type Schema, type Model } from '../../reader/Reader'
+import { type Module, type Schema, type Model, type Definition } from '../../reader/Reader'
 import { type Validator } from '../Plugin'
-import { existsSync as exists, promises as fs } from 'fs'
+import { promises as fs } from 'fs'
 import path from 'path'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { type VerificationError } from '../../writer/Writer'
@@ -11,67 +11,67 @@ import { getPropertiesFromImplementation } from './JavaParser'
 // TODO: Document
 
 export function javaValidator (options: JavaPluginOptions): Validator {
-  if (options.srcDir === undefined) {
-    return async () => []
+  // No source directory, no validation
+  if (options.srcDir === undefined) return async () => []
+  return async (model: Model) => {
+    const result: VerificationError[] = []
+    for (const module of model.modules) {
+      result.push(...await checkForAdditionalFiles(model, module, options))
+      result.push(...await checkSchemas(model, module, options))
+    }
+    return result
   }
-  return async (model: Model) => await flatAsync(model.modules.map(async module => {
-    const dir = getModuleDir(module, options)
-    const files = await readDirRecursive(dir)
-    const fileErrors = await flatAsync(files.map(async file => await verifyFile(model, module, file)))
-    const schemaErrors = await flatAsync(model.schemas.map(async schema => await verifySchema(model, module, schema, options)))
-    return [...fileErrors, ...schemaErrors]
-  }))
 }
 
-async function readDirRecursive (dir: string): Promise<string[]> {
-  let result: string[] = []
-  if (!exists(dir)) {
-    return []
-  }
+async function checkForAdditionalFiles (model: Model, module: Module, options: JavaPluginOptions): Promise<VerificationError[]> {
+  if (options.ignoreAdditionalFiles) return []
+  const dir = getModuleDir(module, options)
+  // If there is no dir, there are no additional files
+  if (!await isAccessible(dir)) return []
+  const results: VerificationError[] = []
+  const expectedFiles = getSchemasForModule(model, module).flatMap(s => [getSimpleJavaClassName(s), ...Object.keys(s.definitions).map(d => getSimpleJavaClassName(s, d))])
   const files = await fs.readdir(dir)
   for (const file of files) {
     const filePath = path.join(dir, file)
-    const lstat = await fs.lstat(filePath)
-    if (lstat.isDirectory()) {
-      const subFiles = await readDirRecursive(filePath)
-      result = result.concat(subFiles)
-    } else {
-      result.push(file)
+    // There should not be any subdirs
+    if (await isDirectory(filePath)) {
+      results.push({ module, text: `Directory ${file} does not correspond to a domain model`, type: 'NOT_IN_DOMAIN_MODEL' })
+    }
+    // Ignore if it is not a java file
+    if (path.extname(file) !== '.java') continue
+    const className = path.basename(file, path.extname(file))
+    if (expectedFiles.includes(className)) continue
+    results.push({ module, text: `File ${file} does not correspond to a domain model`, type: 'NOT_IN_DOMAIN_MODEL' })
+  }
+  return results
+}
+
+async function checkSchemas (model: Model, module: Module, options: JavaPluginOptions): Promise<VerificationError[]> {
+  const results: VerificationError[] = []
+  for (const schema of getSchemasForModule(model, module)) {
+    const filename = path.join(getModuleDir(module, options), getSimpleJavaClassName(schema) + '.java')
+    results.push(...await verifyDefinition(model, schema, filename, schema, options))
+    for (const definitionName of Object.keys(schema.definitions)) {
+      const filename = path.join(getModuleDir(module, options), getSimpleJavaClassName(schema, definitionName) + '.java')
+      const definition = schema.definitions[definitionName]
+      results.push(...await verifyDefinition(model, schema, filename, definition, options))
     }
   }
-  return result
+  return results
 }
 
-async function verifyFile (model: Model, module: Module, file: string): Promise<VerificationError[]> {
-  // FIXME: Disable in config
-  if (path.extname(file) !== '.java') {
-    // Not a Java file, ignore
-    return []
-  }
-  const className = path.basename(file, path.extname(file))
-  const schema = getSchemasForModule(model, module).find(s => className === path.basename(s.$id, path.extname(s.$id)))
-  if (!schema) {
-    return [{ module, text: `File ${file} does not correspond to a domain model`, type: 'NOT_IN_DOMAIN_MODEL' }]
-  }
-  return []
-}
-
-async function verifySchema (model: Model, module: Module, schema: Schema, options: JavaPluginOptions): Promise<VerificationError[]> {
-  // FIXME: Sub- Definitions
-  const filename = path.join(getModuleDir(module, options), getSimpleJavaClassName(schema) + '.java')
-  if (!exists(filename)) {
-    return [{ schema, text: `Schema '${schema.$id}' is missing in the implementation`, type: 'MISSING_IN_IMPLEMENTATION' }]
+async function verifyDefinition (model: Model, schema: Schema, filename: string, definition: Definition, options: JavaPluginOptions): Promise<VerificationError[]> {
+  if (!await isAccessible(filename)) {
+    return [{ schema, text: `File '${filename}' should exist but is missing in the implementation`, type: 'MISSING_IN_IMPLEMENTATION' }]
   }
   const results: VerificationError[] = []
-  const domainProperties = 'properties' in schema ? schema.properties : { }
+  const domainProperties = 'properties' in definition ? definition.properties : { }
   const implementationProperties = await getPropertiesFromImplementation(filename)
-
   for (const propertyName of Object.keys(domainProperties)) {
     if (!(propertyName in implementationProperties)) {
       results.push({ schema, text: `Property '${propertyName}' is missing in the implementation`, type: 'MISSING_IN_IMPLEMENTATION' })
     }
   }
-
   for (const propertyName of Object.keys(implementationProperties)) {
     if (!(propertyName in domainProperties)) {
       results.push({ schema, text: `Property '${propertyName}' does not exist in the domain model`, type: 'NOT_IN_DOMAIN_MODEL' })
@@ -86,6 +86,19 @@ async function verifySchema (model: Model, module: Module, schema: Schema, optio
   return results
 }
 
+async function isAccessible (file: string): Promise<boolean> {
+  const exists = await fs.stat(file).then(_ => true).catch(_ => false)
+  if (!exists) return false
+  return await fs.access(file, fs.constants.F_OK)
+    .then(() => true)
+    .catch(() => false)
+}
+
+async function isDirectory (file: string): Promise<boolean> {
+  const lstat = await fs.lstat(file)
+  return lstat.isDirectory()
+}
+
 function printType (type: JavaType): string {
   switch (type.type) {
     case 'CLASS': return type.fullName
@@ -97,10 +110,6 @@ function getModuleDir (module: Module, options: JavaPluginOptions): string {
   const packageName = getJavaPackageNameForModule(module, options)
   if (options.srcDir === undefined) throw new Error('This is not allowed here, scrDir must be set!')
   return path.join(typeof options.srcDir === 'string' ? options.srcDir : options.srcDir(module), packageName.replace('.', '/'))
-}
-
-async function flatAsync<T> (input: Array<Promise<T[]>>): Promise<T[]> {
-  return (await Promise.all(input)).flat()
 }
 
 function typesEqual (type1: JavaType, type2: JavaType): boolean {

@@ -46,7 +46,9 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
 
   public override fieldDeclaration (ctx: FieldDeclarationCtx): any {
     if (this.isStaticField(ctx)) return
-    this.results[this.getFieldName(ctx)] = this.getType(ctx)
+    const names = this.getFieldNames(ctx)
+    const type = this.getType(ctx)
+    names.forEach(name => { this.results[name] = type })
   }
 
   public override importDeclaration (ctx: ImportDeclarationCtx, param?: any): any {
@@ -72,12 +74,13 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
     return getSingle(ctx, 'Identifier').image
   }
 
-  // FIXME: Why those strage getSingleChild calls?
-  private getFieldName (ctx: FieldDeclarationCtx): string {
+  private getFieldNames (ctx: FieldDeclarationCtx): string[] {
     const variableDeclaratorList = getSingleChild(ctx, 'variableDeclaratorList')
-    const variableDeclarator = getSingleChild(variableDeclaratorList, 'variableDeclarator')
-    const variableDeclaratorId = getSingleChild(variableDeclarator, 'variableDeclaratorId')
-    return getSingle(variableDeclaratorId, 'Identifier').image
+    return variableDeclaratorList.variableDeclarator.map(v => {
+      const variableDeclarator = v.children
+      const variableDeclaratorId = getSingleChild(variableDeclarator, 'variableDeclaratorId')
+      return getSingle(variableDeclaratorId, 'Identifier').image
+    })
   }
 
   // A fiels is static if it has the static modifier

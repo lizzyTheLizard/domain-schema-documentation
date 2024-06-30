@@ -45,7 +45,8 @@ describe('JavaGenerator', () => {
     basicTypeMap: { ...defaultJavaBasicTypeMap, ...defaultJavaFormatMap },
     classTemplate: loadTemplate(path.join(__dirname, 'class.hbs')),
     enumTemplate: loadTemplate(path.join(__dirname, 'enum.hbs')),
-    interfaceTemplate: loadTemplate(path.join(__dirname, 'interface.hbs'))
+    interfaceTemplate: loadTemplate(path.join(__dirname, 'interface.hbs')),
+    ignoreAdditionalFiles: false
   }
 
   test('empty model', async () => {
