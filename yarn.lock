@@ -1914,6 +1914,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chevrotain@npm:6.5.0":
+  version: 6.5.0
+  resolution: "chevrotain@npm:6.5.0"
+  dependencies:
+    regexp-to-ast: "npm:0.4.0"
+  checksum: 10c0/7fa4cf8ac2600f5c08bc4538bb49e0ce88daedbfb9507227251d87e5fa33ab28a39e69418b054299f00809fe9821f32cdebef0c36910b0ee7c15513f98dd609d
+  languageName: node
+  linkType: hard
+
 "chownr@npm:^2.0.0":
   version: 2.0.0
   resolution: "chownr@npm:2.0.0"
@@ -3958,6 +3967,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"java-parser@npm:2.2.0":
+  version: 2.2.0
+  resolution: "java-parser@npm:2.2.0"
+  dependencies:
+    chevrotain: "npm:6.5.0"
+    lodash: "npm:4.17.21"
+  checksum: 10c0/3d1355a47d3ef0335e1f7a1f07924f0fbd97ba11a252399debaa0afa253e5b82d3ca07bf77b3db6a59784c2e03338c01c0fc3c2eb979850830c8270b83ce41ed
+  languageName: node
+  linkType: hard
+
 "jest-changed-files@npm:^29.7.0":
   version: 29.7.0
   resolution: "jest-changed-files@npm:29.7.0"
@@ -4550,6 +4569,7 @@ __metadata:
     ajv-formats: "npm:^3.0.1"
     cpy-cli: "npm:^5.0.0"
     handlebars: "npm:^4.7.8"
+    java-parser: "npm:2.2.0"
     jest: "npm:^29.7.0"
     minimist: "npm:^1.2.8"
     tmp: "npm:^0.2.3"
@@ -4595,6 +4615,13 @@ __metadata:
   version: 4.6.2
   resolution: "lodash.merge@npm:4.6.2"
   checksum: 10c0/402fa16a1edd7538de5b5903a90228aa48eb5533986ba7fa26606a49db2572bf414ff73a2c9f5d5fd36b31c46a5d5c7e1527749c07cbcf965ccff5fbdf32c506
+  languageName: node
+  linkType: hard
+
+"lodash@npm:4.17.21":
+  version: 4.17.21
+  resolution: "lodash@npm:4.17.21"
+  checksum: 10c0/d8cbea072bb08655bb4c989da418994b073a608dffa608b09ac04b43a791b12aeae7cd7ad919aa4c925f33b48490b5cfe6c1f71d827956071dae2e7bb3a6b74c
   languageName: node
   linkType: hard
 
@@ -5365,6 +5392,13 @@ __metadata:
     js-yaml: "npm:^4.0.0"
     strip-bom: "npm:^4.0.0"
   checksum: 10c0/bad0673abe78a5bde7c53b22ee7cdd0dfe49ab7338a4ad8618be9fcd2fd25ab9ae60d395907fddbfb2e7fbbf494867aeec78295c2396bec2669fd7087d2734c1
+  languageName: node
+  linkType: hard
+
+"regexp-to-ast@npm:0.4.0":
+  version: 0.4.0
+  resolution: "regexp-to-ast@npm:0.4.0"
+  checksum: 10c0/56b7148be88ea553e648f5ebba486c951f4c044723e5e34360786c8b5cf0b2a2315b0f145143fb3afe1699b8e44d9586bd1a977693109f7d7ae230d62fa74b61
   languageName: node
   linkType: hard
 

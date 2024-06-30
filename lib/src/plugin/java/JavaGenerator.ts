@@ -4,8 +4,7 @@ import { getDependencies } from '../../reader/helper/GetDependencies'
 import Handlebars from 'handlebars'
 import { type Generator } from '../Plugin'
 import { type JavaPluginOptions } from './JavaPlugin'
-import { getFullJavaClassName, getSimpleJavaClassName, getJavaPackageName, getJavaPropertyType } from './JavaHelper'
-import { getType } from '../../reader/helper/GetType'
+import { getFullJavaClassName, getSimpleJavaClassName, getJavaPackageName, getJavaPropertyType, type JavaType } from './JavaHelper'
 import { getModuleId } from '../../reader/helper/InputHelper'
 import path from 'path'
 
@@ -61,8 +60,8 @@ function collectImports (model: Model, schema: Schema, options: JavaPluginOption
   if ('properties' in definition && options.useLombok) { result.push('lombok.*') }
   if ('properties' in definition) {
     Object.values(definition.properties).flatMap((property) => {
-      const propertyType = getType(model, schema, property)
-      return getJavaPropertyType(propertyType, schema, options).imports
+      const type = getJavaPropertyType(model, schema, property, options)
+      return collectImportsFromType(type)
     }).forEach(i => result.push(i))
   }
   implementedInterfaces(model, schema, definitionName).forEach(i => result.push(getFullJavaClassName(i, options)))
@@ -73,16 +72,31 @@ function collectImports (model: Model, schema: Schema, options: JavaPluginOption
   return [...new Set(result)].filter(x => !isInPackage(x, packageName))
 }
 
+function collectImportsFromType (type: JavaType): string[] {
+  switch (type.type) {
+    case 'CLASS': return [type.fullName]
+    case 'COLLECTION': return [...collectImportsFromType(type.items), 'java.util.Collection']
+  }
+}
+
 const javaBasicTypes = new Map([['Short', 'short'], ['Integer', 'int'], ['Long', 'long'], ['Float', 'float'], ['Double', 'double'], ['Boolean', 'boolean'], ['Character', 'char']])
 
-function propertyType (model: Model, schema: Schema, definiion: ObjectDefinition, propertyName: string, options: JavaPluginOptions): string {
-  const property = definiion.properties[propertyName]
-  const propertyType = getType(model, schema, property)
-  const javaType = getJavaPropertyType(propertyType, schema, options)
-  if (definiion.required.includes(propertyName)) {
-    return javaBasicTypes.get(javaType.name) ?? javaType.name
+function propertyType (model: Model, schema: Schema, definition: ObjectDefinition, propertyName: string, options: JavaPluginOptions): string {
+  const property = definition.properties[propertyName]
+  const javaType = getJavaPropertyType(model, schema, property, options)
+  const simpleName = getSimpleClassNameFromType(javaType)
+  if (definition.required.includes(propertyName)) {
+    return javaBasicTypes.get(simpleName) ?? simpleName
   }
-  return javaType.name
+  return simpleName
+}
+
+function getSimpleClassNameFromType (type: JavaType): string {
+  switch (type.type) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    case 'CLASS': return type.fullName.split('.').pop()!
+    case 'COLLECTION': return `java.util.Collection<${getSimpleClassNameFromType(type.items)}>`
+  }
 }
 
 function comment (text: string, indentation: number): string {

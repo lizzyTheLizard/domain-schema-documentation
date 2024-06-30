@@ -41,6 +41,7 @@ describe('JavaGenerator', () => {
     mainPackageName: 'com.example',
     modelPackageName: 'model',
     useLombok: true,
+    srcDir: undefined,
     basicTypeMap: { ...defaultJavaBasicTypeMap, ...defaultJavaFormatMap },
     classTemplate: loadTemplate(path.join(__dirname, 'class.hbs')),
     enumTemplate: loadTemplate(path.join(__dirname, 'enum.hbs')),

@@ -5,6 +5,7 @@ import { javaUpdator } from './JavaUpdator'
 import { loadTemplate } from '../../writer/WriterHelpers'
 import path from 'path'
 import { type FormatName } from 'ajv-formats'
+import { type Module } from '../../reader/Reader'
 
 // TODO: Document
 
@@ -16,13 +17,14 @@ export interface JavaPluginOptions {
   classTemplate: HandlebarsTemplateDelegate
   enumTemplate: HandlebarsTemplateDelegate
   interfaceTemplate: HandlebarsTemplateDelegate
+  srcDir: string | ((module: Module) => string) | undefined
 }
 
 export function javaPlugin (outputFolder: string, optionsOrUndefined?: JavaPluginOptions): Plugin {
   const options = applyDefaults(optionsOrUndefined)
   return {
     updateModel: javaUpdator(),
-    validate: javaValidator(),
+    validate: javaValidator(options),
     generateOutput: javaGenerator(outputFolder, options)
   }
 }
@@ -35,7 +37,8 @@ function applyDefaults (optionsOrUndefined?: JavaPluginOptions): JavaPluginOptio
     basicTypeMap: optionsOrUndefined?.basicTypeMap ?? { ...defaultJavaBasicTypeMap, ...defaultJavaFormatMap },
     classTemplate: optionsOrUndefined?.classTemplate ?? loadTemplate(path.join(__dirname, 'class.hbs')),
     enumTemplate: optionsOrUndefined?.enumTemplate ?? loadTemplate(path.join(__dirname, 'enum.hbs')),
-    interfaceTemplate: optionsOrUndefined?.interfaceTemplate ?? loadTemplate(path.join(__dirname, 'interface.hbs'))
+    interfaceTemplate: optionsOrUndefined?.interfaceTemplate ?? loadTemplate(path.join(__dirname, 'interface.hbs')),
+    srcDir: optionsOrUndefined?.srcDir
   }
 }
 

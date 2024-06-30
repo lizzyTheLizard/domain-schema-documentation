@@ -2754,6 +2754,16 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["chevrotain", [\
+      ["npm:6.5.0", {\
+        "packageLocation": "./.yarn/cache/chevrotain-npm-6.5.0-7a25dc8528-7fa4cf8ac2.zip/node_modules/chevrotain/",\
+        "packageDependencies": [\
+          ["chevrotain", "npm:6.5.0"],\
+          ["regexp-to-ast", "npm:0.4.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["chownr", [\
       ["npm:2.0.0", {\
         "packageLocation": "./.yarn/cache/chownr-npm-2.0.0-638f1c9c61-594754e130.zip/node_modules/chownr/",\
@@ -5124,6 +5134,17 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["java-parser", [\
+      ["npm:2.2.0", {\
+        "packageLocation": "./.yarn/cache/java-parser-npm-2.2.0-0873e21ac0-3d1355a47d.zip/node_modules/java-parser/",\
+        "packageDependencies": [\
+          ["java-parser", "npm:2.2.0"],\
+          ["chevrotain", "npm:6.5.0"],\
+          ["lodash", "npm:4.17.21"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["jest", [\
       ["npm:29.7.0", {\
         "packageLocation": "./.yarn/cache/jest-npm-29.7.0-d8dd095b81-f40eb8171c.zip/node_modules/jest/",\
@@ -5820,6 +5841,7 @@ const RAW_RUNTIME_STATE =
           ["ajv-formats", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:3.0.1"],\
           ["cpy-cli", "npm:5.0.0"],\
           ["handlebars", "npm:4.7.8"],\
+          ["java-parser", "npm:2.2.0"],\
           ["jest", "virtual:3d0e1bfb8afd782ca3699443368ec9a5da7fe24a763052978c0ed16db2ac4212f8c53551dff2f37fe8d3d2ca6001e09b4ad64d8f483f9aeaab238b6e33d8081d#npm:29.7.0"],\
           ["minimist", "npm:1.2.8"],\
           ["tmp", "npm:0.2.3"],\
@@ -5853,6 +5875,15 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["locate-path", "npm:6.0.0"],\
           ["p-locate", "npm:5.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["lodash", [\
+      ["npm:4.17.21", {\
+        "packageLocation": "./.yarn/cache/lodash-npm-4.17.21-6382451519-d8cbea072b.zip/node_modules/lodash/",\
+        "packageDependencies": [\
+          ["lodash", "npm:4.17.21"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6732,6 +6763,15 @@ const RAW_RUNTIME_STATE =
           ["read-yaml-file", "npm:2.1.0"],\
           ["js-yaml", "npm:4.1.0"],\
           ["strip-bom", "npm:4.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["regexp-to-ast", [\
+      ["npm:0.4.0", {\
+        "packageLocation": "./.yarn/cache/regexp-to-ast-npm-0.4.0-5af9e8065b-56b7148be8.zip/node_modules/regexp-to-ast/",\
+        "packageDependencies": [\
+          ["regexp-to-ast", "npm:0.4.0"]\
         ],\
         "linkType": "HARD"\
       }]\

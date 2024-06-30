@@ -1,9 +1,19 @@
-import { type Schema } from '../../reader/Reader'
-import { type PropertyType } from '../../reader/helper/GetType'
+import { type RefProperty, type Schema, type Module, type Application, type ArrayProperty, type BasicProperty } from '../../reader/Reader'
 import { getFullJavaClassName, getJavaPackageName, getJavaPropertyType, getSimpleJavaClassName } from './JavaHelper'
 import { type JavaPluginOptions } from './JavaPlugin'
 
 describe('JavaHelper', () => {
+  const application: Application = { title: 'Application', description: 'Application description' }
+  const module: Module = {
+    $id: '/Module',
+    title: 'Module',
+    description: 'Module description'
+  }
+  const module2: Module = {
+    $id: '/Module2',
+    title: 'Module 2',
+    description: 'Module 2 description'
+  }
   const schema: Schema = {
     $id: '/Module/Schema.yaml',
     'x-schema-type': 'Entity',
@@ -13,25 +23,35 @@ describe('JavaHelper', () => {
     required: [],
     definitions: {}
   }
+  const schema2: Schema = {
+    $id: '/Module2/Schema2.yaml',
+    'x-schema-type': 'Entity',
+    title: 'Schema 2',
+    type: 'object',
+    properties: {},
+    required: [],
+    definitions: {}
+  }
 
   test('getJavaPropertyType', () => {
+    const model = { application, modules: [module, module2], schemas: [schema, schema2] }
     const options = { mainPackageName: undefined, modelPackageName: undefined, basicTypeMap: { string: 'String' } } as any as JavaPluginOptions
     const options2 = { mainPackageName: 'com.example', modelPackageName: 'model', basicTypeMap: { string: 'com.example.CustomString' } } as any as JavaPluginOptions
-    const refType: PropertyType = { type: 'reference', name: 'schema', $id: '/Module2/Schema2.yaml' }
-    expect(getJavaPropertyType(refType, schema, options)).toEqual({ name: 'Schema2', imports: ['module2.Schema2'] })
-    expect(getJavaPropertyType(refType, schema, options2)).toEqual({ name: 'Schema2', imports: ['com.example.module2.model.Schema2'] })
-    const selfType: PropertyType = { type: 'self', name: 'Schema1' }
-    expect(getJavaPropertyType(selfType, schema, options)).toEqual({ name: 'Schema', imports: ['module.Schema'] })
-    expect(getJavaPropertyType(selfType, schema, options2)).toEqual({ name: 'Schema', imports: ['com.example.module.model.Schema'] })
-    const definitionType: PropertyType = { type: 'definition', name: 'Schema1' }
-    expect(getJavaPropertyType(definitionType, schema, options)).toEqual({ name: 'SchemaSchema1', imports: ['module.SchemaSchema1'] })
-    expect(getJavaPropertyType(definitionType, schema, options2)).toEqual({ name: 'SchemaSchema1', imports: ['com.example.module.model.SchemaSchema1'] })
-    const arrayType: PropertyType = { type: 'array', array: refType }
-    expect(getJavaPropertyType(arrayType, schema, options)).toEqual({ name: 'Collection<Schema2>', imports: ['java.util.Collection', 'module2.Schema2'] })
-    expect(getJavaPropertyType(arrayType, schema, options2)).toEqual({ name: 'Collection<Schema2>', imports: ['java.util.Collection', 'com.example.module2.model.Schema2'] })
-    const localType: PropertyType = { type: 'local', name: 'string' }
-    expect(getJavaPropertyType(localType, schema, options)).toEqual({ name: 'String', imports: [] })
-    expect(getJavaPropertyType(localType, schema, options2)).toEqual({ name: 'CustomString', imports: ['com.example.CustomString'] })
+    const refProperty: RefProperty = { $ref: '../Module2/Schema2.yaml' }
+    expect(getJavaPropertyType(model, schema, refProperty, options)).toEqual({ type: 'CLASS', fullName: 'module2.Schema2' })
+    expect(getJavaPropertyType(model, schema, refProperty, options2)).toEqual({ type: 'CLASS', fullName: 'com.example.module2.model.Schema2' })
+    const selfProperty: RefProperty = { $ref: '#' }
+    expect(getJavaPropertyType(model, schema, selfProperty, options)).toEqual({ type: 'CLASS', fullName: 'module.Schema' })
+    expect(getJavaPropertyType(model, schema, selfProperty, options2)).toEqual({ type: 'CLASS', fullName: 'com.example.module.model.Schema' })
+    const definitionProperty: RefProperty = { $ref: '#/definitions/Schema1' }
+    expect(getJavaPropertyType(model, schema, definitionProperty, options)).toEqual({ type: 'CLASS', fullName: 'module.SchemaSchema1' })
+    expect(getJavaPropertyType(model, schema, definitionProperty, options2)).toEqual({ type: 'CLASS', fullName: 'com.example.module.model.SchemaSchema1' })
+    const arrayProperty: ArrayProperty = { type: 'array', items: refProperty }
+    expect(getJavaPropertyType(model, schema, arrayProperty, options)).toEqual({ type: 'COLLECTION', items: { type: 'CLASS', fullName: 'module2.Schema2' } })
+    expect(getJavaPropertyType(model, schema, arrayProperty, options2)).toEqual({ type: 'COLLECTION', items: { type: 'CLASS', fullName: 'com.example.module2.model.Schema2' } })
+    const basicProperty: BasicProperty = { type: 'string' }
+    expect(getJavaPropertyType(model, schema, basicProperty, options)).toEqual({ type: 'CLASS', fullName: 'String' })
+    expect(getJavaPropertyType(model, schema, basicProperty, options2)).toEqual({ type: 'CLASS', fullName: 'com.example.CustomString' })
   })
 
   test('getJavaPackageName', () => {
