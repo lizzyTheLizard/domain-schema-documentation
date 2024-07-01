@@ -75,7 +75,7 @@ describe('JavaValidator', () => {
     const target = javaValidator(options)
     const result = await target(model)
     expect(result).toEqual([
-      { schema: schema2, text: 'Property \'test\' is missing in the implementation', type: 'MISSING_IN_IMPLEMENTATION' },
+      { schema: schema2, text: `Property 'test' is missing in file '${filename}'`, type: 'MISSING_IN_IMPLEMENTATION' },
       { module, text: 'Schema \'Schema 1\' has 1 validation errors', type: 'WRONG' },
       { application, text: 'Module \'Module\' has 1 validation errors', type: 'WRONG' }
     ])
@@ -91,7 +91,7 @@ describe('JavaValidator', () => {
     const target = javaValidator(options)
     const result = await target(model)
     expect(result).toEqual([
-      { schema, text: 'Property \'test\' does not exist in the domain model', type: 'NOT_IN_DOMAIN_MODEL' },
+      { schema, text: `Property 'test' should not exist in file '${filename}'`, type: 'NOT_IN_DOMAIN_MODEL' },
       { module, text: 'Schema \'Schema 1\' has 1 validation errors', type: 'WRONG' },
       { application, text: 'Module \'Module\' has 1 validation errors', type: 'WRONG' }
     ])
@@ -108,7 +108,7 @@ describe('JavaValidator', () => {
     const target = javaValidator(options)
     const result = await target(model)
     expect(result).toEqual([
-      { schema: schema2, text: 'Property \'test\' has type \'String\' in the implementation but \'module.Schema\' in the domain model', type: 'WRONG' },
+      { schema: schema2, text: `Property 'test' has type 'String' in file '${filename}' but should have type 'module.Schema'`, type: 'WRONG' },
       { module, text: 'Schema \'Schema 1\' has 1 validation errors', type: 'WRONG' },
       { application, text: 'Module \'Module\' has 1 validation errors', type: 'WRONG' }
     ])

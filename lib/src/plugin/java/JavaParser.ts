@@ -9,27 +9,64 @@ import {
   type PrimitiveTypeCtx,
   type ClassTypeCtx,
   type ImportDeclarationCtx,
-  type PackageDeclarationCtx
+  type PackageDeclarationCtx,
+  type ClassDeclarationCtx,
+  type InterfaceDeclarationCtx,
+  type RecordDeclarationCtx,
+  type NormalClassDeclarationCtx,
+  type EnumDeclarationCtx,
+  type EnumConstantCtx
 } from 'java-parser'
 import { type JavaType } from './JavaHelper'
-import { promises as fs } from 'fs'
 
 /**
- * This will get the types from a java source file. It uses java-parser which seems to work fine but has some limitations.
- * java-parser uses a cst instead of an ast, which is a bit more complicated to work with.
+ * This will get the types from a java class source file.
+ * It uses java-parser. While it seems to work fine, it uses a cst instead of an ast, which is a bit more complicated to work with.
  * To deal with this we need some black type magic (see end of file)
  */
-export async function getPropertiesFromImplementation (filename: string): Promise<Record<string, JavaType>> {
-  const fileContent = await fs.readFile(filename).then(b => b.toString())
+export function parseClass (fileContent: string): Record<string, JavaType> | string {
   const cst = parse(fileContent)
   const visitor = new JavaParser()
   visitor.visit(cst)
-  return visitor.results
+  if (visitor.error !== undefined) return visitor.error
+  if (visitor.type !== 'class' && visitor.type !== 'record') return 'Not a class but a ' + visitor.type
+  return visitor.properties
+}
+
+/**
+ * This will check that this is a proper interface
+ * It uses java-parser. While it seems to work fine, it uses a cst instead of an ast, which is a bit more complicated to work with.
+ * To deal with this we need some black type magic (see end of file)
+ */
+export function parseInterface (fileContent: string): undefined | string {
+  const cst = parse(fileContent)
+  const visitor = new JavaParser()
+  visitor.visit(cst)
+  if (visitor.error !== undefined) return visitor.error
+  if (visitor.type !== 'interface') return 'Not an interface but a ' + visitor.type
+}
+
+/**
+ * This will get the enum values from a enum
+ * It uses java-parser. While it seems to work fine, it uses a cst instead of an ast, which is a bit more complicated to work with.
+ * To deal with this we need some black type magic (see end of file)
+ */
+export function parseEnum (fileContent: string): string[] | string {
+  const cst = parse(fileContent)
+  const visitor = new JavaParser()
+  visitor.visit(cst)
+  if (visitor.error !== undefined) return visitor.error
+  if (visitor.type !== 'enum') return 'Not an enum but a ' + visitor.type
+  return visitor.enumValues
 }
 
 class JavaParser extends BaseJavaCstVisitorWithDefaults {
-  public results: Record<string, JavaType> = {}
+  public properties: Record<string, JavaType> = {}
+  public name: string | undefined
+  public type: 'class' | 'interface' | 'record' | 'enum' | undefined
   public imports: Record<string, string> = {}
+  public error: string | undefined
+  public enumValues: string[] = []
   public javaPackageName: string = ''
 
   constructor () {
@@ -40,7 +77,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   public override recordComponentList (listCtx: RecordComponentListCtx, param?: any): any {
     for (const nodes of listCtx.recordComponent) {
       const nodeCtx = nodes.children
-      this.results[this.getComponentName(nodeCtx)] = this.getType(nodeCtx)
+      this.properties[this.getComponentName(nodeCtx)] = this.getType(nodeCtx)
     }
   }
 
@@ -48,7 +85,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
     if (this.isStaticField(ctx)) return
     const names = this.getFieldNames(ctx)
     const type = this.getType(ctx)
-    names.forEach(name => { this.results[name] = type })
+    names.forEach(name => { this.properties[name] = type })
   }
 
   public override importDeclaration (ctx: ImportDeclarationCtx, param?: any): any {
@@ -67,6 +104,51 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
 
   public override packageDeclaration (ctx: PackageDeclarationCtx, param?: any): any {
     this.javaPackageName = ctx.Identifier.map(i => i.image).join('.')
+  }
+
+  public override classDeclaration (ctx: ClassDeclarationCtx, param?: any): any {
+    if (this.name !== undefined) {
+      console.error('Nested Classes are not supported', ctx)
+      this.error = 'Nested Classes are not supported'
+      return
+    }
+    let declaration: NormalClassDeclarationCtx | RecordDeclarationCtx | EnumDeclarationCtx
+    if (ctx.normalClassDeclaration) {
+      this.type = 'class'
+      declaration = getSingleChild(ctx, 'normalClassDeclaration')
+    } else if (ctx.recordDeclaration) {
+      this.type = 'record'
+      declaration = getSingleChild(ctx, 'recordDeclaration')
+    } else if (ctx.enumDeclaration) {
+      this.type = 'enum'
+      declaration = getSingleChild(ctx, 'enumDeclaration')
+    } else {
+      console.error('Unknown class type', ctx)
+      this.error = 'Unknown class type'
+      return
+    }
+    const typeIdentifier = getSingleChild(declaration, 'typeIdentifier')
+    this.name = getSingle(typeIdentifier, 'Identifier').image
+    super.classDeclaration(ctx, param)
+  }
+
+  public override interfaceDeclaration (ctx: InterfaceDeclarationCtx, param?: any): any {
+    if (this.name !== undefined) {
+      console.error('Nested Classes are not supported', ctx)
+      this.error = 'Nested Classes are not supported'
+      return
+    }
+    this.type = 'interface'
+    const normalInterfaceDeclaration = getSingleChild(ctx, 'normalInterfaceDeclaration')
+    const typeIdentifier = getSingleChild(normalInterfaceDeclaration, 'typeIdentifier')
+    this.name = getSingle(typeIdentifier, 'Identifier').image
+    super.interfaceDeclaration(ctx, param)
+  }
+
+  public override enumConstant (ctx: EnumConstantCtx, param?: any): any {
+    this.enumValues.push(getSingle(ctx, 'Identifier').image)
+    console.log('enumBody', ctx)
+    super.enumConstant(ctx, param)
   }
 
   // Getting the name of the component is staighforward, we just take the identifier
