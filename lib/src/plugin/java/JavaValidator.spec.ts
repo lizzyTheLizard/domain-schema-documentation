@@ -32,7 +32,11 @@ describe('JavaValidator', () => {
     const model = { application, modules: [module], schemas: [schema] }
     const target = javaValidator(options)
     const result = await target(model)
-    expect(result).toEqual([{ schema, text: `File '${tmpDir.name}/module/Schema.java' should exist but is missing in the implementation`, type: 'MISSING_IN_IMPLEMENTATION' }])
+    expect(result).toEqual([
+      { schema, text: `File '${tmpDir.name}/module/Schema.java' should exist but is missing in the implementation`, type: 'MISSING_IN_IMPLEMENTATION' },
+      { module, text: 'Schema \'Schema 1\' has 1 validation errors', type: 'WRONG' },
+      { application, text: 'Module \'Module\' has 1 validation errors', type: 'WRONG' }
+    ])
   })
 
   test('Empty Schema', async () => {
@@ -70,7 +74,11 @@ describe('JavaValidator', () => {
     const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
     const target = javaValidator(options)
     const result = await target(model)
-    expect(result).toEqual([{ schema: schema2, text: 'Property \'test\' is missing in the implementation', type: 'MISSING_IN_IMPLEMENTATION' }])
+    expect(result).toEqual([
+      { schema: schema2, text: 'Property \'test\' is missing in the implementation', type: 'MISSING_IN_IMPLEMENTATION' },
+      { module, text: 'Schema \'Schema 1\' has 1 validation errors', type: 'WRONG' },
+      { application, text: 'Module \'Module\' has 1 validation errors', type: 'WRONG' }
+    ])
   })
 
   test('Excess Property', async () => {
@@ -82,7 +90,11 @@ describe('JavaValidator', () => {
     const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
     const target = javaValidator(options)
     const result = await target(model)
-    expect(result).toEqual([{ schema, text: 'Property \'test\' does not exist in the domain model', type: 'NOT_IN_DOMAIN_MODEL' }])
+    expect(result).toEqual([
+      { schema, text: 'Property \'test\' does not exist in the domain model', type: 'NOT_IN_DOMAIN_MODEL' },
+      { module, text: 'Schema \'Schema 1\' has 1 validation errors', type: 'WRONG' },
+      { application, text: 'Module \'Module\' has 1 validation errors', type: 'WRONG' }
+    ])
   })
 
   test('Wrong Property', async () => {
@@ -95,7 +107,11 @@ describe('JavaValidator', () => {
     const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
     const target = javaValidator(options)
     const result = await target(model)
-    expect(result).toEqual([{ schema: schema2, text: 'Property \'test\' has type \'String\' in the implementation but \'module.Schema\' in the domain model', type: 'WRONG' }])
+    expect(result).toEqual([
+      { schema: schema2, text: 'Property \'test\' has type \'String\' in the implementation but \'module.Schema\' in the domain model', type: 'WRONG' },
+      { module, text: 'Schema \'Schema 1\' has 1 validation errors', type: 'WRONG' },
+      { application, text: 'Module \'Module\' has 1 validation errors', type: 'WRONG' }
+    ])
   })
 
   test('Missing definition Implementation', async () => {
@@ -108,7 +124,11 @@ describe('JavaValidator', () => {
     const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
     const target = javaValidator(options)
     const result = await target(model)
-    expect(result).toEqual([{ schema: schema2, text: `File '${tmpDir.name}/module/SchemaTest.java' should exist but is missing in the implementation`, type: 'MISSING_IN_IMPLEMENTATION' }])
+    expect(result).toEqual([
+      { schema: schema2, text: `File '${tmpDir.name}/module/SchemaTest.java' should exist but is missing in the implementation`, type: 'MISSING_IN_IMPLEMENTATION' },
+      { module, text: 'Schema \'Schema 1\' has 1 validation errors', type: 'WRONG' },
+      { application, text: 'Module \'Module\' has 1 validation errors', type: 'WRONG' }
+    ])
   })
 
   test('Correct Definition Implementation', async () => {

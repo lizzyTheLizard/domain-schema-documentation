@@ -1,7 +1,6 @@
 package com.example.module.model;
 
 import lombok.*;
-import java.util.Collection;
 
 // This is an integration test for the application
 @Builder
@@ -10,8 +9,13 @@ import java.util.Collection;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Object implements Interface {
-  private Collection<String> ids;
+  private String[] ids;
   private String name;
+
+  //Addtitional functions are ignored
+  public void doSomething() {
+    System.out.println("Doing something");
+  }
 }
 
 

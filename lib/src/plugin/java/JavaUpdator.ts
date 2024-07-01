@@ -2,8 +2,9 @@ import { type Link, type Module, type Schema, type Model } from '../../reader/Re
 import { type Updator } from '../Plugin'
 import { getSimpleJavaClassName } from './JavaHelper'
 
-// TODO: Document
-
+/**
+ * The updator for Java files. Adds links to the Java files for each module and schema.
+ */
 export function javaUpdator (): Updator {
   return async (model: Model) => ({
     application: model.application,

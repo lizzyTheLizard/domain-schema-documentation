@@ -7,4 +7,11 @@
   "typescript.tsdk": ".yarn/sdks/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "jest.jestCommandLine": "yarn unit-tests",
+  "terminal.integrated.profiles.linux": {
+    "bash (login)": {
+      "path": "bash",
+      "args": ["--login"]
+    }
+  },
+  "terminal.integrated.defaultProfile.linux": "bash (login)"
 }

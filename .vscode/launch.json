@@ -8,11 +8,13 @@
             "type": "node",
             "request": "launch",
             "name": "Run Example",
-            "runtimeExecutable": "yarn",
+            "runtimeExecutable": "yarn",            
             "runtimeArgs": [
+                "workspace",
+                "example",
                 "generate"
             ],
-            "cwd": "${workspaceRoot}/example",
+            "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
         }, {
             "type": "node",
@@ -20,9 +22,23 @@
             "name": "Run Example (Watch Mode)",
             "runtimeExecutable": "yarn",
             "runtimeArgs": [
+                "workspace",
+                "example",
                 "generate:watch"
             ],
-            "cwd": "${workspaceRoot}/example",
+            "cwd": "${workspaceRoot}",
+            "console": "integratedTerminal",
+        }, {
+            "type": "node",
+            "request": "launch",
+            "name": "Run Java Test",
+            "runtimeExecutable": "yarn",
+            "runtimeArgs": [
+                "workspace",
+                "test-java",
+                "integration-tests"
+            ],
+            "cwd": "${workspaceRoot}",
             "console": "integratedTerminal",
         }
     ]

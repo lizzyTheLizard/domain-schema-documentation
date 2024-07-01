@@ -3,6 +3,9 @@
   "sortFirst": ["name", "version", "scripts"],
   "semverGroups": [
       {
+        "range": "",
+        "dependencies": ["java-parser"]
+      }, {
         "label": "Use latest compatible version",
         "range": "^"
       }

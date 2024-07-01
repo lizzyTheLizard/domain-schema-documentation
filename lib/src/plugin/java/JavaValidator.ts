@@ -5,22 +5,34 @@ import path from 'path'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { type VerificationError } from '../../writer/Writer'
 import { type JavaType, getJavaPropertyType, getSimpleJavaClassName, getJavaPackageNameForModule } from './JavaHelper'
-import { getSchemasForModule } from '../../reader/helper/InputHelper'
+import { getModuleForSchema, getSchemasForModule } from '../../reader/helper/InputHelper'
 import { getPropertiesFromImplementation } from './JavaParser'
 
-// TODO: Document
-
+/**
+ * Validator for Java files
+ * @param options Options, @see JavaPluginOptions
+ */
 export function javaValidator (options: JavaPluginOptions): Validator {
   // No source directory, no validation
   if (options.srcDir === undefined) return async () => []
   return async (model: Model) => {
     const result: VerificationError[] = []
-    for (const module of model.modules) {
-      result.push(...await checkForAdditionalFiles(model, module, options))
-      result.push(...await checkSchemas(model, module, options))
-    }
+    for (const module of model.modules) result.push(...await checkModule(model, module, options))
     return result
   }
+}
+
+async function checkModule (model: Model, module: Module, options: JavaPluginOptions): Promise<VerificationError[]> {
+  const errors: VerificationError[] = []
+  errors.push(...await checkForAdditionalFiles(model, module, options))
+  for (const schema of getSchemasForModule(model, module)) {
+    errors.push(...await checkSchema(model, schema, options))
+  }
+  const moduleErrors = errors.filter(e => 'module' in e && e.module === module)
+  if (moduleErrors.length > 0) {
+    errors.push({ application: model.application, text: `Module '${module.title}' has ${moduleErrors.length} validation errors`, type: 'WRONG' })
+  }
+  return errors
 }
 
 async function checkForAdditionalFiles (model: Model, module: Module, options: JavaPluginOptions): Promise<VerificationError[]> {
@@ -46,21 +58,24 @@ async function checkForAdditionalFiles (model: Model, module: Module, options: J
   return results
 }
 
-async function checkSchemas (model: Model, module: Module, options: JavaPluginOptions): Promise<VerificationError[]> {
-  const results: VerificationError[] = []
-  for (const schema of getSchemasForModule(model, module)) {
-    const filename = path.join(getModuleDir(module, options), getSimpleJavaClassName(schema) + '.java')
-    results.push(...await verifyDefinition(model, schema, filename, schema, options))
-    for (const definitionName of Object.keys(schema.definitions)) {
-      const filename = path.join(getModuleDir(module, options), getSimpleJavaClassName(schema, definitionName) + '.java')
-      const definition = schema.definitions[definitionName]
-      results.push(...await verifyDefinition(model, schema, filename, definition, options))
-    }
+async function checkSchema (model: Model, schema: Schema, options: JavaPluginOptions): Promise<VerificationError[]> {
+  const errors: VerificationError[] = []
+  errors.push(...await checkDefinition(model, schema, undefined, schema, options))
+  for (const definitionName of Object.keys(schema.definitions)) {
+    const definition = schema.definitions[definitionName]
+    errors.push(...await checkDefinition(model, schema, definitionName, definition, options))
   }
-  return results
+  if (errors.length > 0) {
+    const module = getModuleForSchema(model, schema)
+    errors.push({ module, text: `Schema '${schema.title}' has ${errors.length} validation errors`, type: 'WRONG' })
+  }
+  return errors
 }
 
-async function verifyDefinition (model: Model, schema: Schema, filename: string, definition: Definition, options: JavaPluginOptions): Promise<VerificationError[]> {
+async function checkDefinition (model: Model, schema: Schema, definitionName: string | undefined, definition: Definition, options: JavaPluginOptions): Promise<VerificationError[]> {
+  // TODO: Check for other types of definitions (Interfaces, Enums)
+  const module = getModuleForSchema(model, schema)
+  const filename = path.join(getModuleDir(module, options), getSimpleJavaClassName(schema, definitionName) + '.java')
   if (!await isAccessible(filename)) {
     return [{ schema, text: `File '${filename}' should exist but is missing in the implementation`, type: 'MISSING_IN_IMPLEMENTATION' }]
   }
@@ -69,18 +84,18 @@ async function verifyDefinition (model: Model, schema: Schema, filename: string,
   const implementationProperties = await getPropertiesFromImplementation(filename)
   for (const propertyName of Object.keys(domainProperties)) {
     if (!(propertyName in implementationProperties)) {
-      results.push({ schema, text: `Property '${propertyName}' is missing in the implementation`, type: 'MISSING_IN_IMPLEMENTATION' })
+      results.push({ schema, text: `Property '${propertyName}'${definitionName === undefined ? '' : ' in SubSchema \'' + definitionName + '\''} is missing in the implementation`, type: 'MISSING_IN_IMPLEMENTATION' })
     }
   }
   for (const propertyName of Object.keys(implementationProperties)) {
     if (!(propertyName in domainProperties)) {
-      results.push({ schema, text: `Property '${propertyName}' does not exist in the domain model`, type: 'NOT_IN_DOMAIN_MODEL' })
+      results.push({ schema, text: `Property '${propertyName}'${definitionName === undefined ? '' : ' in Subschema \'' + definitionName + '\''} does not exist in the domain model`, type: 'NOT_IN_DOMAIN_MODEL' })
       continue
     }
     const domainType = getJavaPropertyType(model, schema, domainProperties[propertyName], options)
     const implType = implementationProperties[propertyName]
     if (!typesEqual(domainType, implType)) {
-      results.push({ schema, text: `Property '${propertyName}' has type '${printType(implType)}' in the implementation but '${printType(domainType)}' in the domain model`, type: 'WRONG' })
+      results.push({ schema, text: `Property '${propertyName}'${definitionName === undefined ? '' : ' in ' + definitionName} has type '${printType(implType)}' in the implementation but '${printType(domainType)}' in the domain model`, type: 'WRONG' })
     }
   }
   return results
@@ -109,7 +124,8 @@ function printType (type: JavaType): string {
 function getModuleDir (module: Module, options: JavaPluginOptions): string {
   const packageName = getJavaPackageNameForModule(module, options)
   if (options.srcDir === undefined) throw new Error('This is not allowed here, scrDir must be set!')
-  return path.join(typeof options.srcDir === 'string' ? options.srcDir : options.srcDir(module), packageName.replace('.', '/'))
+  const baseDir = typeof options.srcDir === 'string' ? options.srcDir : options.srcDir(module)
+  return baseDir + (baseDir.endsWith('/') ? '' : '/') + packageName.replaceAll('.', '/')
 }
 
 function typesEqual (type1: JavaType, type2: JavaType): boolean {

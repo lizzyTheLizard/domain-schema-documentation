@@ -48,6 +48,15 @@
 {{/each}}
 {{/if}}
 
+{{#if errors}}
+## Verification Errors
+| Type | Description |
+|------|-------------|
+{{#each errors}}
+| {{type}} | {{text}} |
+{{/each}}
+{{/if}}
+
 {{#if x-links}}
 ## Links
 {{#each x-links}}

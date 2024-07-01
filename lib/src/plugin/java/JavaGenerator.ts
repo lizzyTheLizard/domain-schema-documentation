@@ -8,10 +8,13 @@ import { getFullJavaClassName, getSimpleJavaClassName, getJavaPackageName, getJa
 import { getModuleId } from '../../reader/helper/InputHelper'
 import path from 'path'
 
-// TODO: Document
-
 type HandlebarsContext = Definition & { schema: Schema, definitionName?: string } & JavaPluginOptions
 
+/**
+ * Generator for Java files
+ * @param outputFolder The folder to write the output to. Should be the same as the output folder of the writer.
+ * @param options Options, @see JavaPluginOptions
+ */
 export function javaGenerator (outputFolder: string, options: JavaPluginOptions): Generator {
   return async (model: Model) => {
     Handlebars.registerHelper('javaPackageName', (ctx: HandlebarsContext) => getJavaPackageName(ctx.schema, options))
@@ -69,7 +72,7 @@ function collectImports (model: Model, schema: Schema, options: JavaPluginOption
   function isInPackage (fullClassName: string, packageName: string): boolean {
     return fullClassName.split('.').slice(0, -1).join('.') === packageName
   }
-  return [...new Set(result)].filter(x => !isInPackage(x, packageName))
+  return [...new Set(result)].filter(x => !isInPackage(x, packageName)).filter(x => x.includes('.'))
 }
 
 function collectImportsFromType (type: JavaType): string[] {
@@ -95,7 +98,7 @@ function getSimpleClassNameFromType (type: JavaType): string {
   switch (type.type) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     case 'CLASS': return type.fullName.split('.').pop()!
-    case 'COLLECTION': return `java.util.Collection<${getSimpleClassNameFromType(type.items)}>`
+    case 'COLLECTION': return `Collection<${getSimpleClassNameFromType(type.items)}>`
   }
 }
 

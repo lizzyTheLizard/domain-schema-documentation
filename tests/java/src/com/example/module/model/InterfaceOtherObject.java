@@ -7,9 +7,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InterfaceOtherObject implements Interface {
-  private String id;
-  private String wrongType;
+public record InterfaceOtherObject(String id, int wrongType, Integer wrongProperty) implements Interface {
 }
 
 

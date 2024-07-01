@@ -81,6 +81,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-n", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:16.6.2"],\
           ["eslint-plugin-promise", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:6.2.0"],\
           ["handlebars", "npm:4.7.8"],\
+          ["java-parser", "npm:2.2.0"],\
           ["minimist", "npm:1.2.8"],\
           ["syncpack", "npm:12.3.2"],\
           ["typescript", "patch:typescript@npm%3A5.4.3#optional!builtin<compat/typescript>::version=5.4.3&hash=5adc0c"],\
@@ -3281,6 +3282,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-n", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:16.6.2"],\
           ["eslint-plugin-promise", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:6.2.0"],\
           ["handlebars", "npm:4.7.8"],\
+          ["java-parser", "npm:2.2.0"],\
           ["minimist", "npm:1.2.8"],\
           ["syncpack", "npm:12.3.2"],\
           ["typescript", "patch:typescript@npm%3A5.4.3#optional!builtin<compat/typescript>::version=5.4.3&hash=5adc0c"],\

@@ -47,6 +47,28 @@
 </section>
 {{/if}}
 
+{{# if errors}}
+<section>
+  <h2>Verification Errors</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+{{#each errors}}
+      <tr>
+        <td>{{type}}</td>
+        <td>{{text}}</td>
+      </tr>
+{{/each}}
+    </tbody>
+  </table>
+</section>
+{{/if}}
+
 {{#if links}}
 <section>
   <h2>Links</h2>

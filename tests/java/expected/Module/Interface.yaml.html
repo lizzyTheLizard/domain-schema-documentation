@@ -48,6 +48,11 @@
       
       <h1>Interface</h1>
       
+      <div class="alert alert-danger" role="alert">
+        <ul>
+          <li>2 validation errors</li>
+        </ul>
+      </div>
       
       <section>
         <p>This is an interface</p>
@@ -84,6 +89,28 @@
       
       
       <section>
+        <h2>Verification Errors</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>WRONG</td>
+              <td>Property &#x27;wrongType&#x27; in OtherObject has type &#x27;Integer&#x27; in the implementation but &#x27;String&#x27; in the domain model</td>
+            </tr>
+            <tr>
+              <td>NOT_IN_DOMAIN_MODEL</td>
+              <td>Property &#x27;wrongProperty&#x27; in Subschema &#x27;OtherObject&#x27; does not exist in the domain model</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      
+      <section>
         <h2>Links</h2>
         <ul>
           <li><a href="./java/Interface.java">Java-File</a></li>
@@ -91,7 +118,6 @@
           <li><a href="./java/InterfaceInterface3.java">Java-File (Interface3)</a></li>
         </ul>
       </section>
-      
       
       
       <h2>Subschemas</h2>
@@ -114,7 +140,7 @@
               <td></td>
             </tr>
             <tr>
-              <td>name</td>
+              <td>wrongType</td>
               <td>string</td>
               <td></td>
             </tr>

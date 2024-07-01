@@ -7,21 +7,61 @@ import path from 'path'
 import { type FormatName } from 'ajv-formats'
 import { type Module } from '../../reader/Reader'
 
-// TODO: Document
-
+/**
+ * Options for the Java plugin.
+ */
 export interface JavaPluginOptions {
+  /**
+   * The main package name for the generated Java classes. The package name will be
+   * ${mainPackageName}.#{modelName}.${modelPackageName}. Can be left undefined if there is no main package name
+   * Default is undefined.
+   */
   mainPackageName: string | undefined
+  /**
+   * The model package name for the generated Java classes. The package name will be
+   * ${mainPackageName}.#{modelName}.${modelPackageName}. Can be left undefined if there is no model package name
+   * Default is undefined.
+   */
   modelPackageName: string | undefined
+  /**
+   * Should Lombok annotations be used in the generated Java classes. Default is true.
+   */
   useLombok: boolean
+  /**
+   * Mapping of JSON Schema types and formats to Java types. Default is @see defaultJavaBasicTypeMap and @see defaultJavaFormatMap.
+   */
   basicTypeMap: Record<string, string>
+  /**
+   * Handlebars template for generating Java classes. Default is the class.hbs template.
+   */
   classTemplate: HandlebarsTemplateDelegate
+  /**
+   * Handlebars template for generating Java enums. Default is the enum.hbs template.
+   */
   enumTemplate: HandlebarsTemplateDelegate
+  /**
+   * Handlebars template for generating Java interfaces. Default is the interface.hbs template.
+   */
   interfaceTemplate: HandlebarsTemplateDelegate
+  /**
+   * The source directory for the Java classes to validate. If undefined, no validation will be done.
+   * You can also provide a function that takes a module and returns the source directory if the source directory is different for each module.
+   * Default is undefined.
+   */
   srcDir: string | ((module: Module) => string) | undefined
+  /**
+   * If true, files in the source directory that do not match a domain model schema will be ignored. If false they will be considered as errors
+   * Default is true.
+   */
   ignoreAdditionalFiles: boolean
 }
 
-export function javaPlugin (outputFolder: string, optionsOrUndefined?: JavaPluginOptions): Plugin {
+/**
+ * A plugin that generates Java classes and validate existing Java classes.
+ * @param outputFolder The folder to write the output to. Should be the same as the output folder of the writer.
+ * @param optionsOrUndefined Options, @see JavaPluginOptions
+ */
+export function javaPlugin (outputFolder: string, optionsOrUndefined?: Partial<JavaPluginOptions>): Plugin {
   const options = applyDefaults(optionsOrUndefined)
   return {
     updateModel: javaUpdator(),
@@ -30,7 +70,7 @@ export function javaPlugin (outputFolder: string, optionsOrUndefined?: JavaPlugi
   }
 }
 
-function applyDefaults (optionsOrUndefined?: JavaPluginOptions): JavaPluginOptions {
+function applyDefaults (optionsOrUndefined?: Partial<JavaPluginOptions>): JavaPluginOptions {
   return {
     mainPackageName: optionsOrUndefined?.mainPackageName ?? 'com.example',
     modelPackageName: optionsOrUndefined?.modelPackageName ?? 'model',
@@ -44,7 +84,9 @@ function applyDefaults (optionsOrUndefined?: JavaPluginOptions): JavaPluginOptio
   }
 }
 
-// Basic JSON Schema types, must be present in basicTypeMap
+/**
+ * Basic JSON Schema types, must be present in basicTypeMap
+ */
 export const defaultJavaBasicTypeMap = {
   string: 'String',
   integer: 'Integer',
@@ -53,7 +95,9 @@ export const defaultJavaBasicTypeMap = {
   null: 'Void'
 }
 
-// Mapping for all ajv-formats. As this is the default list of all formats, these should be included in the basicTypeMap
+/**
+ * Mapping for all ajv-formats. As this is the default list of all formats, these should be included in the basicTypeMap
+ */
 export const defaultJavaFormatMap: Record<FormatName, string> = {
   date: 'java.time.LocalDate',
   time: 'java.time.OffsetTime',
