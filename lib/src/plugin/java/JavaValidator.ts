@@ -136,7 +136,7 @@ class JavaValidator {
     if (typeof implementationProperties === 'string') {
       this.results.push({
         schema: this.currentSchema,
-        text: `File '${filename}' could not be parsed: ${implementationProperties}`,
+        text: `File '${filename}' is invalid: ${implementationProperties}`,
         type: 'WRONG'
       })
       return
@@ -176,7 +176,7 @@ class JavaValidator {
     if (typeof parseResult === 'string') {
       this.results.push({
         schema: this.currentSchema,
-        text: `File '${filename}' could not be parsed: ${parseResult}`,
+        text: `File '${filename}' is invalid: ${parseResult}`,
         type: 'WRONG'
       })
     }
@@ -187,7 +187,7 @@ class JavaValidator {
     if (typeof enumValues === 'string') {
       this.results.push({
         schema: this.currentSchema,
-        text: `File '${filename}' could not be parsed: ${enumValues}`,
+        text: `File '${filename}' is invalid: ${enumValues}`,
         type: 'WRONG'
       })
     }

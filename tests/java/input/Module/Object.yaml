@@ -15,3 +15,5 @@ properties:
       type: string
   name:
     type: string
+  obj2:
+    $ref: ../Module2/Object2.yaml

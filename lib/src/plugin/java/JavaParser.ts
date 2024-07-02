@@ -29,7 +29,7 @@ export function parseClass (fileContent: string): Record<string, JavaType> | str
   const visitor = new JavaParser()
   visitor.visit(cst)
   if (visitor.error !== undefined) return visitor.error
-  if (visitor.type !== 'class' && visitor.type !== 'record') return 'Not a class but a ' + visitor.type
+  if (visitor.type !== 'class' && visitor.type !== 'record') return `This is suppose to be a class or record but is a '${visitor.type}''`
   return visitor.properties
 }
 
@@ -43,7 +43,7 @@ export function parseInterface (fileContent: string): undefined | string {
   const visitor = new JavaParser()
   visitor.visit(cst)
   if (visitor.error !== undefined) return visitor.error
-  if (visitor.type !== 'interface') return 'Not an interface but a ' + visitor.type
+  if (visitor.type !== 'interface') return `This is suppose to be an interface but is a '${visitor.type}''`
 }
 
 /**
@@ -56,7 +56,7 @@ export function parseEnum (fileContent: string): string[] | string {
   const visitor = new JavaParser()
   visitor.visit(cst)
   if (visitor.error !== undefined) return visitor.error
-  if (visitor.type !== 'enum') return 'Not an enum but a ' + visitor.type
+  if (visitor.type !== 'enum') return `This is suppose to be an enum but is a '${visitor.type}''`
   return visitor.enumValues
 }
 
@@ -109,7 +109,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   public override classDeclaration (ctx: ClassDeclarationCtx, param?: any): any {
     if (this.name !== undefined) {
       console.error('Nested Classes are not supported', ctx)
-      this.error = 'Nested Classes are not supported'
+      this.error = 'Class contains nested classes. This is not supported by the validator'
       return
     }
     let declaration: NormalClassDeclarationCtx | RecordDeclarationCtx | EnumDeclarationCtx
@@ -124,7 +124,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
       declaration = getSingleChild(ctx, 'enumDeclaration')
     } else {
       console.error('Unknown class type', ctx)
-      this.error = 'Unknown class type'
+      this.error = 'Cannot determine the type of the file. Not a class, record, interface or enum'
       return
     }
     const typeIdentifier = getSingleChild(declaration, 'typeIdentifier')
@@ -135,7 +135,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   public override interfaceDeclaration (ctx: InterfaceDeclarationCtx, param?: any): any {
     if (this.name !== undefined) {
       console.error('Nested Classes are not supported', ctx)
-      this.error = 'Nested Classes are not supported'
+      this.error = 'Class contains nested classes. This is not supported by the validator'
       return
     }
     this.type = 'interface'
@@ -147,7 +147,6 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
 
   public override enumConstant (ctx: EnumConstantCtx, param?: any): any {
     this.enumValues.push(getSingle(ctx, 'Identifier').image)
-    console.log('enumBody', ctx)
     super.enumConstant(ctx, param)
   }
 
@@ -191,7 +190,8 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
       return isArray ? { type: 'COLLECTION', items: itemType } : itemType
     }
     console.error('Unknown Type: It is not a primitive nor a reference type', ctx)
-    throw new Error('Cannot determine java type. Check logs for more information.')
+    this.error = 'Cannot determine java type of property. Check logs for more information'
+    return { type: 'CLASS', fullName: 'Object' }
   }
 
   // Primitive types are easy, we just need to check if it is a boolean or a numeric type and which kind
@@ -204,7 +204,8 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
         if (floatingPointType.Float !== undefined) return { type: 'CLASS', fullName: 'Float' }
         if (floatingPointType.Double !== undefined) return { type: 'CLASS', fullName: 'Double' }
         console.error('Unknown floating point type: Not float nor double', ctx)
-        throw new Error('Cannot determine java type. Check logs for more information.')
+        this.error = 'Cannot determine java type of property. Check logs for more information'
+        return { type: 'CLASS', fullName: 'Object' }
       }
       if (numericType.integralType !== undefined) {
         const integralType = getSingleChild(numericType, 'integralType')
@@ -214,13 +215,16 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
         if (integralType.Long !== undefined) return { type: 'CLASS', fullName: 'Long' }
         if (integralType.Char !== undefined) return { type: 'CLASS', fullName: 'Char' }
         console.error('Unknown integral type', ctx)
-        throw new Error('Cannot determine java type. Check logs for more information.')
+        this.error = 'Cannot determine java type of property. Check logs for more information'
+        return { type: 'CLASS', fullName: 'Object' }
       }
       console.error('Unknown numeric type: Not floating point nor integral type', ctx)
-      throw new Error('Cannot determine java type. Check logs for more information.')
+      this.error = 'Cannot determine java type of property. Check logs for more information'
+      return { type: 'CLASS', fullName: 'Object' }
     }
     console.error('Unknown primitive type: Not boolean nor numeric type', ctx)
-    throw new Error('Cannot determine java type. Check logs for more information.')
+    this.error = 'Cannot determine java type of property. Check logs for more information'
+    return { type: 'CLASS', fullName: 'Object' }
   }
 
   // Reference types are harder... We need to check if its a collection type and if it is, we need to get the type of the items
@@ -268,7 +272,8 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
       return isArray ? { type: 'COLLECTION', items: itemType } : itemType
     }
     console.error('Generic type is not a primitive nor a reference type', ctx)
-    throw new Error('Cannot determine java type. Check logs for more information.')
+    this.error = 'Cannot determine java type of property. Check logs for more information'
+    return { type: 'CLASS', fullName: 'Object' }
   }
 }
 

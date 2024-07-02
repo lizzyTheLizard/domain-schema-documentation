@@ -3,7 +3,7 @@ import { applicationDiagram, moduleDiagram, schemaDiagramm } from './MermaidDiag
 import path from 'path'
 import fs from 'fs'
 import Handlebars from 'handlebars'
-import { getModuleForSchema } from '../reader/helper/InputHelper'
+import { getModuleForSchema, getSchemasForModule } from '../reader/helper/InputHelper'
 import { type VerificationError } from './Writer'
 
 // TODO: Document
@@ -42,7 +42,7 @@ export function enhanceModule (model: Model, module: Module, verificationErrors:
     todos: [...module.todos ?? [], ...getErrorTodos(errors)],
     errors,
     classDiagram: moduleDiagram(model, module),
-    schemas: model.schemas.filter(s => s.$id.startsWith(module.$id))
+    schemas: getSchemasForModule(model, module)
   }
 }
 
