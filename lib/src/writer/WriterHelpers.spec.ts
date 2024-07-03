@@ -8,17 +8,18 @@ import {
 } from './WriterHelpers'
 import path from 'path'
 import { type Application, type Model, type Module, type Schema } from '../reader/Reader'
-import { type VerificationError } from './Writer'
 
 describe('writerHelpers', () => {
   const application: Application = {
     title: 'Test Application',
-    description: 'Test Application Description'
+    description: 'Test Application Description',
+    errors: [{ type: 'NOT_IN_DOMAIN_MODEL', text: 'test' }]
   }
   const module: Module = {
     $id: '/test',
     title: 'Test Module',
-    description: 'Test Module Description'
+    description: 'Test Module Description',
+    errors: [{ type: 'NOT_IN_DOMAIN_MODEL', text: 'test' }]
   }
   const schema: Schema = {
     $id: '/test/Schema.yaml',
@@ -28,11 +29,9 @@ describe('writerHelpers', () => {
     type: 'object',
     properties: { id: { type: 'string' } },
     definitions: {},
-    required: []
+    required: [],
+    'x-errors': [{ type: 'NOT_IN_DOMAIN_MODEL', text: 'test' }]
   }
-  const applicationError: VerificationError = { type: 'NOT_IN_DOMAIN_MODEL', text: 'test', application }
-  const moduleError: VerificationError = { type: 'NOT_IN_DOMAIN_MODEL', text: 'test', module }
-  const schemaError: VerificationError = { type: 'NOT_IN_DOMAIN_MODEL', text: 'test', schema }
   test('loadTemplate', () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const filename = path.join(tmpDir.name, 'valid.hbs')
@@ -72,44 +71,41 @@ describe('writerHelpers', () => {
   test('enhanceApplication', async () => {
     const model: Model = { application, modules: [module], schemas: [schema] }
 
-    const result = enhanceApplication(model, [applicationError, schemaError, moduleError])
+    const result = enhanceApplication(model)
 
     expect(result).toEqual({
       ...application,
       classDiagram: 'classDiagram\nclass _test["Test Module"]\nclick _test href "./test/index.html" "Test Module"',
       links: [],
       todos: ['1 validation error'],
-      modules: [module],
-      errors: [applicationError]
+      modules: [module]
     })
   })
 
   test('enhanceModule', async () => {
     const model: Model = { application, modules: [module], schemas: [schema] }
 
-    const result = enhanceModule(model, module, [applicationError, schemaError, moduleError])
+    const result = enhanceModule(model, module)
 
     expect(result).toEqual({
       ...module,
       classDiagram: result.classDiagram,
       links: [],
       todos: ['1 validation error'],
-      schemas: [schema],
-      errors: [moduleError]
+      schemas: [schema]
     })
   })
 
   test('enhanceSchema', async () => {
     const model: Model = { application, modules: [module], schemas: [schema] }
 
-    const result = enhanceSchema(model, schema, [applicationError, schemaError, moduleError])
+    const result = enhanceSchema(model, schema)
 
     expect(result).toEqual({
       ...schema,
       classDiagram: result.classDiagram,
       'x-links': [],
       'x-todos': ['1 validation error'],
-      errors: [schemaError],
       module,
       hasDefinitions: false
     })

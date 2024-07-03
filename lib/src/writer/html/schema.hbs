@@ -95,7 +95,7 @@
 </section>
 {{/if}}
 
-{{# if errors}}
+{{# if x-errors}}
 <section>
   <h2>Verification Errors</h2>
   <table class="table">
@@ -106,7 +106,7 @@
       </tr>
     </thead>
     <tbody>
-{{#each errors}}
+{{#each x-errors}}
       <tr>
         <td>{{type}}</td>
         <td>{{text}}</td>

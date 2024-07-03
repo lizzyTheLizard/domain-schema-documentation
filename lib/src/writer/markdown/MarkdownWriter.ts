@@ -1,4 +1,4 @@
-import { type VerificationError, type Writer } from '../Writer'
+import { type Writer } from '../Writer'
 import { type Model, type Property, type Schema } from '../../reader/Reader'
 import path from 'path'
 import Handlebars from 'handlebars'
@@ -27,12 +27,12 @@ export interface MarkdownWriterOptions {
  * @see MarkdownWriterOptions
  */
 export function markdownWriter (outputFolder: string, optionsOrUndefined?: Partial<MarkdownWriterOptions>): Writer {
-  return async function (model: Model, verificationErrors: VerificationError[]): Promise<void> {
+  return async function (model: Model): Promise<void> {
     const options = applyDefaults(outputFolder, optionsOrUndefined)
     registerHandlebarsHelpers(model, options)
-    await writeSchemaFiles(model, verificationErrors, options)
-    await writeModuleFiles(model, verificationErrors, options)
-    await writeApplicationFile(model, verificationErrors, options)
+    await writeSchemaFiles(model, options)
+    await writeModuleFiles(model, options)
+    await writeApplicationFile(model, options)
   }
 }
 
@@ -76,24 +76,24 @@ function mdGetType (schema: Schema, type: PropertyType): string {
   }
 }
 
-async function writeSchemaFiles (model: Model, verificationErrors: VerificationError[], options: MarkdownWriterOptions): Promise<void> {
+async function writeSchemaFiles (model: Model, options: MarkdownWriterOptions): Promise<void> {
   await Promise.all(model.schemas.map(async (schema) => {
-    const context = enhanceSchema(model, schema, verificationErrors)
+    const context = enhanceSchema(model, schema)
     const output = options.schemaTemplate(context)
     await options.write(output, `${schema.$id}.md`)
   }))
 }
 
-async function writeModuleFiles (model: Model, verificationErrors: VerificationError[], options: MarkdownWriterOptions): Promise<void> {
+async function writeModuleFiles (model: Model, options: MarkdownWriterOptions): Promise<void> {
   await Promise.all(model.modules.map(async (module) => {
-    const context = enhanceModule(model, module, verificationErrors)
+    const context = enhanceModule(model, module)
     const output = options.moduleTemplate(context)
     await options.write(output, path.join(module.$id, 'README.md'))
   }))
 }
 
-async function writeApplicationFile (model: Model, verificationErrors: VerificationError[], options: MarkdownWriterOptions): Promise<void> {
-  const context = enhanceApplication(model, verificationErrors)
+async function writeApplicationFile (model: Model, options: MarkdownWriterOptions): Promise<void> {
+  const context = enhanceApplication(model)
   const output = options.applicationTemplate(context)
   await options.write(output, 'README.md')
 }

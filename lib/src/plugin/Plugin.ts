@@ -1,25 +1,10 @@
 import { type Model } from '../reader/Reader'
-import { type VerificationError } from '../writer/Writer'
 
 /**
- * A plugins for domain model generation. A plugin can update the model, validate  implmenentations and generate output.
+ * A plugins for domain model generation. A plugin gets the model before it is given to the writer.
+ * It can then e.g.
+ * * Generate additional output files
+ * * Update the model with e.g. verifivation errors and links to generated files
+ * or any other change on the model you can think of.
  */
-export interface Plugin {
-  /**
-   * Update the model. This can be used to add links to the model or to add additional information.
-   */
-  updateModel?: Updator
-  /**
-   * Validate an existing implementation.
-   * It returns a list of errors that are found in the implementation. Those errors will be added to the documentation
-   */
-  validate?: Validator
-  /**
-   * Generate output. This can be used to generate code or documentation from the model.
-   */
-  generateOutput?: Generator
-}
-
-export type Generator = (model: Model) => Promise<void>
-export type Validator = (model: Model) => Promise<VerificationError[]>
-export type Updator = (model: Model) => Promise<Model>
+export type Plugin = (model: Model) => Promise<void>

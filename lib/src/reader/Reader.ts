@@ -11,6 +11,15 @@ export interface Link {
   href: string
 }
 
+/** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
+export interface ImplementationError {
+  text: string
+  type: ImplementationErrorType
+}
+
+/** Type of the verification error */
+export type ImplementationErrorType = 'NOT_IN_DOMAIN_MODEL' | 'MISSING_IN_IMPLEMENTATION' | 'WRONG' | 'OTHER'
+
 /** A single property in an object schema */
 export type Property = ArrayProperty | RefProperty | BasicProperty
 
@@ -97,6 +106,8 @@ export interface SchemaCommon {
   'x-todos'?: string[]
   /** Links to other resources */
   'x-links'?: Link[]
+  /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
+  'x-errors'?: ImplementationError[]
 }
 
 /** A module in the application */
@@ -111,6 +122,8 @@ export interface Module {
   todos?: string[]
   /** Links to other resources */
   links?: Link[]
+  /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
+  errors?: ImplementationError[]
 }
 
 /** The application definition */
@@ -123,6 +136,8 @@ export interface Application {
   todos?: string[]
   /** Links to other resources */
   links?: Link[]
+  /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
+  errors?: ImplementationError[]
 }
 
 /** The full model that is read from the input folder */

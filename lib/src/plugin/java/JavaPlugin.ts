@@ -1,11 +1,10 @@
 import { type Plugin } from '../Plugin'
-import { javaGenerator } from './JavaGenerator'
 import { javaValidator } from './JavaValidator'
-import { javaUpdator } from './JavaUpdator'
 import { loadTemplate } from '../../writer/WriterHelpers'
 import path from 'path'
 import { type FormatName } from 'ajv-formats'
 import { type Module } from '../../reader/Reader'
+import { javaGenerator } from './JavaGenerator'
 
 /**
  * Options for the Java plugin.
@@ -63,10 +62,9 @@ export interface JavaPluginOptions {
  */
 export function javaPlugin (outputFolder: string, optionsOrUndefined?: Partial<JavaPluginOptions>): Plugin {
   const options = applyDefaults(optionsOrUndefined)
-  return {
-    updateModel: javaUpdator(),
-    validate: javaValidator(options),
-    generateOutput: javaGenerator(outputFolder, options)
+  return async (model) => {
+    await javaValidator(model, options)
+    await javaGenerator(model, outputFolder, options)
   }
 }
 

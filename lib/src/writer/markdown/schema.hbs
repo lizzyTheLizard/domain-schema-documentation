@@ -48,11 +48,11 @@
 {{/each}}
 {{/if}}
 
-{{#if errors}}
+{{#if x-errors}}
 ## Verification Errors
 | Type | Description |
 |------|-------------|
-{{#each errors}}
+{{#each x-errors}}
 | {{type}} | {{text}} |
 {{/each}}
 {{/if}}

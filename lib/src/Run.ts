@@ -40,22 +40,15 @@ export async function run (optionsOrUndefined?: Partial<RunOptions>): Promise<vo
   const options = applyDefaults(optionsOrUndefined)
 
   // Read the input model
-  let model = await options.reader()
+  const model = await options.reader()
 
-  // Update model with plugins, must be executed in sequence
+  // Update model with plugins, must be executed in sequence as they update the model
   for (const plugin of options.plugins) {
-    model = await plugin.updateModel?.(model) ?? model
+    await plugin(model)
   }
 
-  // Validate model with plugins, can be executed in parallel
-  const errorMap = await Promise.all(options.plugins.map(async p => await p.validate?.(model) ?? []))
-  const errors = errorMap.flatMap(e => e)
-
-  // Generate output with plugins, can be executed in parallel
-  await Promise.all(options.plugins.map(async p => await p.generateOutput?.(model)))
-
   // Write output, can be executed in parallel
-  await Promise.all(options.writers.map(async w => { await w(model, errors) }))
+  await Promise.all(options.writers.map(async w => { await w(model) }))
 }
 
 function applyDefaults (options?: Partial<RunOptions>): RunOptions {

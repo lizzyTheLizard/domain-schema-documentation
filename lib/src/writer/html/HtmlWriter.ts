@@ -1,4 +1,4 @@
-import { type VerificationError, type Writer } from '../Writer'
+import { type Writer } from '../Writer'
 import { type Model, type Property, type Schema } from '../../reader/Reader'
 import path from 'path'
 import { enhanceApplication, enhanceModule, enhanceSchema, loadTemplate, writeOutput } from '../WriterHelpers'
@@ -29,12 +29,12 @@ export interface HtmlWriterOptions {
  * @see HtmlWriterOptions
  */
 export function htmlWriter (outputFolder: string, optionsOrUndefined?: Partial<HtmlWriterOptions>): Writer {
-  return async function (model: Model, verificationErrors: VerificationError[]): Promise<void> {
+  return async function (model: Model): Promise<void> {
     const options = applyDefaults(outputFolder, optionsOrUndefined)
     registerHandlebarsHelpers(model, options)
-    await writeSchemaFiles(model, verificationErrors, options)
-    await writeModuleFiles(model, verificationErrors, options)
-    await writeApplicationFile(model, verificationErrors, options)
+    await writeSchemaFiles(model, options)
+    await writeModuleFiles(model, options)
+    await writeApplicationFile(model, options)
   }
 }
 
@@ -74,26 +74,26 @@ function htmlGetType (schema: Schema, type: PropertyType): string {
   }
 }
 
-async function writeSchemaFiles (model: Model, verificationErrors: VerificationError[], options: HtmlWriterOptions): Promise<void> {
+async function writeSchemaFiles (model: Model, options: HtmlWriterOptions): Promise<void> {
   await Promise.all(model.schemas.map(async (schema) => {
-    const context = enhanceSchema(model, schema, verificationErrors)
+    const context = enhanceSchema(model, schema)
     const output1 = options.schemaTemplate(context)
     const output2 = options.basicTemplate({ content: output1, title: schema.title })
     await options.write(output2, `${schema.$id}.html`)
   }))
 }
 
-async function writeModuleFiles (model: Model, verificationErrors: VerificationError[], options: HtmlWriterOptions): Promise<void> {
+async function writeModuleFiles (model: Model, options: HtmlWriterOptions): Promise<void> {
   await Promise.all(model.modules.map(async (module) => {
-    const context = enhanceModule(model, module, verificationErrors)
+    const context = enhanceModule(model, module)
     const output1 = options.moduleTemplate(context)
     const output2 = options.basicTemplate({ content: output1, title: module.title })
     await options.write(output2, path.join(module.$id, 'index.html'))
   }))
 }
 
-async function writeApplicationFile (model: Model, verificationErrors: VerificationError[], options: HtmlWriterOptions): Promise<void> {
-  const context = enhanceApplication(model, verificationErrors)
+async function writeApplicationFile (model: Model, options: HtmlWriterOptions): Promise<void> {
+  const context = enhanceApplication(model)
   const output1 = options.applicationTemplate(context)
   const output2 = options.basicTemplate({ content: output1, title: model.application.title })
   await options.write(output2, 'index.html')

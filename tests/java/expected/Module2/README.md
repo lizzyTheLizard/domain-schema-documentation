@@ -24,7 +24,7 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 ## Verification Errors
 | Type | Description |
 |------|-------------|
-| WRONG | Schema &#x27;Object 2&#x27; has 2 validation errors |
+| WRONG | Schema &#x27;Object 2&#x27; has 2 java validation errors |
 
 ## Links
 1. [Java-Files](./java)

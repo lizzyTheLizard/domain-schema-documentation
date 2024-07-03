@@ -27,7 +27,7 @@ describe('htmlWriter', () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const target = htmlWriter(tmpDir.name)
 
-    await target({ application, modules: [], schemas: [] }, [])
+    await target({ application, modules: [], schemas: [] })
 
     const files = await fs.readdir(tmpDir.name)
     expect(files).toContain('index.html')
@@ -39,7 +39,7 @@ describe('htmlWriter', () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const target = htmlWriter(tmpDir.name)
 
-    await target({ application, modules: [module], schemas: [] }, [])
+    await target({ application, modules: [module], schemas: [] })
 
     const files = await fs.readdir(tmpDir.name + '/test')
     expect(files).toContain('index.html')
@@ -51,7 +51,7 @@ describe('htmlWriter', () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const target = htmlWriter(tmpDir.name)
 
-    await target({ application, modules: [module], schemas: [schema] }, [])
+    await target({ application, modules: [module], schemas: [schema] })
 
     const files = await fs.readdir(tmpDir.name + '/test')
     expect(files).toContain('Schema.yaml.html')
