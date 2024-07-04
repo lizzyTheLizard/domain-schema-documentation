@@ -39,8 +39,8 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 ## Verification Errors
 | Type | Description |
 |------|-------------|
-| MISSING_IN_IMPLEMENTATION | File &#x27;/home/grma/IdeaProjects/domain-schema-documentation/tests/java/src/com/example/module2/model/Object2.java&#x27; should exist but is missing in the implementation |
-| MISSING_IN_IMPLEMENTATION | File &#x27;/home/grma/IdeaProjects/domain-schema-documentation/tests/java/src/com/example/module2/model/Object2Type.java&#x27; should exist but is missing in the implementation |
+| MISSING_IN_IMPLEMENTATION | &#x27;com.example.module2.model.Object2&#x27; should exist but is missing in the implementation |
+| MISSING_IN_IMPLEMENTATION | &#x27;com.example.module2.model.Object2Type&#x27; should exist but is missing in the implementation |
 
 ## Links
 1. [Java-File](./java/Object2.java)
