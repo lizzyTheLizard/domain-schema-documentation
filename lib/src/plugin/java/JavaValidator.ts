@@ -8,7 +8,8 @@ import { parseClass, parseEnum, parseInterface } from './JavaParser'
 
 /**
  * Validator for Java files
- * @param options Options, @see JavaPluginOptions
+ * @param model The model to validate
+ * @param options The java plugin options
  */
 export async function javaValidator (model: Model, options: JavaPluginOptions): Promise<void> {
   // No source directory, no validation

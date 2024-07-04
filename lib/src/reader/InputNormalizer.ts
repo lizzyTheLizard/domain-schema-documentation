@@ -24,15 +24,16 @@ import { type FormatName, fullFormats } from 'ajv-formats/dist/formats'
  * Options for the InputNormalizer
  */
 export interface InputNormalizerOptions {
-  /** AjvOptions given to the InputNormalizer. By default {allErrors: true, discriminator: true}
-   * @see https://ajv.js.org/options.html
-   * @see InputNormalizer
+  /**
+   * AjvOptions given to the {@link InputNormalizer}. By default {allErrors: true, discriminator: true}
+   * @see {@link https://ajv.js.org/options.html}
    */
   ajvOptions: Options
   /** Allow additional non documented properties in the examples, By default false   */
   noAdditionalPropertiesInExamples: boolean
-  /** Allowed formats. By default the formats of ajv-formats
-   * @see https://ajv.js.org/packages/ajv-formats.html
+  /**
+   * Allowed formats. By default the formats of ajv-formats
+   * @see {@link https://ajv.js.org/packages/ajv-formats.html}
    */
   allowedFormats: Array<{ name: string, avjFormat: Format }>
   /** Allowed additional keywords. By default none */
@@ -67,7 +68,7 @@ interface NormalizerResult<T> {
 }
 
 /**
- * Normalizes the input to an "DefaultInput" according to @see Model
+ * Normalizes the input to an "DefaultInput" according to {@link Model}
  */
 export class InputNormalizer {
   readonly #noAdditionalPropertiesInExamples: boolean
@@ -107,6 +108,7 @@ export class InputNormalizer {
    * Adds an read module object
    * @param parsed The read object
    * @param fileLocation The location of the file, for debug infos only
+   * @param expectedId An expected ID that should be in this object (e.g. from filename) or none, if no ID is expected
    */
   public addModule (parsed: unknown, fileLocation: string, expectedId?: string): void {
     this.ajvValidate(parsed, '_Module.yaml', fileLocation)
@@ -403,6 +405,6 @@ function applyDefaults (optionsOrUndefined?: Partial<InputNormalizerOptions>): I
 
 /**
  * The default list of formats to support. Basically all from avjFormats
-   * @see https://ajv.js.org/packages/ajv-formats.html
+ * @see {@link https://ajv.js.org/packages/ajv-formats.html}
  */
 export const defaultFormats = Object.keys(fullFormats).map(name => ({ name, avjFormat: fullFormats[name as FormatName] }))

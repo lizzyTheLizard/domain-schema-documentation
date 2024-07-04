@@ -9,6 +9,11 @@ export interface OpenApiPluginOptions {
   securitySchemes: Record<string, any>
 }
 
+// TODO: Implement openApiPlugin
+// TODO: Test
+// TODO: Document
+
+// eslint-disable-next-line jsdoc/require-jsdoc
 export function openApiPlugin (outputFolder: string, options?: OpenApiPluginOptions): Plugin {
   return async (model: Model) => {
     addLinks(model)

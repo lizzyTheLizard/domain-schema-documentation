@@ -18,9 +18,8 @@ interface BaseOptions {
 
 interface InputNormalizerDefinition {
   /**
-   * Object to normalize the input in certain ways. Takes inputs as defined in the JSON Schemas for the input and makes sure a model as defined is generated
-   * @see Model
-   * @see inputDefinition
+   * Object to normalize the input in certain ways.
+   * Takes inputs as defined in the JSON Schemas for the input and makes sure a {@link Model} as defined is generated
    */
   inputNormalizer: InputNormalizer
 }
@@ -29,10 +28,9 @@ type FileReader = (filePath: string) => Promise<unknown>
 
 /**
  * Create a default reader, reads the input folder as defined in the Readme and returns the model
- * @param {string} inputFolder The folder to read from
- * @param {DefaultReaderOptions} optionsOrUndefined Additional options for the reader (optional)
- * @see DefaultReaderOptions
- * @returns {() => Promise<Model>} Returns the reader function
+ * @param inputFolder The folder to read from
+ * @param optionsOrUndefined Additional options for the reader (optional). If not provided, the default options will be used.
+ * @returns Returns the reader function
  */
 export function defaultReader (inputFolder: string, optionsOrUndefined?: Partial<DefaultReaderOptions>): Reader {
   return async function (): Promise<Model> {

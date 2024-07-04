@@ -27,7 +27,7 @@ export interface JavaPluginOptions {
    */
   useLombok: boolean
   /**
-   * Mapping of JSON Schema types and formats to Java types. Default is @see defaultJavaBasicTypeMap and @see defaultJavaFormatMap.
+   * Mapping of JSON Schema types and formats to Java types. Default is {@link defaultJavaBasicTypeMap} and {@link defaultJavaFormatMap}.
    */
   basicTypeMap: Record<string, string>
   /**
@@ -58,7 +58,8 @@ export interface JavaPluginOptions {
 /**
  * A plugin that generates Java classes and validate existing Java classes.
  * @param outputFolder The folder to write the output to. Should be the same as the output folder of the writer.
- * @param optionsOrUndefined Options, @see JavaPluginOptions
+ * @param optionsOrUndefined The options for the plugin. If not provided, the default options will be used.
+ * @returns The plugin
  */
 export function javaPlugin (outputFolder: string, optionsOrUndefined?: Partial<JavaPluginOptions>): Plugin {
   const options = applyDefaults(optionsOrUndefined)

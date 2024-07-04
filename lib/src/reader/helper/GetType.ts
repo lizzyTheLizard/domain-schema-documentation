@@ -1,13 +1,18 @@
 import { type Property, type Schema, type BasicProperty, type Model } from '../Reader'
 import path from 'path'
 
-// TODO: Document
-
 export type PropertyType = PropertyReferenceType | PropertyLocalType | PropertyArrayType
 export type PropertyReferenceType = { type: 'self', name: string } | { type: 'definition', name: string } | { type: 'reference', name: string, $id: string }
 export interface PropertyLocalType { type: 'local', name: string, references?: PropertyReferenceType[] }
 export interface PropertyArrayType { type: 'array', array: PropertyType }
 
+/**
+ * Get the type of a property
+ * @param model The model where the property is defined
+ * @param schema The schema where the property is defined
+ * @param property The property to get the type for
+ * @returns The type of the property
+ */
 export function getType (model: Model, schema: Schema, property: Property): PropertyType {
   if ('type' in property && property.type === 'array') return { type: 'array', array: getType(model, schema, property.items) }
   if ('$ref' in property && property.$ref !== undefined) return getReferenceType(model, schema, property.$ref)

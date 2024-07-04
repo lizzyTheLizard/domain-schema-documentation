@@ -4,9 +4,12 @@ module.exports = {
   overrides: [
     {
       files: ['*.ts'],
-      extends: 'love',
+      plugins: ['jsdoc'],
+      extends: ['love', 'plugin:jsdoc/recommended-typescript'],
       rules: {
-        '@typescript-eslint/strict-boolean-expressions': ['error', { allowNullableObject: true }]
+        '@typescript-eslint/strict-boolean-expressions': ['error', { allowNullableObject: true }],
+        'jsdoc/no-undefined-types': ['error'],
+        'jsdoc/require-jsdoc': ['error', { publicOnly: true }]
       },
       parserOptions: {
         project: './tsconfig.json',
@@ -15,7 +18,11 @@ module.exports = {
     },
     {
       files: ['*.js'],
-      extends: 'standard'
+      plugins: ['jsdoc'],
+      extends: 'standard',
+      rules: {
+        'jsdoc/require-jsdoc': ['error', { publicOnly: true }]
+      }
     }
   ]
 }

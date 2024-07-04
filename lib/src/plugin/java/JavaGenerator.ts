@@ -11,8 +11,9 @@ type HandlebarsContext = Definition & { schema: Schema, definitionName?: string 
 
 /**
  * Generator for Java files
+ * @param model The model to generate from
  * @param outputFolder The folder to write the output to. Should be the same as the output folder of the writer.
- * @param options Options, @see JavaPluginOptions
+ * @param options The plugin options
  */
 export async function javaGenerator (model: Model, outputFolder: string, options: JavaPluginOptions): Promise<void> {
   Handlebars.registerHelper('javaPackageName', (ctx: HandlebarsContext) => getJavaPackageName(ctx.schema, options))

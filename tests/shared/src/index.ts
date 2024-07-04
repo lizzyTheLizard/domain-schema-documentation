@@ -4,11 +4,20 @@ import { compare } from 'dir-compare'
 import { promises as fs } from 'fs'
 import { createTwoFilesPatch } from 'diff'
 
+/**
+ * Handle en error while running the tests. Print the error and exit the process with -2
+ * @param error The error to handle
+ */
 export function handleError (error: unknown): void {
   console.error(error)
   process.exit(-2)
 }
 
+/**
+ * Compare the output of the generator with the expected output
+ * @param outputFolder The folder with the generated output
+ * @param expectedFolder The folder with the expected output
+ */
 export async function compareOutput (outputFolder: string, expectedFolder?: string): Promise<void> {
   expectedFolder = expectedFolder ?? path.join(__dirname, '..', 'expected')
   const result = await compare(outputFolder, expectedFolder, { compareContent: true })

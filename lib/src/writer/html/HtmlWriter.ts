@@ -24,9 +24,9 @@ export interface HtmlWriterOptions {
 
 /**
  * Create a new HTML writer. This writer will write a documentation of the model to the output folder in HTML format.
- * @param {string} outputFolder The folder to write the documentation to (required)
- * @param {HtmlWriterOptions} optionsOrUndefined Additional options for the writer (optional)
- * @see HtmlWriterOptions
+ * @param outputFolder The folder to write the documentation to (required)
+ * @param optionsOrUndefined Additional options for the writer (optional). If not provided, the default options will be used.
+ * @returns The writer
  */
 export function htmlWriter (outputFolder: string, optionsOrUndefined?: Partial<HtmlWriterOptions>): Writer {
   return async function (model: Model): Promise<void> {

@@ -5,14 +5,18 @@ import fs from 'fs'
 import Handlebars from 'handlebars'
 import { getModuleForSchema, getSchemasForModule } from '../reader/helper/InputHelper'
 
-// TODO: Document
-
 export type EnhancedSchema = Schema & {
   hasDefinitions: boolean
   classDiagram: string
   module: Module
 }
 
+/**
+ * Enhance a schema with additional information to be used in templates
+ * @param model The model the schema belongs to
+ * @param schema The schema to enhance
+ * @returns The enhanced schema
+ */
 export function enhanceSchema (model: Model, schema: Schema): EnhancedSchema {
   return {
     ...schema,
@@ -29,6 +33,12 @@ export type EnhancedModule = Module & {
   schemas: Schema[]
 }
 
+/**
+ * Enhance a module with additional information to be used in templates
+ * @param model The model the module belongs to
+ * @param module The module to enhance
+ * @returns The enhanced module
+ */
 export function enhanceModule (model: Model, module: Module): EnhancedModule {
   return {
     ...module,
@@ -44,6 +54,11 @@ export type EnhancedApplication = Application & {
   modules: Module[]
 }
 
+/**
+ * Enhance an application with additional information to be used in templates
+ * @param model The model the application belongs to
+ * @returns The enhanced application
+ */
 export function enhanceApplication (model: Model): EnhancedApplication {
   const application = model.application
   return {
@@ -62,6 +77,12 @@ function getErrorTodos (error: ImplementationError[] | undefined): string[] {
   return [`${error.length} validation errors`]
 }
 
+/**
+ * Write the output to a file
+ * @param output The output to write
+ * @param relativeFilename The filename to write to, relative to the output folder
+ * @param outputFolder The output folder to write to
+ */
 export async function writeOutput (output: string, relativeFilename: string, outputFolder: string): Promise<void> {
   const outputFileName = path.join(outputFolder, relativeFilename)
   const outputDir = path.dirname(outputFileName)
@@ -69,6 +90,11 @@ export async function writeOutput (output: string, relativeFilename: string, out
   await fs.promises.writeFile(outputFileName, output, 'utf8')
 }
 
+/**
+ * Load a {@link Handlebars.TemplateDelegate} from a file
+ * @param path The path to the template file
+ * @returns The loaded template
+ */
 export function loadTemplate (path: string): Handlebars.TemplateDelegate {
   const templateString = fs.readFileSync(path).toString()
   return Handlebars.compile(templateString)

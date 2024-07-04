@@ -10,10 +10,10 @@ interface JavaCollectionType { type: 'COLLECTION', items: JavaType }
 
 /**
  * Gets the Java type for a given property.
- * @param model The model, @see Model
- * @param schema The schema the property is in, @see Schema
- * @param property The property to get the type for, @see Property
- * @param options The Java plugin options, @see JavaPluginOptions
+ * @param model The model the property is in
+ * @param schema The schema the property is in
+ * @param property The property to get the type for
+ * @param options The Java plugin options
  * @returns The Java type for the property
  */
 export function getJavaPropertyType (model: Model, schema: Schema, property: Property, options: JavaPluginOptions): JavaType {
@@ -36,8 +36,8 @@ function getJavaPropertyTypeInternal (propertyType: PropertyType, schema: Schema
 
 /**
  * Gets the java package name for a given schema.
- * @param schemaOrSchemaId The schema or schema id to get the package name for, @see Schema
- * @param options The Java plugin options, @see JavaPluginOptions
+ * @param schemaOrSchemaId The schema or schema id to get the package name for
+ * @param options The Java plugin options
  * @returns The package name of this schema
  */
 export function getJavaPackageName (schemaOrSchemaId: Schema | string, options: JavaPluginOptions): string {
@@ -46,8 +46,8 @@ export function getJavaPackageName (schemaOrSchemaId: Schema | string, options: 
 }
 /**
  * Gets the java package name for a given module.
- * @param moduleOrModuleId The module or module id to get the package name for, @see Module
- * @param options The Java plugin options, @see JavaPluginOptions
+ * @param moduleOrModuleId The module or module id to get the package name for
+ * @param options The Java plugin options
  * @returns The package name of this schema
  */
 export function getJavaPackageNameForModule (moduleOrModuleId: Module | string, options: JavaPluginOptions): string {
@@ -60,8 +60,8 @@ export function getJavaPackageNameForModule (moduleOrModuleId: Module | string, 
 
 /**
  * Gets the full java class name for a given schema.
- * @param schemaOrSchemaId The schema or schema id to get the java class name for, @see Schema
- * @param options The Java plugin options, @see JavaPluginOptions
+ * @param schemaOrSchemaId The schema or schema id to get the java class name for
+ * @param options The Java plugin options
  * @param definitionName The name of the definition in this schema to generate the class name for or undefined if the schema itself should be used
  * @returns The full java class name for this schema
  */
@@ -71,7 +71,7 @@ export function getFullJavaClassName (schemaOrSchemaId: Schema | string, options
 
 /**
  * Gets the simple java class name for a given schema.
- * @param schemaOrSchemaId The schema or schema id to get the java class name for, @see Schema
+ * @param schemaOrSchemaId The schema or schema id to get the java class name for
  * @param definitionName The name of the definition in this schema to generate the class name for or undefined if the schema itself should be used
  * @returns The simple java class name for this schema
  */

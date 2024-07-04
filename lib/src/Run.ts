@@ -9,23 +9,18 @@ import { htmlWriter } from './writer/html/HtmlWriter'
  */
 export interface RunOptions {
   /**
-   * Reader to use. Must implement the Reader interface.
-   * If not defined, defaultReader is used on folder './input'
-   * @see reader/Reader
-   * @see reader/DefaultReader
+   * Reader to use. Must implement the {@link Reader} interface.
+   * If not defined, {@link defaultReader} is used on folder './input'
    */
   reader: Reader
   /**
-   * Plugins to use. Must implement the Plugin interface.
+   * Plugins to use. Must implement the {@link Plugin} interface.
    * If not defined, no plugins are used.
-   * @see plugin/Plugin
    */
   plugins: Plugin[]
   /**
-   * Writers to use. Must implement the Writer interface.
-   * If not defined, htmlWriter is used on folder './out'
-   * @see writer/Writer
-   * @see writer/html/HtmlWriter
+   * Writers to use. Must implement the {@link Writer} interface.
+   * If not defined, {@link htmlWriter} is used on folder './out'
    */
   writers: Writer[]
 }
@@ -33,8 +28,7 @@ export interface RunOptions {
 /**
  * Run domain-schema-documentation with the given options.
  * @param optionsOrUndefined Options or default if not given
- * @returns {Promise<void>} Promise that resolves when the run is finished
- * @see RunOptions
+ * @returns Promise that resolves when the run is finished
  */
 export async function run (optionsOrUndefined?: Partial<RunOptions>): Promise<void> {
   const options = applyDefaults(optionsOrUndefined)

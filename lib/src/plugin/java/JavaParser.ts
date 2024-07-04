@@ -23,6 +23,8 @@ import { type JavaType } from './JavaHelper'
  * This will get the types from a java class source file.
  * It uses java-parser. While it seems to work fine, it uses a cst instead of an ast, which is a bit more complicated to work with.
  * To deal with this we need some black type magic (see end of file)
+ * @param fileContent The content to parse
+ * @returns The parsed properties or an error message
  */
 export function parseClass (fileContent: string): Record<string, JavaType> | string {
   const cst = parse(fileContent)
@@ -37,6 +39,8 @@ export function parseClass (fileContent: string): Record<string, JavaType> | str
  * This will check that this is a proper interface
  * It uses java-parser. While it seems to work fine, it uses a cst instead of an ast, which is a bit more complicated to work with.
  * To deal with this we need some black type magic (see end of file)
+ * @param fileContent The content to parse
+ * @returns undefined if it is a proper interface or an error message
  */
 export function parseInterface (fileContent: string): undefined | string {
   const cst = parse(fileContent)
@@ -50,6 +54,8 @@ export function parseInterface (fileContent: string): undefined | string {
  * This will get the enum values from a enum
  * It uses java-parser. While it seems to work fine, it uses a cst instead of an ast, which is a bit more complicated to work with.
  * To deal with this we need some black type magic (see end of file)
+ * @param fileContent The content to parse
+ * @returns The enum values or an error message
  */
 export function parseEnum (fileContent: string): string[] | string {
   const cst = parse(fileContent)

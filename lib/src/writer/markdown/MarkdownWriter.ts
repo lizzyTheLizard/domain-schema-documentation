@@ -22,9 +22,9 @@ export interface MarkdownWriterOptions {
 
 /**
  * Create a new Markdown writer. This writer will write a documentation of the model to the output folder in Markdown format.
- * @param {string} outputFolder The folder to write the documentation to (required)
- * @param {MarkdownWriterOptions} optionsOrUndefined Additional options for the writer (optional)
- * @see MarkdownWriterOptions
+ * @param outputFolder The folder to write the documentation to (required)
+ * @param optionsOrUndefined Additional options for the writer (optional). If not provided, the default options will be used.
+ * @returns The writer
  */
 export function markdownWriter (outputFolder: string, optionsOrUndefined?: Partial<MarkdownWriterOptions>): Writer {
   return async function (model: Model): Promise<void> {
