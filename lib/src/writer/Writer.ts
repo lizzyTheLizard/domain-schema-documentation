@@ -1,25 +1,10 @@
-import { type Application, type Model, type Module, type Schema } from '../reader/Model'
+import { type Model } from '../reader/Reader'
+import { htmlWriter } from './html/HtmlWriter'
+import { markdownWriter } from './markdown/MarkdownWriter'
 
-export type VerificationError = ApplicationVerificationError | ModuleVerificationError | SchemaVerificationError
-
-export interface ApplicationVerificationError {
-  text: string
-  type: VerificationErrorType
-  application: Application
-}
-
-export interface ModuleVerificationError {
-  text: string
-  type: VerificationErrorType
-  module: Module
-}
-
-export interface SchemaVerificationError {
-  text: string
-  type: VerificationErrorType
-  schema: Schema
-}
-
-export type VerificationErrorType = 'NOT_IN_DOMAIN_MODEL' | 'MISSING_IN_IMPLEMENTATION' | 'WRONG'
-
-export type Writer = (model: Model, verificationErrors: VerificationError[]) => Promise<void>
+/**
+ * A writer takes the model and produces some output. It is not allowed to alter the model in any way.
+ * Examples for writers are {@link htmlWriter} or {@link markdownWriter}
+ * but you can define your own writers as well.
+ */
+export type Writer = (model: Model) => Promise<void>

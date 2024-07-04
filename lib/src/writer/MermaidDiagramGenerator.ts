@@ -1,4 +1,4 @@
-import { type Module, type Schema, type Model } from '../reader/Model'
+import { type Module, type Schema, type Model } from '../reader/Reader'
 import {
   getModuleForSchema,
   getModuleId,
@@ -7,6 +7,11 @@ import {
 } from '../reader/helper/InputHelper'
 import { type Dependency, type DependencyType, getDependencies } from '../reader/helper/GetDependencies'
 
+/**
+ * Generate a dependency diagram for the whole application
+ * @param model The model to generate the diagram for
+ * @returns The diagram for the whole application as mermaid code
+ */
 export function applicationDiagram (model: Model): string {
   const dependencies = model.schemas
     .flatMap(s => getDependencies(model, s))
@@ -24,6 +29,12 @@ export function applicationDiagram (model: Model): string {
   return lines.join('\n')
 }
 
+/**
+ * Get a dependency diagram for a single module
+ * @param model The model to generate the diagram for
+ * @param module The module to generate the diagram for
+ * @returns The diagram for the module as mermaid code
+ */
 export function moduleDiagram (model: Model, module: Module): string {
   const dependenciesTo = model.schemas
     .filter(s => getModuleId(s) !== module.$id)
@@ -36,6 +47,12 @@ export function moduleDiagram (model: Model, module: Module): string {
   return toDiagram(dependencies, endpoints, model, module.$id)
 }
 
+/**
+ * Get a dependency diagram for a single schema
+ * @param model The model to generate the diagram for
+ * @param schema The schema to generate the diagram for
+ * @returns The diagram for the schema as mermaid code
+ */
 export function schemaDiagramm (model: Model, schema: Schema): string {
   const dependenciesTo = model.schemas
     .filter(s => s !== schema)

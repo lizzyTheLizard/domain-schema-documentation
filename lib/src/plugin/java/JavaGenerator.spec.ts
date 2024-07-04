@@ -1,7 +1,7 @@
 import * as tmp from 'tmp'
-import { type InterfaceDefinition, type Application, type Module, type Schema, type EnumDefinition } from '../../reader/Model'
+import { type InterfaceDefinition, type Application, type Module, type Schema, type EnumDefinition } from '../../reader/Reader'
 import { javaGenerator } from './JavaGenerator'
-import { type JavaPluginOptions, defaultAjvFormatMap, defaultBasicTypeMap } from './JavaPlugin'
+import { defaultJavaBasicTypeMap, defaultJavaFormatMap, type JavaPluginOptions } from './JavaPlugin'
 import { loadTemplate } from '../../writer/WriterHelpers'
 import { promises as fs } from 'fs'
 import path from 'path'
@@ -41,17 +41,18 @@ describe('JavaGenerator', () => {
     mainPackageName: 'com.example',
     modelPackageName: 'model',
     useLombok: true,
-    basicTypeMap: { ...defaultBasicTypeMap, ...defaultAjvFormatMap },
+    srcDir: undefined,
+    basicTypeMap: { ...defaultJavaBasicTypeMap, ...defaultJavaFormatMap },
     classTemplate: loadTemplate(path.join(__dirname, 'class.hbs')),
     enumTemplate: loadTemplate(path.join(__dirname, 'enum.hbs')),
-    interfaceTemplate: loadTemplate(path.join(__dirname, 'interface.hbs'))
+    interfaceTemplate: loadTemplate(path.join(__dirname, 'interface.hbs')),
+    ignoreAdditionalFiles: false
   }
 
   test('empty model', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = javaGenerator(tmpDir.name, options)
     const model = { application, modules: [], schemas: [] }
-    await target(model)
+    await javaGenerator(model, tmpDir.name, options)
 
     const files = await fs.readdir(tmpDir.name)
     expect(files).toEqual([])
@@ -59,9 +60,8 @@ describe('JavaGenerator', () => {
 
   test('simple model', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = javaGenerator(tmpDir.name, options)
     const model = { application, modules: [module], schemas: [schema] }
-    await target(model)
+    await javaGenerator(model, tmpDir.name, options)
 
     const baseFiles = await fs.readdir(tmpDir.name)
     expect(baseFiles).toEqual(['Module'])
@@ -76,9 +76,8 @@ describe('JavaGenerator', () => {
 
   test('lombok', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = javaGenerator(tmpDir.name, { ...options, useLombok: true })
     const model = { application, modules: [module], schemas: [schema] }
-    await target(model)
+    await javaGenerator(model, tmpDir.name, { ...options, useLombok: true })
 
     const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
     expect(content).toContain('import lombok.*;')
@@ -87,9 +86,8 @@ describe('JavaGenerator', () => {
 
   test('no lombok', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = javaGenerator(tmpDir.name, { ...options, useLombok: false })
     const model = { application, modules: [module], schemas: [schema] }
-    await target(model)
+    await javaGenerator(model, tmpDir.name, { ...options, useLombok: false })
 
     const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
     expect(content).not.toContain('import lombok.*;')
@@ -98,9 +96,8 @@ describe('JavaGenerator', () => {
 
   test('implements interface', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = javaGenerator(tmpDir.name, options)
     const model = { application, modules: [module, module2], schemas: [schema, oneOfSchema] }
-    await target(model)
+    await javaGenerator(model, tmpDir.name, options)
 
     const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
     expect(content).toContain('import com.example.module2.model.Schema2;')
@@ -109,9 +106,8 @@ describe('JavaGenerator', () => {
 
   test('SubSchema', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = javaGenerator(tmpDir.name, options)
     const model = { application, modules: [module, module2], schemas: [schema, oneOfSchema] }
-    await target(model)
+    await javaGenerator(model, tmpDir.name, options)
 
     const content = (await fs.readFile(tmpDir.name + '/Module2/java/Schema2SubSchema.java', 'utf-8')).toString()
     expect(content).not.toContain('import com.example.module2.model.Schema2;')
@@ -120,9 +116,8 @@ describe('JavaGenerator', () => {
 
   test('Interface', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = javaGenerator(tmpDir.name, options)
     const model = { application, modules: [module, module2], schemas: [schema, oneOfSchema] }
-    await target(model)
+    await javaGenerator(model, tmpDir.name, options)
 
     const content = (await fs.readFile(tmpDir.name + '/Module2/java/Schema2.java', 'utf-8')).toString()
     expect(content).toContain('package com.example.module2.model;')
@@ -131,9 +126,8 @@ describe('JavaGenerator', () => {
 
   test('Enum', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = javaGenerator(tmpDir.name, options)
     const model = { application, modules: [module], schemas: [enumSchema] }
-    await target(model)
+    await javaGenerator(model, tmpDir.name, options)
 
     const content = (await fs.readFile(tmpDir.name + '/Module/java/EnumSchema.java', 'utf-8')).toString()
     expect(content).toContain('package com.example.module.model;')
@@ -144,12 +138,21 @@ describe('JavaGenerator', () => {
 
   test('Descriptions', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const target = javaGenerator(tmpDir.name, options)
     const model = { application, modules: [module], schemas: [enumSchema] }
-    await target(model)
+    await javaGenerator(model, tmpDir.name, options)
 
     const content = (await fs.readFile(tmpDir.name + '/Module/java/EnumSchema.java', 'utf-8')).toString()
     expect(content).toContain('// Enum description')
     expect(content).toContain('  // Description A')
+  })
+
+  test('Links', async () => {
+    schema['x-links'] = undefined; module.links = undefined
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const schema2: Schema = { ...schema, definitions: { definition1: { type: 'object', properties: {}, required: [] } } }
+    const model = { application, modules: [module], schemas: [schema2] }
+    await javaGenerator(model, tmpDir.name, options)
+    expect(schema2['x-links']).toEqual([{ text: 'Java-File', href: './java/Schema.java' }, { text: 'Java-File (definition1)', href: './java/SchemaDefinition1.java' }])
+    expect(module.links).toEqual([{ text: 'Java-Files', href: './java' }])
   })
 })

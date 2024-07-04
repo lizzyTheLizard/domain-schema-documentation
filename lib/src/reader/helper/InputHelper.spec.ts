@@ -7,7 +7,7 @@ import {
   getSchemasForModuleAndTyp,
   resolveRelativeId
 } from './InputHelper'
-import { type Application, type Module, type Schema, type Model } from '../Model'
+import { type Application, type Module, type Schema, type Model } from '../Reader'
 
 describe('InputHelper', () => {
   const application: Application = { title: 'Application', description: 'Application description' }

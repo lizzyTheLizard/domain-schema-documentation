@@ -122,8 +122,16 @@ A plugin for Java and OpenAPI is already included, but you can also define your 
 You can use multiple plugins at the same time.
 
 ### Java Plugin
-[comment]: # (TODO: Document Java Plugin when finished)
-TBD
+The Java-Plugin can be added using
+```javascript
+run({ plugins: [javaPlugin('./out')]}).catch(console.error)
+```
+
+It will then do two things:
+* For each schema it will generate a Java class in the folder `./out/java` that represents the schema. Those file will be linked into the generated documentation.
+* If an implementation folder is configured, it will check the implementation against the domain model. It will check if all classes are present and if the properties are correct. If the implementation is not up-to-date, it will generate a list of errors that will be added to the documentation.
+
+You can configure the Java Plugin by passing an [JavaPluginOptions](./lib/src/plugin/java/JavaPlugin.ts) object to the plugin. 
 ### OpenAPI Plugin
 [comment]: # (TODO: Document Java Plugin when finished)
 TBD

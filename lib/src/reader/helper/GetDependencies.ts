@@ -1,21 +1,37 @@
-import { type Definition, type Property, type Schema, type Model } from '../Model'
+import { type Definition, type Property, type Schema, type Model } from '../Reader'
 import { getSchema, resolveRelativeId } from './InputHelper'
 
+/**
+ * A dependency between two schemas
+ */
 export interface Dependency {
+  /** The schema from where this dependency is comming from */
   fromSchema: Schema
+  /** The definition in the fromSchema from where this dependency is comming from, undefined if from the "main" definition */
   fromDefinitionName?: string
+  /** The schema where this dependency is going to */
   toSchema: Schema
+  /** The definition in the toSchema where this dependency is going to, undefined if to the "main" definition */
   toDefinitionName?: string
+  /** The type of the dependency */
   type: DependencyType
+  /** The name of the property, if any. Usually the name of the property where the dependency is defined */
   dependencyName?: string
+  /** If this is an array dependency */
   array: boolean
 }
 
 export type DependencyType = 'IS_IMPLEMENTED_BY' | 'CONTAINS' | 'REFERENCES' | 'ENUM'
 
-export function getDependencies (model: Model, s: Schema): Dependency[] {
-  const schemaDependencies = getDependenciesForDefinition(model, s)
-  const definitionDependencies = Object.keys(s.definitions).flatMap(name => getDependenciesForDefinition(model, s, name))
+/**
+ * Get all dependencies for a schema
+ * @param model The model to get the dependencies from
+ * @param schema The schema to get the dependencies for
+ * @returns All dependencies for the schema
+ */
+export function getDependencies (model: Model, schema: Schema): Dependency[] {
+  const schemaDependencies = getDependenciesForDefinition(model, schema)
+  const definitionDependencies = Object.keys(schema.definitions).flatMap(name => getDependenciesForDefinition(model, schema, name))
   return Array.from(new Set([...schemaDependencies, ...definitionDependencies]))
 }
 

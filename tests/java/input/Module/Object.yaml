@@ -4,10 +4,16 @@ description: This is an integration test for the application
 type: object
 x-schema-type: Aggregate
 examples:
-  - id: "1"
+  - ids: 
+    - "1"
+    - "2"
     name: "Test"
 properties:
-  id:
-    type: string
+  ids:
+    type: array
+    items:
+      type: string
   name:
     type: string
+  obj2:
+    $ref: ../Module2/Object2.yaml

@@ -1,8 +1,7 @@
 import path from 'path'
 import { type Plugin } from '../Plugin'
-import { type Module, type Model } from '../../reader/Model'
+import { type Module, type Model } from '../../reader/Reader'
 import { writeOutput } from '../../writer/WriterHelpers'
-import { type VerificationError } from '../../writer/Writer'
 import * as yaml from 'yaml'
 
 export interface OpenApiPluginOptions {
@@ -10,11 +9,16 @@ export interface OpenApiPluginOptions {
   securitySchemes: Record<string, any>
 }
 
+// TODO: Implement openApiPlugin
+// TODO: Test
+// TODO: Document
+
+// eslint-disable-next-line jsdoc/require-jsdoc
 export function openApiPlugin (outputFolder: string, options?: OpenApiPluginOptions): Plugin {
-  return {
-    updateModel: async (model) => addLinks(model),
-    validate: async () => await validateOpenApiSpec(),
-    generateOutput: async (model) => { await generateOpenApiSpecs(model, outputFolder, options) }
+  return async (model: Model) => {
+    addLinks(model)
+    // TODO: Implement validation
+    await generateOpenApiSpecs(model, outputFolder, options)
   }
 }
 
@@ -28,11 +32,6 @@ function addLinks (model: Model): Model {
 
 function getFileName (module: Module): string {
   return `${path.basename(module.$id).replace(path.extname(module.$id), '')}.openapi.yaml`
-}
-
-async function validateOpenApiSpec (): Promise<VerificationError[]> {
-  // TODO: Implement validation
-  return []
 }
 
 async function generateOpenApiSpecs (model: Model, outputFolder: string, options?: OpenApiPluginOptions): Promise<void> {

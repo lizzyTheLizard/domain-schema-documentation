@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class InterfaceOtherObject implements Interface {
   private String id;
-  private String name;
+  private String wrongType;
 }
 
 
