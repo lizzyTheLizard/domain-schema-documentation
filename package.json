@@ -41,9 +41,7 @@
     "typescript": "^5.4.3"
   },
   "files": [
-    "dist/*",
-    "README.md",
-    "LICENSE"
+    "dist/**"
   ],
   "homepage": "https://github.com/lizzyTheLizard/domain-schema-documentation",
   "keywords": [
