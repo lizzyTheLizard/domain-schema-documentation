@@ -7,9 +7,9 @@ import { promises as fs } from 'fs'
 import path from 'path'
 
 describe('JavaGenerator', () => {
-  const application: Application = { title: 'Application', description: 'Application description' }
-  const module: Module = { $id: '/Module', title: 'Module', description: 'Module description' }
-  const module2: Module = { $id: '/Module2', title: 'Module 2', description: 'Module description' }
+  const application: Application = { title: 'Application', description: 'Application description', errors: [], todos: [], links: [] }
+  const module: Module = { $id: '/Module', title: 'Module', description: 'Module description', errors: [], todos: [], links: [] }
+  const module2: Module = { $id: '/Module2', title: 'Module 2', description: 'Module description', errors: [], todos: [], links: [] }
   const schema: Schema = {
     $id: '/Module/Schema.yaml',
     'x-schema-type': 'Entity',
@@ -17,7 +17,11 @@ describe('JavaGenerator', () => {
     type: 'object',
     properties: {},
     required: [],
-    definitions: {}
+    definitions: {},
+    'x-errors': [],
+    'x-links': [],
+    'x-todos': []
+
   }
   const enumSchema: Schema & EnumDefinition = {
     $id: '/Module/EnumSchema.yaml',
@@ -27,7 +31,10 @@ describe('JavaGenerator', () => {
     definitions: {},
     enum: ['A', 'B'],
     description: 'Enum description',
-    'x-enum-description': { A: 'Description A', B: 'Description B' }
+    'x-enum-description': { A: 'Description A', B: 'Description B' },
+    'x-errors': [],
+    'x-links': [],
+    'x-todos': []
   }
   const oneOfSchema: Schema & InterfaceDefinition = {
     $id: '/Module2/Schema2.yaml',
@@ -35,7 +42,10 @@ describe('JavaGenerator', () => {
     title: 'OneOf Schema',
     type: 'object',
     oneOf: [{ $ref: '../Module/Schema.yaml' }, { $ref: '#/definitions/SubSchema' }],
-    definitions: { SubSchema: { type: 'object', properties: {}, required: [] } }
+    definitions: { SubSchema: { type: 'object', properties: {}, required: [] } },
+    'x-errors': [],
+    'x-links': [],
+    'x-todos': []
   }
   const options: JavaPluginOptions = {
     mainPackageName: 'com.example',
@@ -147,7 +157,7 @@ describe('JavaGenerator', () => {
   })
 
   test('Links', async () => {
-    schema['x-links'] = undefined; module.links = undefined
+    schema['x-links'] = []; module.links = []
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const schema2: Schema = { ...schema, definitions: { definition1: { type: 'object', properties: {}, required: [] } } }
     const model = { application, modules: [module], schemas: [schema2] }

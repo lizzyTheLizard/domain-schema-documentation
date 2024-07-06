@@ -19,6 +19,6 @@ click _Module2 href "./Module2/index.html" "Module 2"
 ## Verification Errors
 | Type | Description |
 |------|-------------|
-| WRONG | Module &#x27;Module&#x27; has 1 java validation errors |
-| WRONG | Module &#x27;Module 2&#x27; has 1 java validation errors |
+| WRONG | Module &#x27;Module&#x27; has 1 validation errors |
+| WRONG | Module &#x27;Module 2&#x27; has 1 validation errors |
 

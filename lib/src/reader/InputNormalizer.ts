@@ -12,7 +12,9 @@ import {
   type Property,
   type Schema,
   type SchemaType,
-  type Model
+  type Model,
+  type Link,
+  type ImplementationError
 } from './Reader'
 import * as fs from 'fs'
 import * as yaml from 'yaml'
@@ -40,6 +42,23 @@ export interface InputNormalizerOptions {
   allowedKeywords: string[]
 }
 
+interface NonNormalizedApplication {
+  title: string
+  description: string
+  todos?: string[]
+  links?: Link[]
+  errors?: ImplementationError[]
+}
+
+interface NonNormalizedModule {
+  $id: string
+  title: string
+  description: string
+  todos?: string[]
+  links?: Link[]
+  errors?: ImplementationError[]
+}
+
 interface NonNormalizedSchema {
   $id: string
   title: string
@@ -50,6 +69,9 @@ interface NonNormalizedSchema {
   properties?: Record<string, NonNormalizedSubSchema>
   required?: string[]
   enum?: string[] | undefined
+  'x-todos'?: string[]
+  'x-links'?: Link[]
+  'x-errors'?: ImplementationError[]
 }
 
 interface NonNormalizedSubSchema {
@@ -90,6 +112,7 @@ export class InputNormalizer {
     this.#ajv.addKeyword('x-enum-description')
     this.#ajv.addKeyword('x-todos')
     this.#ajv.addKeyword('x-links')
+    this.#ajv.addKeyword('x-errors')
     options.allowedKeywords.forEach(f => this.#ajv.addKeyword(f))
   }
 
@@ -100,7 +123,13 @@ export class InputNormalizer {
    */
   public addApplication (parsed: unknown, fileLocation: string): void {
     this.ajvValidate(parsed, '_Application.yaml', fileLocation)
-    const application = parsed as Application
+    const nonNormalizedApplication = parsed as NonNormalizedApplication
+    const application: Application = {
+      ...nonNormalizedApplication,
+      errors: nonNormalizedApplication.errors ?? [],
+      todos: nonNormalizedApplication.todos ?? [],
+      links: nonNormalizedApplication.links ?? []
+    }
     this.#applications.push(application)
   }
 
@@ -112,8 +141,14 @@ export class InputNormalizer {
    */
   public addModule (parsed: unknown, fileLocation: string, expectedId?: string): void {
     this.ajvValidate(parsed, '_Module.yaml', fileLocation)
-    const module = parsed as Module
-    this.validateId(module, fileLocation, expectedId)
+    const nonNormalizedModule = parsed as NonNormalizedModule
+    this.validateId(nonNormalizedModule, fileLocation, expectedId)
+    const module: Module = {
+      ...nonNormalizedModule,
+      errors: nonNormalizedModule.errors ?? [],
+      todos: nonNormalizedModule.todos ?? [],
+      links: nonNormalizedModule.links ?? []
+    }
     this.#modules.push(module)
   }
 
@@ -278,7 +313,10 @@ export class InputNormalizer {
         ...schema,
         type: 'object',
         oneOf: cleaned.result,
-        definitions: this.normalizeDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions })
+        definitions: this.normalizeDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions }),
+        'x-links': schema['x-links'] ?? [],
+        'x-errors': schema['x-errors'] ?? [],
+        'x-todos': schema['x-todos'] ?? []
       }
     }
 
@@ -290,7 +328,10 @@ export class InputNormalizer {
         ...schema,
         enum: schema.enum,
         type: 'string',
-        definitions: this.normalizeDefinitions(schema.definitions ?? {})
+        definitions: this.normalizeDefinitions(schema.definitions ?? {}),
+        'x-links': schema['x-links'] ?? [],
+        'x-errors': schema['x-errors'] ?? [],
+        'x-todos': schema['x-todos'] ?? []
       }
     }
 
@@ -301,7 +342,10 @@ export class InputNormalizer {
         type: 'object',
         properties: cleaned.result,
         required: schema.required ?? [],
-        definitions: this.normalizeDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions })
+        definitions: this.normalizeDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions }),
+        'x-links': schema['x-links'] ?? [],
+        'x-errors': schema['x-errors'] ?? [],
+        'x-todos': schema['x-todos'] ?? []
       }
     }
     throw new Error(`Schema ${schema.$id} is not an interface, object or enum`)

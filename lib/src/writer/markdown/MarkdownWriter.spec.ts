@@ -6,12 +6,18 @@ import { type Schema, type Application, type Module } from '../../reader/Reader'
 describe('markdownWriter', () => {
   const application: Application = {
     title: 'Test Application',
-    description: 'Test Application Description'
+    description: 'Test Application Description',
+    errors: [],
+    todos: [],
+    links: []
   }
   const module: Module = {
     $id: '/test',
     title: 'Test Module',
-    description: 'Test Module Description'
+    description: 'Test Module Description',
+    errors: [],
+    todos: [],
+    links: []
   }
   const schema: Schema = {
     $id: '/test/Schema.yaml',
@@ -21,7 +27,10 @@ describe('markdownWriter', () => {
     type: 'object',
     properties: { id: { type: 'string' } },
     definitions: {},
-    required: []
+    required: [],
+    'x-errors': [],
+    'x-todos': [],
+    'x-links': []
   }
   test('Write Application File', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })

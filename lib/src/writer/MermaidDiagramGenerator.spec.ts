@@ -4,12 +4,18 @@ import { type Application, type Model, type Module, type Schema } from '../reade
 describe('mermaidDiagramGenerator', () => {
   const application: Application = {
     title: 'Test Application',
-    description: 'Test Application Description'
+    description: 'Test Application Description',
+    errors: [],
+    todos: [],
+    links: []
   }
   const module: Module = {
     $id: '/test',
     title: 'Test Module',
-    description: 'Test Module Description'
+    description: 'Test Module Description',
+    errors: [],
+    todos: [],
+    links: []
   }
   const module2: Module = { ...module, $id: '/test2', title: 'Test 2' }
   const schema: Schema = {
@@ -20,7 +26,10 @@ describe('mermaidDiagramGenerator', () => {
     type: 'object',
     properties: { id: { type: 'string' } },
     definitions: {},
-    required: []
+    required: [],
+    'x-errors': [],
+    'x-todos': [],
+    'x-links': []
   }
   const schema2: Schema = { ...schema, $id: '/test2/Schema.yaml', properties: { ref: { $ref: '../test/Schema.yaml' } } }
 

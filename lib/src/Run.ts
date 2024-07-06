@@ -1,8 +1,9 @@
 import { type Plugin } from './plugin/Plugin'
 import { type Writer } from './writer/Writer'
-import { type Reader } from './reader/Reader'
+import { type Model, type ImplementationError, type Reader, type Module } from './reader/Reader'
 import { defaultReader } from './reader/DefaultReader'
 import { htmlWriter } from './writer/html/HtmlWriter'
+import { getSchemasForModule } from './reader/helper/InputHelper'
 
 /**
  * Options for the run function.
@@ -41,6 +42,9 @@ export async function run (optionsOrUndefined?: Partial<RunOptions>): Promise<vo
     await plugin(model)
   }
 
+  // Finalize the model
+  finalize(model)
+
   // Write output, can be executed in parallel
   await Promise.all(options.writers.map(async w => { await w(model) }))
 }
@@ -51,4 +55,34 @@ function applyDefaults (options?: Partial<RunOptions>): RunOptions {
     plugins: options?.plugins ?? [],
     writers: options?.writers ?? [htmlWriter('./out')]
   }
+}
+
+function finalize (model: Model): void {
+  model.schemas.forEach(s => s['x-todos'].push(...getErrorTodos(s['x-errors'])))
+  model.modules.forEach(m => m.errors.push(...getSchemaErrors(model, m)))
+  model.modules.forEach(m => m.todos.push(...getErrorTodos(m.errors)))
+  model.application.errors.push(...getModuleErrors(model))
+  model.application.todos.push(...getErrorTodos(model.application.errors))
+}
+
+function getModuleErrors (model: Model): ImplementationError[] {
+  return model.modules.flatMap(m => {
+    const count = m.errors.length
+    if (count === 0) return []
+    return [{ text: `Module '${m.title}' has ${count} validation errors`, type: 'WRONG' }]
+  })
+}
+
+function getSchemaErrors (model: Model, module: Module): ImplementationError[] {
+  return getSchemasForModule(model, module).flatMap(s => {
+    const count = s['x-errors'].length
+    if (count === 0) return []
+    return [{ text: `Schema '${s.title}' has ${count} validation errors`, type: 'WRONG' }]
+  })
+}
+
+function getErrorTodos (error: ImplementationError[]): string[] {
+  if (error.length === 0) return []
+  if (error.length === 1) return ['1 validation error']
+  return [`${error.length} validation errors`]
 }

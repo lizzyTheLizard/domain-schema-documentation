@@ -103,11 +103,11 @@ export interface SchemaCommon {
   /** The type of the schema, used for documentation */
   'x-schema-type': SchemaType
   /** TODOS that still needs to be changed on the domain model, for documentation */
-  'x-todos'?: string[]
+  'x-todos': string[]
   /** Links to other resources */
-  'x-links'?: Link[]
+  'x-links': Link[]
   /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
-  'x-errors'?: ImplementationError[]
+  'x-errors': ImplementationError[]
 }
 
 /** A module in the application */
@@ -119,11 +119,11 @@ export interface Module {
   /** The description of the module */
   description: string
   /** TODOS that still needs to be changed on the domain model, for documentation */
-  todos?: string[]
+  todos: string[]
   /** Links to other resources */
-  links?: Link[]
+  links: Link[]
   /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
-  errors?: ImplementationError[]
+  errors: ImplementationError[]
 }
 
 /** The application definition */
@@ -133,11 +133,11 @@ export interface Application {
   /** The description of the application */
   description: string
   /** TODOS that still needs to be changed on the domain model, for documentation */
-  todos?: string[]
+  todos: string[]
   /** Links to other resources */
-  links?: Link[]
+  links: Link[]
   /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
-  errors?: ImplementationError[]
+  errors: ImplementationError[]
 }
 
 /** The full model that is read from the input folder */

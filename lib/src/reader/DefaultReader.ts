@@ -85,12 +85,10 @@ function getExpectedId (baseFolder: string, filePath: string): string {
 
 function isIndexFile (filePath: string): boolean {
   const filename = path.basename(filePath).toLowerCase()
-  console.log('1', filePath, filename, filename === 'index.yaml' || filename === 'index.yml')
   return filename === 'index.yaml' || filename === 'index.yml'
 }
 
 function isYamlFile (filePath: string): boolean {
   const ext = path.extname(filePath)?.toLowerCase()
-  console.log('2', filePath, ext, ext === '.yaml' || ext === '.yml')
   return ext === '.yaml' || ext === '.yml'
 }

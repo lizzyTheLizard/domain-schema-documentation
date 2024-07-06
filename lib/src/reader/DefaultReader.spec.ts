@@ -12,9 +12,33 @@ const inputNormalizer = {
   toModel: jest.fn()
 }
 
-const applicationFile: Application = { title: 'Title', description: 'Description' }
-const moduleFile: Module = { $id: '/Module', title: 'Module', description: 'Description' }
-const schemaFile: Schema = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: {}, required: [], definitions: {} }
+const applicationFile: Application = {
+  title: 'Title',
+  description: 'Description',
+  errors: [],
+  todos: [],
+  links: []
+}
+const moduleFile: Module = {
+  $id: '/Module',
+  title: 'Module',
+  description: 'Description',
+  errors: [],
+  todos: [],
+  links: []
+}
+const schemaFile: Schema = {
+  $id: '/Module/Schema.yaml',
+  title: 'Schema',
+  'x-schema-type': 'Aggregate',
+  type: 'object',
+  properties: {},
+  required: [],
+  definitions: {},
+  'x-errors': [],
+  'x-links': [],
+  'x-todos': []
+}
 
 describe('DefaultReader', () => {
   let tmpDir: tmp.DirResult

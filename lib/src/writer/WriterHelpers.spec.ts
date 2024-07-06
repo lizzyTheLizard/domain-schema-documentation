@@ -13,12 +13,16 @@ describe('writerHelpers', () => {
   const application: Application = {
     title: 'Test Application',
     description: 'Test Application Description',
+    todos: [],
+    links: [],
     errors: [{ type: 'NOT_IN_DOMAIN_MODEL', text: 'test' }]
   }
   const module: Module = {
     $id: '/test',
     title: 'Test Module',
     description: 'Test Module Description',
+    todos: [],
+    links: [],
     errors: [{ type: 'NOT_IN_DOMAIN_MODEL', text: 'test' }]
   }
   const schema: Schema = {
@@ -30,7 +34,9 @@ describe('writerHelpers', () => {
     properties: { id: { type: 'string' } },
     definitions: {},
     required: [],
-    'x-errors': [{ type: 'NOT_IN_DOMAIN_MODEL', text: 'test' }]
+    'x-errors': [{ type: 'NOT_IN_DOMAIN_MODEL', text: 'test' }],
+    'x-todos': [],
+    'x-links': []
   }
   test('loadTemplate', () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
@@ -76,8 +82,6 @@ describe('writerHelpers', () => {
     expect(result).toEqual({
       ...application,
       classDiagram: 'classDiagram\nclass _test["Test Module"]\nclick _test href "./test/index.html" "Test Module"',
-      links: [],
-      todos: ['1 validation error'],
       modules: [module]
     })
   })
@@ -90,8 +94,6 @@ describe('writerHelpers', () => {
     expect(result).toEqual({
       ...module,
       classDiagram: result.classDiagram,
-      links: [],
-      todos: ['1 validation error'],
       schemas: [schema]
     })
   })
@@ -104,8 +106,6 @@ describe('writerHelpers', () => {
     expect(result).toEqual({
       ...schema,
       classDiagram: result.classDiagram,
-      'x-links': [],
-      'x-todos': ['1 validation error'],
       module,
       hasDefinitions: false
     })

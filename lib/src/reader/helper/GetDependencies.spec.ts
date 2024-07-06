@@ -2,8 +2,8 @@ import { type Application, type Module, type Schema } from '../Reader'
 import { getDependencies } from './GetDependencies'
 
 describe('GetDependencies', () => {
-  const application: Application = { title: 'Application', description: 'Application description' }
-  const module: Module = { $id: '/Module', title: 'Module', description: 'Module description' }
+  const application: Application = { title: 'Application', description: 'Application description', errors: [], todos: [], links: [] }
+  const module: Module = { $id: '/Module', title: 'Module', description: 'Module description', errors: [], todos: [], links: [] }
   const schema: Schema = {
     $id: '/Module/Schema.yaml',
     'x-schema-type': 'Entity',
@@ -11,7 +11,10 @@ describe('GetDependencies', () => {
     type: 'object',
     properties: {},
     required: [],
-    definitions: {}
+    definitions: {},
+    'x-errors': [],
+    'x-links': [],
+    'x-todos': []
   }
 
   test('no dependencies', async () => {
@@ -87,7 +90,10 @@ describe('GetDependencies', () => {
       title: 'Schema 2',
       type: 'object',
       oneOf: [{ $ref: './Schema.yaml' }],
-      definitions: {}
+      definitions: {},
+      'x-errors': [],
+      'x-links': [],
+      'x-todos': []
     }
     const model = { application, modules: [module], schemas: [schema, schema2] }
     expect(getDependencies(model, schema2)).toEqual([{

@@ -1,3 +1,4 @@
+import { type Schema } from 'ajv'
 import { InputNormalizer } from './InputNormalizer'
 
 describe('InputNormalizer', () => {
@@ -24,7 +25,7 @@ describe('InputNormalizer', () => {
     type: 'object',
     oneOf: [{ $ref: './Schema.yaml' }]
   }
-  const schema = { ...objectSchemaFile, definitions: {}, required: [] }
+  const schema: Schema = { ...objectSchemaFile, definitions: {}, required: [], 'x-links': [], 'x-errors': [], 'x-todos': [] }
   let target: InputNormalizer
 
   beforeEach(() => {
@@ -75,8 +76,8 @@ describe('InputNormalizer', () => {
     target.addSchema(objectSchemaFile, 'file.yaml')
     expect(target.toModel()).toEqual({
       schemas: [schema],
-      application: applicationFile,
-      modules: [moduleFile]
+      application: { ...applicationFile, errors: [], todos: [], links: [] },
+      modules: [{ ...moduleFile, errors: [], todos: [], links: [] }]
     })
   })
 
@@ -233,7 +234,10 @@ describe('InputNormalizer', () => {
     expect(target.toModel().schemas.find(s => s.$id === interfaceSchemaFile.$id)).toEqual({
       ...interfaceSchemaFile,
       definitions: {},
-      oneOf: [{ $ref: './Schema.yaml' }]
+      oneOf: [{ $ref: './Schema.yaml' }],
+      'x-links': [],
+      'x-errors': [],
+      'x-todos': []
     })
   })
 
@@ -245,7 +249,10 @@ describe('InputNormalizer', () => {
     expect(target.toModel().schemas.find(s => s.$id === interfaceSchemaFile.$id)).toEqual({
       ...interfaceSchemaFile,
       definitions: { InterFace1: { type: 'object', properties: objectSchemaFile.properties, required: [] } },
-      oneOf: [{ $ref: '#/definitions/InterFace1' }]
+      oneOf: [{ $ref: '#/definitions/InterFace1' }],
+      'x-links': [],
+      'x-errors': [],
+      'x-todos': []
     })
   })
 
@@ -256,7 +263,10 @@ describe('InputNormalizer', () => {
     expect(target.toModel().schemas.find(s => s.$id === objectSchemaFile.$id)).toEqual({
       ...objectSchemaFile,
       definitions: {},
-      required: []
+      required: [],
+      'x-links': [],
+      'x-errors': [],
+      'x-todos': []
     })
   })
 
@@ -268,7 +278,10 @@ describe('InputNormalizer', () => {
       ...objectSchemaFile,
       definitions: { Deep: { type: 'object', properties: objectSchemaFile.properties, required: [] } },
       properties: { deep: { $ref: '#/definitions/Deep' } },
-      required: []
+      required: [],
+      'x-links': [],
+      'x-errors': [],
+      'x-todos': []
     })
   })
 
@@ -280,7 +293,10 @@ describe('InputNormalizer', () => {
       ...objectSchemaFile,
       definitions: { Deep: { type: 'string', enum: enumSchemaFile.enum } },
       properties: { deep: { $ref: '#/definitions/Deep' } },
-      required: []
+      required: [],
+      'x-links': [],
+      'x-errors': [],
+      'x-todos': []
     })
   })
 
@@ -292,7 +308,10 @@ describe('InputNormalizer', () => {
       ...objectSchemaFile,
       definitions: { Deep: { type: 'object', oneOf: interfaceSchemaFile.oneOf } },
       properties: { deep: { $ref: '#/definitions/Deep' } },
-      required: []
+      required: [],
+      'x-links': [],
+      'x-errors': [],
+      'x-todos': []
     })
   })
 
@@ -303,7 +322,10 @@ describe('InputNormalizer', () => {
     target.addSchema(enumSchemaFile, 'file.yaml')
     expect(target.toModel().schemas.find(s => s.$id === enumSchemaFile.$id)).toEqual({
       ...enumSchemaFile,
-      definitions: {}
+      definitions: {},
+      'x-links': [],
+      'x-errors': [],
+      'x-todos': []
     })
   })
 })

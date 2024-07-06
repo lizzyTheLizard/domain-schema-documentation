@@ -3,16 +3,22 @@ import { getFullJavaClassName, getJavaPackageName, getJavaPropertyType, getSimpl
 import { type JavaPluginOptions } from './JavaPlugin'
 
 describe('JavaHelper', () => {
-  const application: Application = { title: 'Application', description: 'Application description' }
+  const application: Application = { title: 'Application', description: 'Application description', errors: [], todos: [], links: [] }
   const module: Module = {
     $id: '/Module',
     title: 'Module',
-    description: 'Module description'
+    description: 'Module description',
+    errors: [],
+    todos: [],
+    links: []
   }
   const module2: Module = {
     $id: '/Module2',
     title: 'Module 2',
-    description: 'Module 2 description'
+    description: 'Module 2 description',
+    errors: [],
+    todos: [],
+    links: []
   }
   const schema: Schema = {
     $id: '/Module/Schema.yaml',
@@ -21,7 +27,11 @@ describe('JavaHelper', () => {
     type: 'object',
     properties: {},
     required: [],
-    definitions: {}
+    definitions: {},
+    'x-errors': [],
+    'x-links': [],
+    'x-todos': []
+
   }
   const schema2: Schema = {
     $id: '/Module2/Schema2.yaml',
@@ -30,7 +40,10 @@ describe('JavaHelper', () => {
     type: 'object',
     properties: {},
     required: [],
-    definitions: {}
+    definitions: {},
+    'x-errors': [],
+    'x-links': [],
+    'x-todos': []
   }
 
   test('getJavaPropertyType', () => {
