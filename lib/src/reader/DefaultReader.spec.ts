@@ -49,7 +49,7 @@ describe('DefaultReader', () => {
     expect(inputNormalizer.addModule).toHaveBeenCalledWith(moduleFile, filePath, moduleFile.$id)
   })
 
-  test('Read schema file', async () => {
+  test('Read schema file (yaml)', async () => {
     await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
     await fs.mkdir(path.join(tmpDir.name, 'Module'))
     const filePath = path.join(tmpDir.name, 'Module', 'Schema.yaml')
@@ -58,5 +58,17 @@ describe('DefaultReader', () => {
     await target()
 
     expect(inputNormalizer.addSchema).toHaveBeenCalledWith(schemaFile, filePath, schemaFile.$id)
+  })
+
+  test('Read schema file (yml)', async () => {
+    await fs.writeFile(path.join(tmpDir.name, 'index.yml'), JSON.stringify(applicationFile))
+    await fs.mkdir(path.join(tmpDir.name, 'Module'))
+    const filePath = path.join(tmpDir.name, 'Module', 'Schema.yml')
+    const schemaFile2 = { ...schemaFile, $id: '/Module/Schema.yml' }
+    await fs.writeFile(filePath, JSON.stringify(schemaFile2))
+
+    await target()
+
+    expect(inputNormalizer.addSchema).toHaveBeenCalledWith(schemaFile2, filePath, '/Module/Schema.yml')
   })
 })

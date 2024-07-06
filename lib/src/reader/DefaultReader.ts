@@ -60,14 +60,14 @@ async function readFolderRecursive (baseFolder: string, folder: string, depth: n
     const lstat = await fs.lstat(filePath)
     if (lstat.isDirectory()) {
       await readFolderRecursive(baseFolder, filePath, depth + 1, options)
-    } else if (filePath.endsWith('index.yaml') && depth === 0) {
+    } else if (isIndexFile(filePath) && depth === 0) {
       const application = await options.fileReader(filePath)
       options.inputNormalizer.addApplication(application, filePath)
-    } else if (filePath.endsWith('index.yaml')) {
+    } else if (isIndexFile(filePath)) {
       const module = await options.fileReader(filePath)
       const expectedId = '/' + path.dirname(path.relative(baseFolder, filePath))
       options.inputNormalizer.addModule(module, filePath, expectedId)
-    } else if (filePath.endsWith('.yaml')) {
+    } else if (isYamlFile(filePath)) {
       const schema = await options.fileReader(filePath)
       const expectedId = '/' + path.relative(baseFolder, filePath)
       options.inputNormalizer.addSchema(schema, filePath, expectedId)
@@ -75,4 +75,16 @@ async function readFolderRecursive (baseFolder: string, folder: string, depth: n
       throw new Error(`Unexpected file ${filePath}. Not a valid input file`)
     }
   }
+}
+
+function isIndexFile (filePath: string): boolean {
+  const filename = path.basename(filePath).toLowerCase()
+  console.log('1', filePath, filename, filename === 'index.yaml' || filename === 'index.yml')
+  return filename === 'index.yaml' || filename === 'index.yml'
+}
+
+function isYamlFile (filePath: string): boolean {
+  const ext = path.extname(filePath)?.toLowerCase()
+  console.log('2', filePath, ext, ext === '.yaml' || ext === '.yml')
+  return ext === '.yaml' || ext === '.yml'
 }
