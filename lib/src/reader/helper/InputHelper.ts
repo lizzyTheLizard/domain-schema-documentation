@@ -54,6 +54,7 @@ export function getSchema (model: Model, schemaId: string): Schema {
  */
 export function resolveRelativeId (from: Schema | string, relativeId: string): string {
   const fromId = typeof from === 'string' ? from : from.$id
+  // TODO: Check this join for OS sep.
   return path.join(path.dirname(fromId), relativeId)
 }
 
@@ -66,6 +67,7 @@ export function resolveRelativeId (from: Schema | string, relativeId: string): s
 export function relativeLink (fromSchemaOrId: Schema | string, toSchemaOrId: Schema | string): string {
   const fromId = typeof fromSchemaOrId === 'string' ? fromSchemaOrId : fromSchemaOrId.$id
   const toId = typeof toSchemaOrId === 'string' ? toSchemaOrId : toSchemaOrId.$id
+  // TODO: Check this for backslash
   const relative = path.relative(fromId, toId)
   return relative.startsWith('..') ? relative : './' + relative
 }

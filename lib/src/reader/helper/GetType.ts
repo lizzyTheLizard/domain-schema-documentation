@@ -1,5 +1,5 @@
 import { type Property, type Schema, type BasicProperty, type Model } from '../Reader'
-import path from 'path'
+import { resolveRelativeId } from './InputHelper'
 
 export type PropertyType = PropertyReferenceType | PropertyLocalType | PropertyArrayType
 export type PropertyReferenceType = { type: 'self', name: string } | { type: 'definition', name: string } | { type: 'reference', name: string, $id: string }
@@ -31,12 +31,12 @@ export function getType (model: Model, schema: Schema, property: Property): Prop
 
 function getReferenceType (model: Model, schema: Schema, reference: string): PropertyReferenceType {
   if (!reference.startsWith('#')) {
-    const absolutId = path.join(path.dirname(schema.$id), reference)
-    const otherSchema = model.schemas.find(s => s.$id === absolutId)
+    const absoluteId = resolveRelativeId(schema, reference)
+    const otherSchema = model.schemas.find(s => s.$id === absoluteId)
     if (!otherSchema) {
       throw new Error(`Invalid reference '${reference}' in ${schema.$id}, cannot determine type`)
     }
-    return { type: 'reference', $id: absolutId, name: otherSchema.title }
+    return { type: 'reference', $id: absoluteId, name: otherSchema.title }
   }
   if (reference === '#') {
     return { type: 'self', name: schema.title }

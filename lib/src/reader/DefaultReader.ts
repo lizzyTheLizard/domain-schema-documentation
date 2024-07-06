@@ -65,16 +65,22 @@ async function readFolderRecursive (baseFolder: string, folder: string, depth: n
       options.inputNormalizer.addApplication(application, filePath)
     } else if (isIndexFile(filePath)) {
       const module = await options.fileReader(filePath)
-      const expectedId = '/' + path.dirname(path.relative(baseFolder, filePath))
+      const expectedId = getExpectedId(baseFolder, path.dirname(filePath))
       options.inputNormalizer.addModule(module, filePath, expectedId)
     } else if (isYamlFile(filePath)) {
       const schema = await options.fileReader(filePath)
-      const expectedId = '/' + path.relative(baseFolder, filePath)
+      const expectedId = getExpectedId(baseFolder, path.dirname(filePath))
       options.inputNormalizer.addSchema(schema, filePath, expectedId)
     } else {
       throw new Error(`Unexpected file ${filePath}. Not a valid input file`)
     }
   }
+}
+
+function getExpectedId (baseFolder: string, filePath: string): string {
+  const relativeId = path.relative(baseFolder, filePath)
+  // Normalize slashes
+  return '/' + relativeId.replaceAll('\\', '/')
 }
 
 function isIndexFile (filePath: string): boolean {
