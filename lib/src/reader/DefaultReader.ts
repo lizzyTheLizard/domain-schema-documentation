@@ -69,7 +69,7 @@ async function readFolderRecursive (baseFolder: string, folder: string, depth: n
       options.inputNormalizer.addModule(module, filePath, expectedId)
     } else if (isYamlFile(filePath)) {
       const schema = await options.fileReader(filePath)
-      const expectedId = getExpectedId(baseFolder, path.dirname(filePath))
+      const expectedId = getExpectedId(baseFolder, filePath)
       options.inputNormalizer.addSchema(schema, filePath, expectedId)
     } else {
       throw new Error(`Unexpected file ${filePath}. Not a valid input file`)
