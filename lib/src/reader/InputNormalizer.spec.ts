@@ -49,7 +49,7 @@ describe('InputNormalizer', () => {
     }).not.toThrow()
     expect(() => {
       target.addApplication({ wrong: 'field' }, 'file.yaml')
-    }).toThrow(new Error('Invalid file file.yaml: data must have required property \'title\''))
+    }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
   })
 
   test('moduleFile', async () => {
@@ -58,7 +58,7 @@ describe('InputNormalizer', () => {
     }).not.toThrow()
     expect(() => {
       target.addModule({ wrong: 'field' }, 'file.yaml')
-    }).toThrow(new Error('Invalid file file.yaml: data must have required property \'title\''))
+    }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
   })
 
   test('schemaFile', async () => {
@@ -67,7 +67,7 @@ describe('InputNormalizer', () => {
     }).not.toThrow()
     expect(() => {
       target.addSchema({ wrong: 'field' }, 'file.yaml')
-    }).toThrow(new Error('Invalid file file.yaml: data must have required property \'$id\''))
+    }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
   })
 
   test('toModel', async () => {
@@ -155,7 +155,7 @@ describe('InputNormalizer', () => {
     target.addModule(moduleFile, 'file.yaml')
     target.addSchema({ ...objectSchemaFile, examples: [{ key: 7 }, { key: 'wrong' }] }, 'file.yaml')
     expect(() => { target.toModel() })
-      .toThrow(new Error('Invalid example [1] in Schema /Module/Schema.yaml: data/key must be number'))
+      .toThrow(new Error('Invalid example [1] in Schema /Module/Schema.yaml. See logs for details'))
   })
 
   test('verifyExamples additional properties', () => {
@@ -163,7 +163,7 @@ describe('InputNormalizer', () => {
     target.addModule(moduleFile, 'file.yaml')
     target.addSchema({ ...objectSchemaFile, examples: [{ key: 7 }, { key: 8, wrong: '2' }] }, 'file.yaml')
     expect(() => { target.toModel() })
-      .toThrow(new Error('Invalid example [1] in Schema /Module/Schema.yaml: data must NOT have additional properties'))
+      .toThrow(new Error('Invalid example [1] in Schema /Module/Schema.yaml. See logs for details'))
   })
 
   test('verifyExamples additional properties allowed', () => {

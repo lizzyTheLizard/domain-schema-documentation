@@ -21,6 +21,7 @@ import * as yaml from 'yaml'
 import { cleanName, resolveRelativeId } from './helper/InputHelper'
 import path from 'path'
 import { type FormatName, fullFormats } from 'ajv-formats/dist/formats'
+import betterAjvErrors from 'better-ajv-errors'
 
 /**
  * Options for the InputNormalizer
@@ -193,7 +194,13 @@ export class InputNormalizer {
 
   private ajvValidate (parsed: unknown, schemaFile: string, fileLocation: string): void {
     if (this.#ajv.validate(schemaFile, parsed)) return
-    throw new Error(`Invalid file ${fileLocation}: ${this.#ajv.errorsText(this.#ajv.errors)}`)
+    if (!this.#ajv.errors) {
+      throw new Error(`Invalid file ${fileLocation}: ${this.#ajv.errorsText()}`)
+    }
+    const schema = this.#ajv.getSchema(schemaFile)
+    console.error(`Invalid file ${fileLocation}`)
+    console.error(betterAjvErrors(schema, parsed, this.#ajv.errors))
+    throw new Error(`Invalid file ${fileLocation}. See logs for details`)
   }
 
   private addSchemaToAjv (s: Schema): void {
@@ -201,13 +208,20 @@ export class InputNormalizer {
       this.#ajv.addSchema(s, s.$id)
       return
     }
-    if (!this.#noAdditionalPropertiesInExamples) {
+    if ('oneOf' in s) {
+      // In the interface case we cannot set additionalProperties to false
+      // as JSO-Schema will not check for the properties in the oneOf
+      // see https://ajv.js.org/faq.html#additional-properties-inside-compound-keywords-anyof-oneof-etc
+      const m2 = structuredClone(s) as any
+      m2.additionalProperties = true
+      this.#ajv.addSchema(m2 as AnySchema, s.$id)
+    } else if (!this.#noAdditionalPropertiesInExamples) {
       this.#ajv.addSchema(s, s.$id)
-      return
+    } else {
+      const m2 = structuredClone(s) as any
+      m2.additionalProperties = false
+      this.#ajv.addSchema(m2 as AnySchema, s.$id)
     }
-    const m2 = structuredClone(s) as any
-    m2.additionalProperties = false
-    this.#ajv.addSchema(m2 as AnySchema, s.$id)
   }
 
   private validateId (parsed: { $id: string }, fileLocation: string, expectedId?: string): void {
@@ -294,7 +308,12 @@ export class InputNormalizer {
     const examples = s.examples
     examples.forEach((e, i) => {
       if (!this.#ajv.validate(s.$id, e)) {
-        throw new Error(`Invalid example [${i}] in Schema ${s.$id}: ${this.#ajv.errorsText(this.#ajv.errors)}`)
+        if (!this.#ajv.errors) {
+          throw new Error(`Invalid example [${i}] in Schema ${s.$id}: ${this.#ajv.errorsText()}`)
+        }
+        console.error(`Invalid example [${i}] in Schema ${s.$id}`)
+        console.error(betterAjvErrors(s, e, this.#ajv.errors))
+        throw new Error(`Invalid example [${i}] in Schema ${s.$id}. See logs for details`)
       }
     })
   }
