@@ -235,6 +235,25 @@ describe('InputNormalizer', () => {
       ...interfaceSchemaFile,
       definitions: {},
       oneOf: [{ $ref: './Schema.yaml' }],
+      properties: {},
+      required: [],
+      'x-links': [],
+      'x-errors': [],
+      'x-todos': []
+    })
+  })
+
+  test('normalizeOneOf with properties', async () => {
+    target.addApplication(applicationFile, 'file.yaml')
+    target.addModule(moduleFile, 'file.yaml')
+    target.addSchema(objectSchemaFile, 'file.yaml')
+    target.addSchema({ ...interfaceSchemaFile, properties: { deep: { type: 'object', properties: objectSchemaFile.properties } } }, 'file.yaml')
+    expect(target.toModel().schemas.find(s => s.$id === interfaceSchemaFile.$id)).toEqual({
+      ...interfaceSchemaFile,
+      definitions: { Deep: { type: 'object', properties: objectSchemaFile.properties, required: [] } },
+      properties: { deep: { $ref: '#/definitions/Deep' } },
+      required: [],
+      oneOf: [{ $ref: './Schema.yaml' }],
       'x-links': [],
       'x-errors': [],
       'x-todos': []
@@ -250,6 +269,8 @@ describe('InputNormalizer', () => {
       ...interfaceSchemaFile,
       definitions: { InterFace1: { type: 'object', properties: objectSchemaFile.properties, required: [] } },
       oneOf: [{ $ref: '#/definitions/InterFace1' }],
+      properties: {},
+      required: [],
       'x-links': [],
       'x-errors': [],
       'x-todos': []
@@ -306,7 +327,7 @@ describe('InputNormalizer', () => {
     target.addSchema({ ...objectSchemaFile, properties: { deep: { type: 'object', oneOf: interfaceSchemaFile.oneOf } } }, 'file.yaml')
     expect(target.toModel().schemas.find(s => s.$id === objectSchemaFile.$id)).toEqual({
       ...objectSchemaFile,
-      definitions: { Deep: { type: 'object', oneOf: interfaceSchemaFile.oneOf } },
+      definitions: { Deep: { type: 'object', oneOf: interfaceSchemaFile.oneOf, properties: {}, required: [] } },
       properties: { deep: { $ref: '#/definitions/Deep' } },
       required: [],
       'x-links': [],

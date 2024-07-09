@@ -323,16 +323,16 @@ export class InputNormalizer {
       if (schema.enum) {
         throw new Error(`Schema ${schema.$id} is an interface and an enum`)
       }
-      if (schema.properties) {
-        throw new Error(`Schema ${schema.$id} is an interface and an object`)
-      }
       const name = cleanName(schema.title)
-      const cleaned = this.normalizeOneOf(schema.oneOf, name)
+      const cleanedOneOf = this.normalizeOneOf(schema.oneOf, name)
+      const cleanedProperties = this.normalizeProperties(schema.properties ?? {})
       return {
         ...schema,
         type: 'object',
-        oneOf: cleaned.result,
-        definitions: this.normalizeDefinitions({ ...schema.definitions ?? {}, ...cleaned.definitions }),
+        oneOf: cleanedOneOf.result,
+        definitions: this.normalizeDefinitions({ ...schema.definitions ?? {}, ...cleanedOneOf.definitions, ...cleanedProperties.definitions }),
+        properties: cleanedProperties.result,
+        required: schema.required ?? [],
         'x-links': schema['x-links'] ?? [],
         'x-errors': schema['x-errors'] ?? [],
         'x-todos': schema['x-todos'] ?? []
@@ -435,9 +435,20 @@ export class InputNormalizer {
   }
 
   private normalizeDefinition (definition: NonNormalizedSubSchema, name: string): Record<string, Definition> {
-    if (definition.oneOf) {
+    if (definition.oneOf && definition.properties) {
+      const cleanedProperties = this.normalizeProperties(definition.properties)
+      const cleanedInterface = this.normalizeOneOf(definition.oneOf, name)
+      const result: InterfaceDefinition = {
+        required: [],
+        ...definition,
+        type: 'object',
+        properties: cleanedProperties.result,
+        oneOf: cleanedInterface.result
+      }
+      return { [name]: result, ...this.normalizeDefinitions(cleanedProperties.definitions), ...this.normalizeDefinitions(cleanedInterface.definitions) }
+    } else if (definition.oneOf) {
       const cleaned = this.normalizeOneOf(definition.oneOf, name)
-      const result: InterfaceDefinition = { ...definition, type: 'object', oneOf: cleaned.result }
+      const result: InterfaceDefinition = { ...definition, type: 'object', oneOf: cleaned.result, properties: {}, required: [] }
       return { [name]: result, ...this.normalizeDefinitions(cleaned.definitions) }
     } else if (definition.properties) {
       const cleaned = this.normalizeProperties(definition.properties)

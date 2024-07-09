@@ -1,4 +1,4 @@
-import { type Definition, type Property, type Schema, type Model } from '../Reader'
+import { type Definition, type Property, type Schema, type Model, type InterfaceDefinition } from '../Reader'
 import { getSchema, resolveRelativeId } from './InputHelper'
 
 /**
@@ -37,17 +37,20 @@ export function getDependencies (model: Model, schema: Schema): Dependency[] {
 
 function getDependenciesForDefinition (model: Model, s: Schema, fromDefinitionName?: string): Dependency[] {
   const d: Definition = fromDefinitionName !== undefined ? s.definitions[fromDefinitionName] : s
+  const results: Dependency[] = []
   if ('oneOf' in d) {
-    return d.oneOf
+    results.push(...(d as InterfaceDefinition).oneOf
       .flatMap(oneOf => getDependenciesForProperty(model, s, oneOf, fromDefinitionName))
-      .map(d => ({ ...d, type: 'IS_IMPLEMENTED_BY' }))
+      .map(d => ({ ...d, type: 'IS_IMPLEMENTED_BY' } satisfies Dependency))
+    )
   }
   if ('properties' in d) {
-    return Object.entries(d.properties)
+    results.push(...Object.entries(d.properties)
       .flatMap(([name, p]) => getDependenciesForProperty(model, s, p, fromDefinitionName)
         .map(d => ({ ...d, dependencyName: name })))
+    )
   }
-  return []
+  return results
 }
 
 function getDependenciesForProperty (model: Model, fromSchema: Schema, p: Property, fromDefinitionName?: string): Dependency[] {

@@ -43,6 +43,8 @@ describe('JavaGenerator', () => {
     type: 'object',
     oneOf: [{ $ref: '../Module/Schema.yaml' }, { $ref: '#/definitions/SubSchema' }],
     definitions: { SubSchema: { type: 'object', properties: {}, required: [] } },
+    properties: {},
+    required: [],
     'x-errors': [],
     'x-links': [],
     'x-todos': []
@@ -132,6 +134,18 @@ describe('JavaGenerator', () => {
     const content = (await fs.readFile(tmpDir.name + '/Module2/java/Schema2.java', 'utf-8')).toString()
     expect(content).toContain('package com.example.module2.model;')
     expect(content).toContain('public interface Schema2 {')
+  })
+
+  test('Interface with properties', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const oneOfSchemaWithProperties: Schema = { ...oneOfSchema, properties: { prop: { type: 'string' } }, required: [] }
+    const model = { application, modules: [module, module2], schemas: [schema, oneOfSchemaWithProperties] }
+    await javaGenerator(model, tmpDir.name, options)
+
+    const content = (await fs.readFile(tmpDir.name + '/Module2/java/Schema2.java', 'utf-8')).toString()
+    expect(content).toContain('public interface Schema2 {')
+    expect(content).toContain('String getProp();')
+    expect(content).toContain('void setProp(String value);')
   })
 
   test('Enum', async () => {

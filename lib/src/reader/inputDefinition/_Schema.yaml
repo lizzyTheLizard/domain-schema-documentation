@@ -36,28 +36,23 @@ allOf:
     oneOf:
       - type: object
         properties:
-            type:
-                type: string
-                enum:
-                - object
-        required:
-          - properties
+          type:
+            type: string
+            const: 'object'
+        anyOf:
+        - type: object
+          required:
+            - oneOf
+        - type: object
+          required:
+            - properties
       - type: object
         properties:
           type:
             type: string
-            enum:
-              - string
+            const: 'string'
         required:
           - enum
-      - type: object
-        properties:
-          type:
-            type: string
-            enum:
-              - object
-        required:
-          - oneOf
 definitions:
   Schema:
     type: object

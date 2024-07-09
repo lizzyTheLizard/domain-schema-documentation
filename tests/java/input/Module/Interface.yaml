@@ -13,6 +13,16 @@ oneOf:
     x-enum-description:
       Test: "Test description"
       Test2: "Test2 description"
+properties:
+  testProp: 
+    type: string
+    description: This is a test property
+    x-enum-description:
+      Test: "Test description"
+      Test2: "Test2 description"
+    enum:
+      - "Test"
+      - "Test2"
 definitions:
   OtherObject:
     type: object

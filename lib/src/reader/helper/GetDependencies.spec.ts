@@ -90,6 +90,8 @@ describe('GetDependencies', () => {
       title: 'Schema 2',
       type: 'object',
       oneOf: [{ $ref: './Schema.yaml' }],
+      properties: {},
+      required: [],
       definitions: {},
       'x-errors': [],
       'x-links': [],

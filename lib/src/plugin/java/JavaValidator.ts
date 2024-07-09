@@ -88,22 +88,20 @@ class JavaValidator {
       return
     }
     const fileContent = await fs.readFile(filename).then(b => b.toString())
-    if ('properties' in definition) {
-      await this.checkObjectDefinition(fileContent, definition, definitionName)
-      return
-    }
     if ('oneOf' in definition) {
       await this.checkInterfaceDefinition(fileContent, definitionName)
-      return
-    }
-    if (definition.type === 'string') {
+    } else if ('properties' in definition) {
+      await this.checkObjectDefinition(fileContent, definition, definitionName)
+    } else if (definition.type === 'string') {
       await this.checkEnumDefinition(fileContent, definition, definitionName)
-      return
+    } else {
+      throw new Error('Unknown definition type')
     }
-    throw new Error('Unknown definition type')
   }
 
   private async checkObjectDefinition (fileContent: string, definition: ObjectDefinition, definitionName: string | undefined): Promise<void> {
+    // Must be a class and have all the needed properties with the correct type
+    // Do not check any further methods etc.
     const implementationProperties = parseClass(fileContent)
     if (typeof implementationProperties === 'string') {
       this.currentSchema['x-errors'].push({
@@ -140,6 +138,8 @@ class JavaValidator {
   }
 
   private async checkInterfaceDefinition (fileContent: string, definitionName: string | undefined): Promise<void> {
+    // Must be an interface
+    // Do not check if methods for properties exist as they could be left out for a good reason
     const parseResult = parseInterface(fileContent)
     if (typeof parseResult === 'string') {
       this.currentSchema['x-errors'].push({
@@ -150,6 +150,8 @@ class JavaValidator {
   }
 
   private async checkEnumDefinition (fileContent: string, definition: EnumDefinition, definitionName: string | undefined): Promise<void> {
+    // Check that this is an enum and has the correct set of values
+    // Do not check any further methods etc.
     const enumValues = parseEnum(fileContent)
     if (typeof enumValues === 'string') {
       this.currentSchema['x-errors'].push({

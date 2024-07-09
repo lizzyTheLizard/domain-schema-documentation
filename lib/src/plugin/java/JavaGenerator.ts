@@ -4,7 +4,7 @@ import { getDependencies } from '../../reader/helper/GetDependencies'
 import Handlebars from 'handlebars'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { getFullJavaClassName, getSimpleJavaClassName, getJavaPackageName, getJavaPropertyType, type JavaType } from './JavaHelper'
-import { getModuleId } from '../../reader/helper/InputHelper'
+import { cleanName, getModuleId } from '../../reader/helper/InputHelper'
 import path from 'path'
 
 type HandlebarsContext = Definition & { schema: Schema, definitionName?: string } & JavaPluginOptions
@@ -23,7 +23,7 @@ export async function javaGenerator (model: Model, outputFolder: string, options
   Handlebars.registerHelper('javaImplementedInterfaces', (ctx: HandlebarsContext) => implementedInterfaces(model, ctx.schema, ctx.definitionName).map(s => getSimpleJavaClassName(s)))
   Handlebars.registerHelper('javaPropertyType', (ctx: HandlebarsContext, propertyName: string) => propertyType(model, ctx.schema, ctx as ObjectDefinition, propertyName, options))
   Handlebars.registerHelper('javaImports', (ctx: HandlebarsContext) => collectImports(model, ctx.schema, options, ctx.definitionName))
-
+  Handlebars.registerHelper('javaCleanName', (name: string) => cleanName(name))
   for (const module of model.modules) {
     module.links = [...module.links ?? [], { text: 'Java-Files', href: './java' }]
   }
@@ -44,10 +44,10 @@ export async function javaGenerator (model: Model, outputFolder: string, options
 
 async function generate (schema: Schema, options: JavaPluginOptions, definitionName?: string): Promise<string> {
   const definition = definitionName === undefined ? schema : schema.definitions[definitionName]
-  if (definition.type === 'object' && 'properties' in definition) {
-    return options.classTemplate({ ...definition, ...options, schema, definitionName })
-  } else if (definition.type === 'object') {
+  if (definition.type === 'object' && 'oneOf' in definition) {
     return options.interfaceTemplate({ ...definition, ...options, schema, definitionName })
+  } else if (definition.type === 'object') {
+    return options.classTemplate({ ...definition, ...options, schema, definitionName })
   } else {
     return options.enumTemplate({ ...definition, ...options, schema, definitionName })
   }
@@ -64,7 +64,7 @@ function implementedInterfaces (model: Model, schema: Schema, definitionName?: s
 function collectImports (model: Model, schema: Schema, options: JavaPluginOptions, definitionName?: string): string[] {
   const definition = definitionName === undefined ? schema : schema.definitions[definitionName]
   const result: string[] = []
-  if ('properties' in definition && options.useLombok) { result.push('lombok.*') }
+  if ('properties' in definition && !('oneOf' in definition) && options.useLombok) { result.push('lombok.*') }
   if ('properties' in definition) {
     Object.values(definition.properties).flatMap((property) => {
       const type = getJavaPropertyType(model, schema, property, options)

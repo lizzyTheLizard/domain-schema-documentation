@@ -7,6 +7,7 @@ namespace Module {
   class _Module_Interface_yaml["Interface"]
   class OtherObject["OtherObject"]
   class Interface3["Interface3"]
+  class TestProp["TestProp"]
   class _Module_Object_yaml["Object"]
 }
 _Module_Interface_yaml <|-- _Module_Object_yaml 
@@ -15,6 +16,7 @@ _Module_Interface_yaml <|-- Interface3
 click _Module_Interface_yaml href "./Interface.yaml.html" "Interface"
 click OtherObject href "./Interface.yaml.html" "Interface"
 click Interface3 href "./Interface.yaml.html" "Interface"
+click TestProp href "./Interface.yaml.html" "Interface"
 click _Module_Object_yaml href "./Object.yaml.html" "Object"
 ```
 
@@ -25,6 +27,10 @@ click _Module_Object_yaml href "./Object.yaml.html" "Object"
 1. [Interface3](#Interface3)
 
 
+## Properties
+| Name | Type | Description |
+|------|------|-------------|
+| testProp | [TestProp](#TestProp) |  |
 
 ## Subschemas
 ### OtherObject (Object)
@@ -45,6 +51,15 @@ click _Module_Object_yaml href "./Object.yaml.html" "Object"
 | Test | Test description |
 | Test2 | Test2 description |
 
+### TestProp (Enum)
+This is a test property
+
+
+| Name | Description |
+|------|-------------|
+| Test | Test description |
+| Test2 | Test2 description |
+
 
 ## Verification Errors
 | Type | Description |
@@ -58,3 +73,4 @@ click _Module_Object_yaml href "./Object.yaml.html" "Object"
 1. [Java-File](./java/Interface.java)
 1. [Java-File (OtherObject)](./java/InterfaceOtherObject.java)
 1. [Java-File (Interface3)](./java/InterfaceInterface3.java)
+1. [Java-File (TestProp)](./java/InterfaceTestProp.java)

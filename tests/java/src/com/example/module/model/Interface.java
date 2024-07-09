@@ -1,4 +1,6 @@
 package com.example.module.model;
 
-public class Interface {
+public abstract class Interface {
+  public abstract InterfaceTestProp getTestProp();
+  public abstract void setTestProp(InterfaceTestProp value);
 }

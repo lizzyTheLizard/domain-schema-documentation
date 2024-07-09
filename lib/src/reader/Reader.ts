@@ -48,7 +48,7 @@ export interface BasicProperty {
 }
 
 /** A type definition. Can be the root of a schema, or a sub-definition */
-export type Definition = EnumDefinition | ObjectDefinition | InterfaceDefinition
+export type Definition = InterfaceDefinition | EnumDefinition | ObjectDefinition
 
 interface DefinitionCommon {
   /** The description of the definition, as defined in JSON Schema */
@@ -78,10 +78,8 @@ export interface ObjectDefinition extends DefinitionCommon {
 }
 
 /** An Interface definition */
-export interface InterfaceDefinition extends DefinitionCommon {
-  /** The type of the definition, as defined in JSON Schema */
-  type: 'object'
-  /** The implementing shemas, as defined in JSON Schema */
+export interface InterfaceDefinition extends ObjectDefinition {
+  /** The implementing schemas, as defined in JSON Schema */
   oneOf: RefProperty[]
 }
 
