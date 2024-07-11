@@ -12,7 +12,7 @@ import { type DefaultInputNormalizerOptions } from './DefaultInputNormalizer'
  */
 export interface InputValidatorOptions {
   /**
-   * Options given to ajv. By default {allErrors: true, discriminator: true}
+   * Options given to ajv. By default {allErrors: true}
    * @see {@link https://ajv.js.org/options.html}
    */
   ajvOptions: Options
@@ -29,9 +29,8 @@ export interface InputValidatorOptions {
   /**
    * Discriminator is not an JSON-Schema but an OpenAPI keyword. By default, JSON-Schema does not support it.
    * Can either be 'AJV' (AJV default, see {@link https://ajv.js.org/json-schema.html#discriminator},
-   * limited support (e.g. no mappings) but does check all examples if they are valid),
-   * 'ALLOW' (any kind of discriminator is allowed bug examples are not validated any more) or
-   * 'DENY' (no discriminator allowed, examples are not validated any more)
+   * limited support e.g. no mappings but fully validated through AJV), 'ALLOW' (any kind of discriminator is allowed, no checks whatsoever) or
+   * 'DENY' (no discriminator allowed, fully validated through AJV)
    */
   discriminator: 'AJV' | 'ALLOW' | 'DENY'
   /**
