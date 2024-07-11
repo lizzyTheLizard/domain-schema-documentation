@@ -1,7 +1,7 @@
 import { type Plugin } from './plugin/Plugin'
 import { type Writer } from './writer/Writer'
 import { type Model, type ImplementationError, type Reader, type Module } from './reader/Reader'
-import { defaultReader } from './reader/DefaultReader'
+import { defaultReader } from './reader/defaultReader/DefaultReader'
 import { htmlWriter } from './writer/html/HtmlWriter'
 import { getSchemasForModule } from './reader/helper/InputHelper'
 

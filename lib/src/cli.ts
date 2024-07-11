@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { defaultReader } from './reader/DefaultReader'
+import { defaultReader } from './reader/defaultReader/DefaultReader'
 import { htmlWriter } from './writer/html/HtmlWriter'
 import minimist from 'minimist'
 import { run } from './Run'
