@@ -233,6 +233,7 @@ export interface NonNormalizedSchema {
   properties?: Record<string, NonNormalizedSubSchema>
   required?: string[]
   enum?: string[] | undefined
+  additionalProperties?: NonNormalizedSubSchema | boolean
   'x-todos'?: string[]
   'x-links'?: Link[]
   'x-errors'?: ImplementationError[]
@@ -246,6 +247,7 @@ export interface NonNormalizedSubSchema {
   type?: string
   items?: NonNormalizedSubSchema
   enum?: string[]
+  additionalProperties?: NonNormalizedSubSchema | boolean
 }
 
 export interface NonNormalizedApplication {

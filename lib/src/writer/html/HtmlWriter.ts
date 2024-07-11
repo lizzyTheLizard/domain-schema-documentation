@@ -1,5 +1,5 @@
 import { type Writer } from '../Writer'
-import { type Model, type Property, type Schema } from '../../reader/Reader'
+import { type Definition, type Model, type Property, type Schema } from '../../reader/Reader'
 import path from 'path'
 import { enhanceApplication, enhanceModule, enhanceSchema, loadTemplate, writeOutput } from '../WriterHelpers'
 import Handlebars from 'handlebars'
@@ -56,6 +56,7 @@ function registerHandlebarsHelpers (model: Model, options: HtmlWriterOptions): v
   Handlebars.registerHelper('htmlJson', (input: unknown) => JSON.stringify(input))
   Handlebars.registerHelper('htmlGetType', (schema: Schema, property: Property) => htmlGetType(schema, getType(model, schema, property)))
   Handlebars.registerHelper('htmlIntent', (input: string, intent: number) => input.split('\n').map(l => ' '.repeat(intent) + l).join('\n'))
+  Handlebars.registerHelper('htmlAdditionalPropertyType', (schema: Schema, definition: Definition) => htmlAdditionalPropertyType(model, schema, definition))
   Handlebars.registerPartial('htmlSubSchema', options.subSchemaTemplate)
 }
 
@@ -72,6 +73,14 @@ function htmlGetType (schema: Schema, type: PropertyType): string {
         return type.name
       }
   }
+}
+
+function htmlAdditionalPropertyType (model: Model, schema: Schema, definition: Definition): string {
+  const addionalProperties = 'additionalProperties' in definition ? definition.additionalProperties ?? false : false
+  if (addionalProperties === false) throw new Error('Additional properties are not enabled')
+  if (addionalProperties === true) return '*'
+  const propertyType = getType(model, schema, addionalProperties)
+  return htmlGetType(schema, propertyType)
 }
 
 async function writeSchemaFiles (model: Model, options: HtmlWriterOptions): Promise<void> {

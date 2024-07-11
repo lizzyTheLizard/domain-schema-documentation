@@ -8,6 +8,7 @@ examples:
     - "1"
     - "2"
     name: "Test"
+    other: "False"
 properties:
   ids:
     type: array
@@ -17,3 +18,4 @@ properties:
     type: string
   obj2:
     $ref: ../Module2/Object2.yaml
+additionalProperties: true

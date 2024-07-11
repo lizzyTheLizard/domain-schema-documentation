@@ -2,7 +2,7 @@ import { type Application, type Module, type Schema } from '../../reader/Reader'
 import * as tmp from 'tmp'
 import path from 'path'
 import { promises as fs } from 'fs'
-import { type JavaPluginOptions } from './JavaPlugin'
+import { defaultJavaBasicTypeMap, type JavaPluginOptions } from './JavaPlugin'
 import { javaValidator } from './JavaValidator'
 
 describe('JavaValidator', () => {
@@ -84,6 +84,51 @@ describe('JavaValidator', () => {
     expect(application.errors).toEqual([])
     expect(module.errors).toEqual([])
     expect(schema2['x-errors']).toEqual([{ text: 'Property \'test\' is missing in class \'module.Schema\'', type: 'MISSING_IN_IMPLEMENTATION' }])
+  })
+
+  test('Missing Additional Properties', async () => {
+    application.errors = []; module.errors = []; schema['x-errors'] = []
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const filename = path.join(tmpDir.name, 'module', 'Schema.java')
+    await fs.mkdir(path.join(tmpDir.name, 'module'))
+    await fs.writeFile(filename, 'package module; public class Schema {}')
+    const schema2: Schema = { ...schema, additionalProperties: { type: 'string' } }
+    const model = { application, modules: [module], schemas: [schema2] }
+    const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
+    await javaValidator(model, options)
+    expect(application.errors).toEqual([])
+    expect(module.errors).toEqual([])
+    expect(schema['x-errors']).toEqual([{ text: 'Additional Properties are missing in class \'module.Schema\'', type: 'MISSING_IN_IMPLEMENTATION' }])
+  })
+
+  test('Wrong Additional Properties', async () => {
+    application.errors = []; module.errors = []; schema['x-errors'] = []
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const filename = path.join(tmpDir.name, 'module', 'Schema.java')
+    await fs.mkdir(path.join(tmpDir.name, 'module'))
+    await fs.writeFile(filename, 'package module; import java.util.Map; public class Schema { private Map<String, Integer> additionalProperties; }')
+    const schema2: Schema = { ...schema, additionalProperties: { type: 'string' } }
+    const model = { application, modules: [module], schemas: [schema2] }
+    const options = { srcDir: tmpDir.name, basicTypeMap: defaultJavaBasicTypeMap } as any as JavaPluginOptions
+    await javaValidator(model, options)
+    expect(application.errors).toEqual([])
+    expect(module.errors).toEqual([])
+    expect(schema2['x-errors']).toEqual([{ text: 'Additional Properties have type \'Map<String, Integer>\' in class \'module.Schema\' but should have type \'Map<String, String>\'', type: 'WRONG' }])
+  })
+
+  test('Excess Additional Properties', async () => {
+    application.errors = []; module.errors = []; schema['x-errors'] = []
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const filename = path.join(tmpDir.name, 'module', 'Schema.java')
+    await fs.mkdir(path.join(tmpDir.name, 'module'))
+    await fs.writeFile(filename, 'package module; import java.util.Map; public class Schema { private Map<String, Integer> additionalProperties; }')
+    const schema2: Schema = { ...schema, additionalProperties: false }
+    const model = { application, modules: [module], schemas: [schema2] }
+    const options = { srcDir: tmpDir.name, basicTypeMap: defaultJavaBasicTypeMap } as any as JavaPluginOptions
+    await javaValidator(model, options)
+    expect(application.errors).toEqual([])
+    expect(module.errors).toEqual([])
+    expect(schema2['x-errors']).toEqual([{ text: 'Additional Properties should not exist in class \'module.Schema\'', type: 'NOT_IN_DOMAIN_MODEL' }])
   })
 
   test('Excess Property', async () => {

@@ -3,7 +3,7 @@ import { writeOutput } from '../../writer/WriterHelpers'
 import { getDependencies } from '../../reader/helper/GetDependencies'
 import Handlebars from 'handlebars'
 import { type JavaPluginOptions } from './JavaPlugin'
-import { getFullJavaClassName, getSimpleJavaClassName, getJavaPackageName, getJavaPropertyType, type JavaType } from './JavaHelper'
+import { getFullJavaClassName, getSimpleJavaClassName, getJavaPackageName, getJavaPropertyType, type JavaType, getJavaAdditionalPropertyType } from './JavaHelper'
 import { cleanName, getModuleId } from '../../reader/helper/InputHelper'
 import path from 'path'
 
@@ -22,6 +22,7 @@ export async function javaGenerator (model: Model, outputFolder: string, options
   Handlebars.registerHelper('javaEnumDoc', (ctx: HandlebarsContext, key: string) => enumDoc(ctx as EnumDefinition, key))
   Handlebars.registerHelper('javaImplementedInterfaces', (ctx: HandlebarsContext) => implementedInterfaces(model, ctx.schema, ctx.definitionName).map(s => getSimpleJavaClassName(s)))
   Handlebars.registerHelper('javaPropertyType', (ctx: HandlebarsContext, propertyName: string) => propertyType(model, ctx.schema, ctx as ObjectDefinition, propertyName, options))
+  Handlebars.registerHelper('javaAdditionalPropertiesType', (ctx: HandlebarsContext) => additionalPropertiesType(model, ctx.schema, ctx as Definition, options))
   Handlebars.registerHelper('javaImports', (ctx: HandlebarsContext) => collectImports(model, ctx.schema, options, ctx.definitionName))
   Handlebars.registerHelper('javaCleanName', (name: string) => cleanName(name))
   for (const module of model.modules) {
@@ -71,6 +72,10 @@ function collectImports (model: Model, schema: Schema, options: JavaPluginOption
       return collectImportsFromType(type)
     }).forEach(i => result.push(i))
   }
+  if ('additionalProperties' in definition && definition.additionalProperties !== undefined && definition.additionalProperties !== false) {
+    const type = getJavaAdditionalPropertyType(model, schema, definition.additionalProperties, options)
+    collectImportsFromType(type).forEach(i => result.push(i))
+  }
   implementedInterfaces(model, schema, definitionName).forEach(i => result.push(getFullJavaClassName(i, options)))
   const packageName = getJavaPackageName(schema, options)
   function isInPackage (fullClassName: string, packageName: string): boolean {
@@ -83,6 +88,7 @@ function collectImportsFromType (type: JavaType): string[] {
   switch (type.type) {
     case 'CLASS': return [type.fullName]
     case 'COLLECTION': return [...collectImportsFromType(type.items), 'java.util.Collection']
+    case 'MAP': return [...collectImportsFromType(type.items), 'java.util.Map']
   }
 }
 
@@ -98,11 +104,19 @@ function propertyType (model: Model, schema: Schema, definition: ObjectDefinitio
   return simpleName
 }
 
+function additionalPropertiesType (model: Model, schema: Schema, definition: Definition, options: JavaPluginOptions): string {
+  const additionalProperties = 'additionalProperties' in definition ? definition.additionalProperties ?? false : false
+  if (additionalProperties === false) { throw new Error('additionalPropertiesType called without additionalProperties set to true or a property.') }
+  const javaType = getJavaAdditionalPropertyType(model, schema, additionalProperties, options)
+  return getSimpleClassNameFromType(javaType)
+}
+
 function getSimpleClassNameFromType (type: JavaType): string {
   switch (type.type) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     case 'CLASS': return type.fullName.split('.').pop()!
     case 'COLLECTION': return `Collection<${getSimpleClassNameFromType(type.items)}>`
+    case 'MAP': return `Map<String, ${getSimpleClassNameFromType(type.items)}>`
   }
 }
 

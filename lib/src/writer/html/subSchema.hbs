@@ -45,6 +45,13 @@
         <td>{{description}}</td>
       </tr>
 {{/each}}
+{{#if additionalProperties}}
+      <tr>
+        <td>(other)</td>
+        <td>{{{htmlAdditionalPropertyType ../schema .}}}</td>
+        <td>Additional Properties</td>
+      </tr>
+{{/if}}
     </tbody>
   </table>
 {{/if}}

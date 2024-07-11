@@ -23,7 +23,8 @@ click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
     "1",
     "2"
   ],
-  "name": "Test"
+  "name": "Test",
+  "other": "False"
 }
 ```
 
@@ -35,6 +36,7 @@ click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
 | ids | [string] |  |
 | name | string |  |
 | obj2 | [Object 2](../Module2/Object2.yaml.md) |  |
+| (other) | * | Additional Properties |
 
 
 

@@ -50,6 +50,9 @@ function getDependenciesForDefinition (model: Model, s: Schema, fromDefinitionNa
         .map(d => ({ ...d, dependencyName: name })))
     )
   }
+  if ('additionalProperties' in d && typeof d.additionalProperties !== 'boolean' && d.additionalProperties !== undefined) {
+    results.push(...getDependenciesForProperty(model, s, d.additionalProperties, fromDefinitionName))
+  }
   return results
 }
 

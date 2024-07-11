@@ -201,4 +201,22 @@ describe('SchemaNormalizer', () => {
       'x-todos': []
     })
   })
+  test('additionalProperties dependencies', async () => {
+    const schema = { ...common, additionalProperties: { type: 'object', properties: { deepInternal: { type: 'object', oneOf: [{ type: 'object', properties: { key: { type: 'string' } } }] } } } }
+    const result = normalizeSchema(schema)
+    expect(result).toEqual({
+      ...common,
+      definitions: {
+        DeepInternal: { type: 'object', oneOf: [{ $ref: '#/definitions/DeepInternal1' }], properties: {}, required: [] },
+        DeepInternal1: { type: 'object', properties: { key: { type: 'string' } }, required: [] },
+        AdditionalProperties: { type: 'object', properties: { deepInternal: { $ref: '#/definitions/DeepInternal' } }, required: [] }
+      },
+      properties: { },
+      additionalProperties: { $ref: '#/definitions/AdditionalProperties' },
+      required: [],
+      'x-links': [],
+      'x-errors': [],
+      'x-todos': []
+    })
+  })
 })

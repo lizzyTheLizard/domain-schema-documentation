@@ -23,6 +23,9 @@ public class {{{javaClassName this}}}{{#each (javaImplementedInterfaces this)}}{
 {{/if}}
   private {{{javaPropertyType .. @key}}} {{{@key}}};
 {{/each}}
+{{#if additionalProperties}}
+  private {{{javaAdditionalPropertiesType .}}} additionalProperties;
+{{/if}}
 }
 
 

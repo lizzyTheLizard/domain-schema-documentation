@@ -75,6 +75,7 @@ export interface ObjectDefinition extends DefinitionCommon {
   properties: Record<string, Property>
   /** The required properties of the object, as defined in JSON Schema */
   required: string[]
+  additionalProperties?: boolean | Property
 }
 
 /** An Interface definition */

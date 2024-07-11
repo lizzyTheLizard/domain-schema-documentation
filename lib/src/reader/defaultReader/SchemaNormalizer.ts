@@ -22,8 +22,11 @@ export function normalizeSchema (schema: NonNormalizedSchema): Schema {
   const name = cleanName(schema.title)
   const normaliezedDefinition = normalizeDefinition(schema, name)
   const definitions = normalizeDefinitions({ ...normaliezedDefinition.definitions, ...(schema.definitions ?? {}) })
+  // Typescript does not know that whenever there is an additionalProperties field in schema,
+  // it is in normaliezedDefinition.result as well. delete it to avoid type confusion
+  const { additionalProperties: _, ...remainingSchema } = schema
   return {
-    ...schema,
+    ...remainingSchema,
     ...normaliezedDefinition.result,
     'x-links': schema['x-links'] ?? [],
     'x-errors': schema['x-errors'] ?? [],
@@ -33,7 +36,6 @@ export function normalizeSchema (schema: NonNormalizedSchema): Schema {
 }
 
 function normalizeDefinition (definition: NonNormalizedSubSchema, name: string): NormalizerResult<Definition> {
-  // TODO Validate only one type
   let definitions: Record<string, NonNormalizedSubSchema> = {}
 
   if (definition.type === 'string') {
@@ -51,6 +53,12 @@ function normalizeDefinition (definition: NonNormalizedSubSchema, name: string):
     type: 'object',
     properties: cleanedProperties.result,
     required: definition.required ?? []
+  }
+
+  if ('additionalProperties' in definition && definition.additionalProperties !== undefined) {
+    const cleanedAdditionalProperties = normalizeAdditionalProperties(definition.additionalProperties)
+    definitions = { ...definitions, ...cleanedAdditionalProperties.definitions }
+    objectDefinition.additionalProperties = cleanedAdditionalProperties.result
   }
 
   if (!definition.oneOf) {
@@ -117,6 +125,17 @@ function normalizeProperty (property: NonNormalizedSubSchema, name: string): Nor
 
   const result: BasicProperty = { ...property, type: property.type }
   return ({ result, definitions: {} })
+}
+
+function normalizeAdditionalProperties (additionalProperties: NonNormalizedSubSchema | boolean): NormalizerResult<boolean | Property> {
+  if (typeof additionalProperties === 'boolean') {
+    return { result: additionalProperties, definitions: {} }
+  }
+  if (typeof additionalProperties === 'object') {
+    const cleaned = normalizeProperty(additionalProperties, 'AdditionalProperties')
+    return { result: cleaned.result, definitions: cleaned.definitions }
+  }
+  throw new Error(`Invalid type ${typeof additionalProperties} for additionalProperties`)
 }
 
 function normalizeDefinitions (definitions: Record<string, NonNormalizedSubSchema>): Record<string, Definition> {

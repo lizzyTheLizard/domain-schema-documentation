@@ -21,4 +21,7 @@
 {{#each properties}}
 | {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{{mdGetType ../schema this}}} | {{{mdMultiline description}}} |
 {{/each}}
+{{#if additionalProperties}}
+| (other) | {{mdAdditionalPropertyType ../schema .}} | Additional Properties |
+{{/if}}
 {{/if}}

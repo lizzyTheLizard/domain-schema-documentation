@@ -71,12 +71,12 @@ By default, the input model is read from the folder `./input`. It consists of th
   * A list of `todos` that are still open in the domain model (optional)
 * For each type a JSON-Schema file containing the **Type Description**. The Schema-File must be in one of the module folders, and it's `$id` must be equal the filename. Schemas must be valid JSON Schemas. You can add your own additional extensions, but to avoid conflicts, they must be prefixed with `x-`. Additionally, the following restrictions must be fulfilled (see also its [Json Schema Definition](./lib/src/reader/inputDefinition/_Schema.yaml)):
   * Each schema must define a `title` and an `$id`. The title must be a string.
-  * Schemas must be either an enum (`type: string` and have a property `enum`), an object (`type: object`), or an interface (`type: object` and have a `properties`) or an interface (`type: object` and have a list of `oneOf`). You cannot mix these types in one schema or have a basic type as top level schema.
+  * Schemas must be either an enum (`type: string` and have a property `enum`), an object (`type: object` and have a property `properties`) or an interface (`type: object` and have a list of `oneOf`). You cannot mix these types in one schema or have a basic type as top level schema.
   * Each Schema must have an `x-schema-type` of  `Aggregate`, `Entity`, `ValueObject`, `ReferenceData`, or `Other`.
   * A Schema can define `x-links`(a list of links to other parts of the documentation) and `x-todos` (a list of todos that are still open in the domain model).
   * An enum schema can define a property `x-enum-description` documenting the enum values
   * Each basic property can define a `x-references` property that contains a list of references to other types in the domain model. This is usefull, if you store an ID of another type in a property and want to describe the referenced type.
-  * The following JSON Schema Parts are not supported: `additionalProperties`, `additionalItems`, `maxProperties`, `minProperties`, `patternProperties`, `propertyNames`, `allOf`, and `anyOf`.
+  * The following JSON Schema Parts are not supported: `additionalItems`, `maxProperties`, `minProperties`, `patternProperties`, `propertyNames`, `allOf`, and `anyOf`.
   * For `type` and `enum` only string values are supported.
 
 If you want to change how the model is read, you can define your own reader by implementing the [Reader](./lib/src/reader/Reader.ts) interface. You can pass the reader to be included to the run function.

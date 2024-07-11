@@ -51,6 +51,16 @@ describe('InputValidator', () => {
     expect(() => { target.validateSchemaFile({ ...enumSchemaFile, 'x-enum-description': { A: 'doc' } }, 'file.yaml') }).not.toThrow()
   })
 
+  test('validate additional Properties', () => {
+    const schemaFile = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } } }
+    expect(() => { target.validateSchemaFile({ ...schemaFile, additionalProperties: true }, 'file.yaml') }).not.toThrow()
+    expect(() => { target.validateSchemaFile({ ...schemaFile, additionalProperties: false }, 'file.yaml') }).not.toThrow()
+    expect(() => { target.validateSchemaFile({ ...schemaFile, additionalProperties: {} }, 'file.yaml') }).not.toThrow()
+    expect(() => { target.validateSchemaFile({ ...schemaFile, additionalProperties: { type: 'string' } }, 'file.yaml') }).not.toThrow()
+    expect(() => { target.validateSchemaFile({ ...schemaFile, additionalProperties: { type: 'object', additionalProperties: true } }, 'file.yaml') }).not.toThrow()
+    expect(() => { target.validateSchemaFile({ ...schemaFile, additionalProperties: 'string' }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
+  })
+
   test('validateRequired', async () => {
     const schemaFile = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } } }
     expect(() => { target.validateSchemaFile({ ...schemaFile, required: ['other'] }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. It has a required property \'other\' that is not defined'))
@@ -84,7 +94,7 @@ describe('InputValidator', () => {
     expect(() => { target.validateReferences(schemaFile, schemaFile) }).not.toThrow()
   })
 
-  test('allow valid discriminator', () => {
+  test('validate discriminator', () => {
     const schemaFile = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { field1: { type: 'string', const: 'T1' }, field2: { type: 'string' } }, definitions: {}, 'x-errors': [], 'x-links': [], 'x-todos': [], required: ['field1'] } as any as Schema
     const intSchema = { $id: '/Module/Schema2.yaml', title: 'Schema2', 'x-schema-type': 'Aggregate', type: 'object', discriminator: { propertyName: 'field1' }, oneOf: [{ $ref: './Schema.yaml' }], properties: { field1: { type: 'string' } }, definitions: {}, 'x-errors': [], 'x-links': [], 'x-todos': [] } as any as Schema
     target.addSchemaToAjv(schemaFile)
@@ -95,40 +105,4 @@ describe('InputValidator', () => {
     expect(() => { target.validateExamples({ ...intSchema, examples: [{ field1: 'T1', wrong: 1 }] }) }).toThrow(new Error('Invalid example 0 in Schema \'/Module/Schema2.yaml\'. See logs for details'))
     expect(() => { target.validateExamples({ ...intSchema, examples: [{ field1: 'T1', field2: 'something' }] }) }).not.toThrow()
   })
-
-  // TODO discriminator
-  /*
-
-  test('allow valid discriminator', () => {
-    const objSchema = { ...objectSchemaFile, properties: { field1: { type: 'string', const: 'T1' } }, required: ['field1'] }
-    const intSchema = { ...interfaceSchemaFile, discriminator: { propertyName: 'field1' }, examples: [{ field1: 'T1' }], properties: { field1: { type: 'string' } } }
-    target.addApplication(applicationFile, 'file.yaml')
-    target.addModule(moduleFile, 'file.yaml')
-    target.addSchema(objSchema, 'file.yaml')
-    target.addSchema(intSchema, 'file.yaml')
-    expect(() => { target.toModel() }).not.toThrow()
-  })
-
-  test('allow discriminator with mapping', () => {
-    target = new InputNormalizer({ discriminator: 'ALLOW' })
-    const objSchema = { ...objectSchemaFile, properties: { field1: { type: 'string' } }, required: ['field1'] }
-    const intSchema = { ...interfaceSchemaFile, discriminator: { propertyName: 'field1', mapping: { T1: './Schema.yaml' } }, examples: [{ field1: 'T1' }], properties: { field1: { type: 'string' } } }
-    target.addApplication(applicationFile, 'file.yaml')
-    target.addModule(moduleFile, 'file.yaml')
-    target.addSchema(objSchema, 'file.yaml')
-    target.addSchema(intSchema, 'file.yaml')
-    expect(() => { target.toModel() }).not.toThrow()
-  })
-
-  test('oneOf without discriminator', () => {
-    target = new InputNormalizer({ discriminator: 'ALLOW' })
-    const objSchema = { ...objectSchemaFile, properties: { field1: { type: 'string' }, field2: { type: 'number' } }, required: ['field1'] }
-    const intSchema = { ...interfaceSchemaFile, examples: [{ field1: 'T1', field2: 1 }], properties: { field1: { type: 'string' } } }
-    target.addApplication(applicationFile, 'file.yaml')
-    target.addModule(moduleFile, 'file.yaml')
-    target.addSchema(objSchema, 'file.yaml')
-    target.addSchema(intSchema, 'file.yaml')
-    expect(() => { target.toModel() }).not.toThrow()
-  })
-  */
 })

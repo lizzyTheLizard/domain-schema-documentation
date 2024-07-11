@@ -86,6 +86,56 @@ describe('JavaGenerator', () => {
     expect(content).toContain('public class Schema {')
   })
 
+  test('additionalProperties', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const schema2: Schema = { ...schema, additionalProperties: { type: 'integer' } }
+    const model = { application, modules: [module], schemas: [schema2] }
+    await javaGenerator(model, tmpDir.name, options)
+
+    const baseFiles = await fs.readdir(tmpDir.name)
+    expect(baseFiles).toEqual(['Module'])
+    const moduleFiles = await fs.readdir(path.join(tmpDir.name, 'Module'))
+    expect(moduleFiles).toEqual(['java'])
+    const javaFiles = await fs.readdir(path.join(tmpDir.name, 'Module', 'java'))
+    expect(javaFiles).toEqual(['Schema.java'])
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
+    expect(content).toContain('import java.util.Map;')
+    expect(content).toContain('  private Map<String, Integer> additionalProperties;')
+  })
+
+  test('additionalProperties false', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const schema2: Schema = { ...schema, additionalProperties: false }
+    const model = { application, modules: [module], schemas: [schema2] }
+    await javaGenerator(model, tmpDir.name, options)
+
+    const baseFiles = await fs.readdir(tmpDir.name)
+    expect(baseFiles).toEqual(['Module'])
+    const moduleFiles = await fs.readdir(path.join(tmpDir.name, 'Module'))
+    expect(moduleFiles).toEqual(['java'])
+    const javaFiles = await fs.readdir(path.join(tmpDir.name, 'Module', 'java'))
+    expect(javaFiles).toEqual(['Schema.java'])
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
+    expect(content).not.toContain('import java.util.Map;')
+  })
+
+  test('additionalProperties true', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const schema2: Schema = { ...schema, additionalProperties: true }
+    const model = { application, modules: [module], schemas: [schema2] }
+    await javaGenerator(model, tmpDir.name, options)
+
+    const baseFiles = await fs.readdir(tmpDir.name)
+    expect(baseFiles).toEqual(['Module'])
+    const moduleFiles = await fs.readdir(path.join(tmpDir.name, 'Module'))
+    expect(moduleFiles).toEqual(['java'])
+    const javaFiles = await fs.readdir(path.join(tmpDir.name, 'Module', 'java'))
+    expect(javaFiles).toEqual(['Schema.java'])
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
+    expect(content).toContain('import java.util.Map;')
+    expect(content).toContain('  private Map<String, Object> additionalProperties;')
+  })
+
   test('lombok', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const model = { application, modules: [module], schemas: [schema] }

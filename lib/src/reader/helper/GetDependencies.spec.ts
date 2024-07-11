@@ -167,4 +167,16 @@ describe('GetDependencies', () => {
       array: false
     }])
   })
+
+  test('additionalProperties', async () => {
+    const schema1: Schema = { ...schema, additionalProperties: { $ref: '#/definitions/Reference' }, definitions: { Reference: { type: 'string', enum: ['A'] } } }
+    const model = { application, modules: [module], schemas: [schema1] }
+    expect(getDependencies(model, schema1)).toEqual([{
+      fromSchema: schema1,
+      toSchema: schema1,
+      toDefinitionName: 'Reference',
+      type: 'ENUM',
+      array: false
+    }])
+  })
 })

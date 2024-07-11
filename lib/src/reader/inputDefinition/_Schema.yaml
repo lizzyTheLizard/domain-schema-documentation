@@ -91,7 +91,6 @@ definitions:
               $ref: '#/definitions/Schema'
           items:
             $ref: '#/definitions/Schema'
-          additionalProperties: false
           additionalItems: false
           maxProperties: false
           minProperties: false

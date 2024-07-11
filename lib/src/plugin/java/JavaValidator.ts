@@ -2,7 +2,7 @@ import { type Module, type Schema, type Model, type Definition, type ObjectDefin
 import { promises as fs } from 'fs'
 import path from 'path'
 import { type JavaPluginOptions } from './JavaPlugin'
-import { type JavaType, getJavaPropertyType, getSimpleJavaClassName, getJavaPackageNameForModule, getFullJavaClassName } from './JavaHelper'
+import { type JavaType, getJavaPropertyType, getSimpleJavaClassName, getJavaPackageNameForModule, getFullJavaClassName, getJavaAdditionalPropertyType } from './JavaHelper'
 import { getSchemasForModule } from '../../reader/helper/InputHelper'
 import { parseClass, parseEnum, parseInterface } from './JavaParser'
 
@@ -110,6 +110,26 @@ class JavaValidator {
       })
       return
     }
+
+    const additionalProperties = 'additionalProperties' in definition ? (definition.additionalProperties ?? false) : false
+    if (additionalProperties !== false) {
+      if (!('additionalProperties' in implementationProperties)) {
+        this.currentSchema['x-errors'].push({
+          text: `Additional Properties are missing in class '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}'`,
+          type: 'MISSING_IN_IMPLEMENTATION'
+        })
+      } else {
+        const domainType = getJavaAdditionalPropertyType(this.model, this.currentSchema, additionalProperties, this.options)
+        const implType = implementationProperties.additionalProperties
+        if (!typesEqual(domainType, implType)) {
+          this.currentSchema['x-errors'].push({
+            text: `Additional Properties have type '${printType(implType)}' in class '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}' but should have type '${printType(domainType)}'`,
+            type: 'WRONG'
+          })
+        }
+      }
+    }
+
     for (const propertyName of Object.keys(definition.properties)) {
       if (!(propertyName in implementationProperties)) {
         this.currentSchema['x-errors'].push({
@@ -119,6 +139,15 @@ class JavaValidator {
       }
     }
     for (const propertyName of Object.keys(implementationProperties)) {
+      if (propertyName === 'additionalProperties') {
+        if (additionalProperties === false) {
+          this.currentSchema['x-errors'].push({
+            text: `Additional Properties should not exist in class '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}'`,
+            type: 'NOT_IN_DOMAIN_MODEL'
+          })
+        }
+        continue
+      }
       if (!(propertyName in definition.properties)) {
         this.currentSchema['x-errors'].push({
           text: `Property '${propertyName}' should not exist in class '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}'`,
@@ -135,6 +164,10 @@ class JavaValidator {
         })
       }
     }
+  }
+
+  private additionalProperties (definition: ObjectDefinition): boolean {
+    return 'additionalProperties' in definition && definition.additionalProperties !== undefined && definition.additionalProperties !== false
   }
 
   private async checkInterfaceDefinition (fileContent: string, definitionName: string | undefined): Promise<void> {
@@ -191,7 +224,8 @@ async function existAndAccessible (file: string): Promise<boolean> {
 function printType (type: JavaType): string {
   switch (type.type) {
     case 'CLASS': return type.fullName
-    case 'COLLECTION': return `${printType(type.items)}[]`
+    case 'COLLECTION': return `Collection<${printType(type.items)}>`
+    case 'MAP': return `Map<String, ${printType(type.items)}>`
   }
 }
 
@@ -199,5 +233,6 @@ function typesEqual (type1: JavaType, type2: JavaType): boolean {
   switch (type1.type) {
     case 'CLASS': return type2.type === 'CLASS' && type1.fullName === type2.fullName
     case 'COLLECTION': return type2.type === 'COLLECTION' && typesEqual(type1.items, type2.items)
+    case 'MAP': return type2.type === 'MAP' && typesEqual(type1.items, type2.items)
   }
 }

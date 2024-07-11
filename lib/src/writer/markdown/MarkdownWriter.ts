@@ -1,5 +1,5 @@
 import { type Writer } from '../Writer'
-import { type Model, type Property, type Schema } from '../../reader/Reader'
+import { type Definition, type Model, type Property, type Schema } from '../../reader/Reader'
 import path from 'path'
 import Handlebars from 'handlebars'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
@@ -53,6 +53,7 @@ function registerHandlebarsHelpers (model: Model, options: MarkdownWriterOptions
   Handlebars.registerHelper('mdGetProperty', (obj: any | undefined, property: string) => obj?.[property])
   Handlebars.registerHelper('mdHasValue', (obj: any[] | undefined, property: any) => obj?.includes(property))
   Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input, null, 2))
+  Handlebars.registerHelper('mdAdditionalPropertyType', (schema: Schema, definition: Definition) => mdAdditionalPropertyType(model, schema, definition))
   Handlebars.registerPartial('mdSubSchema', options.subSchemaTemplate)
 }
 
@@ -74,6 +75,14 @@ function mdGetType (schema: Schema, type: PropertyType): string {
         return type.name
       }
   }
+}
+
+function mdAdditionalPropertyType (model: Model, schema: Schema, definition: Definition): string {
+  const additionalProperty = 'additionalProperties' in definition ? definition.additionalProperties ?? false : false
+  if (additionalProperty === false) throw new Error('Additional properties are not enabled')
+  if (additionalProperty === true) return '*'
+  const propertyType = getType(model, schema, additionalProperty)
+  return mdGetType(schema, propertyType)
 }
 
 async function writeSchemaFiles (model: Model, options: MarkdownWriterOptions): Promise<void> {

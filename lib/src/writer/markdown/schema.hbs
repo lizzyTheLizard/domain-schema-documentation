@@ -39,6 +39,9 @@
 {{#each properties}}
 | {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{mdGetType .. this}} | {{{mdMultiline description}}} |
 {{/each}}
+{{#if additionalProperties}}
+| (other) | {{mdAdditionalPropertyType . .}} | Additional Properties |
+{{/if}}
 {{/if}}
 
 {{#if hasDefinitions}}
