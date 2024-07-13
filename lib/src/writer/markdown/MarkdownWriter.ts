@@ -1,15 +1,13 @@
-import { type Writer } from '../Writer'
+import { type Writer, applyWriterOptionsDefaults, type WriterBaseOptions } from '../Writer'
 import { type Definition, type Model, type Property, type Schema } from '../../reader/Reader'
 import path from 'path'
 import Handlebars from 'handlebars'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
-import { enhanceApplication, enhanceModule, enhanceSchema, loadTemplate, writeOutput } from '../WriterHelpers'
+import { enhanceApplication, enhanceModule, enhanceSchema, loadTemplate } from '../WriterHelpers'
 import { relativeLink } from '../../reader/helper/InputHelper'
 
 /** Options for the Markdown writer. */
-export interface MarkdownWriterOptions {
-  /** Write output to a single output file relativeFilename in the output dir */
-  write: (output: string, relativeFilename: string) => Promise<void>
+export interface MarkdownWriterOptions extends WriterBaseOptions {
   /** Template for the application documentation */
   applicationTemplate: Handlebars.TemplateDelegate
   /** Template for the module documentation */
@@ -38,22 +36,22 @@ export function markdownWriter (outputFolder: string, optionsOrUndefined?: Parti
 
 function applyDefaults (outputFolder: string, options?: Partial<MarkdownWriterOptions>): MarkdownWriterOptions {
   return {
+    ...applyWriterOptionsDefaults(outputFolder, options),
     schemaTemplate: options?.schemaTemplate ?? loadTemplate(path.join(__dirname, 'schema.hbs')),
     moduleTemplate: options?.moduleTemplate ?? loadTemplate(path.join(__dirname, 'module.hbs')),
     applicationTemplate: options?.applicationTemplate ?? loadTemplate(path.join(__dirname, 'application.hbs')),
-    subSchemaTemplate: options?.subSchemaTemplate ?? loadTemplate(path.join(__dirname, 'subSchema.hbs')),
-    write: options?.write ?? (async (o, f) => { await writeOutput(o, f, outputFolder) })
+    subSchemaTemplate: options?.subSchemaTemplate ?? loadTemplate(path.join(__dirname, 'subSchema.hbs'))
   }
 }
 
 function registerHandlebarsHelpers (model: Model, options: MarkdownWriterOptions): void {
   Handlebars.registerHelper('mdMultiline', (input: string) => mdMultiline(input))
   Handlebars.registerHelper('mdRelativeLink', (fromId: string, toId: string) => relativeLink(fromId, toId))
-  Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, getType(model, schema, property)))
+  Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, getType(model, schema, property), options))
   Handlebars.registerHelper('mdGetProperty', (obj: any | undefined, property: string) => obj?.[property])
   Handlebars.registerHelper('mdHasValue', (obj: any[] | undefined, property: any) => obj?.includes(property))
   Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input, null, 2))
-  Handlebars.registerHelper('mdAdditionalPropertyType', (schema: Schema, definition: Definition) => mdAdditionalPropertyType(model, schema, definition))
+  Handlebars.registerHelper('mdAdditionalPropertyType', (schema: Schema, definition: Definition) => mdAdditionalPropertyType(model, schema, definition, options))
   Handlebars.registerPartial('mdSubSchema', options.subSchemaTemplate)
 }
 
@@ -62,27 +60,27 @@ function mdMultiline (input: string): string {
   return input.split('\n').map(l => l.trim()).join('<br>')
 }
 
-function mdGetType (schema: Schema, type: PropertyType): string {
+function mdGetType (schema: Schema, type: PropertyType, options: MarkdownWriterOptions): string {
   switch (type.type) {
-    case 'array': return `[${mdGetType(schema, type.array)}]`
+    case 'array': return `[${mdGetType(schema, type.array, options)}]`
     case 'reference': return `[${type.name}](${relativeLink(path.dirname(schema.$id), type.$id)}.md)`
     case 'self': return `[${type.name}](./)`
     case 'definition': return `[${type.name}](#${type.name})`
     case 'local':
       if (type.references) {
-        return `References ${type.references.map(r => mdGetType(schema, r)).join(', ')}`
+        return `References ${type.references.map(r => mdGetType(schema, r, options)).join(', ')}`
       } else {
-        return type.name
+        return options.typeName(type.name)
       }
   }
 }
 
-function mdAdditionalPropertyType (model: Model, schema: Schema, definition: Definition): string {
+function mdAdditionalPropertyType (model: Model, schema: Schema, definition: Definition, options: MarkdownWriterOptions): string {
   const additionalProperty = 'additionalProperties' in definition ? definition.additionalProperties ?? false : false
   if (additionalProperty === false) throw new Error('Additional properties are not enabled')
   if (additionalProperty === true) return '*'
   const propertyType = getType(model, schema, additionalProperty)
-  return mdGetType(schema, propertyType)
+  return mdGetType(schema, propertyType, options)
 }
 
 async function writeSchemaFiles (model: Model, options: MarkdownWriterOptions): Promise<void> {
