@@ -42,8 +42,14 @@ export function moduleDiagram (model: Model, module: Module): string {
     .filter(d => getModuleId(d.toSchema) === module.$id)
   const dependenciesFrom = getSchemasForModule(model, module)
     .flatMap(s => getDependencies(model, s))
-  const dependencies = [...dependenciesTo, ...dependenciesFrom]
-  const endpoints = [...getEndpointsFromSchemas(getSchemasForModule(model, module)), ...getEndpointsFromDependencies(dependencies)].filter(e => isEnum(e))
+  const dependencies = [
+    ...dependenciesTo,
+    ...dependenciesFrom
+  ].filter(d => shouldIncludeInDiagram(d))
+  const endpoints = [
+    ...getEndpointsFromSchemas(getSchemasForModule(model, module)),
+    ...getEndpointsFromDependencies(dependencies)
+  ].filter(e => shouldIncludeInDiagram(e))
   return toDiagram(dependencies, endpoints, model, module.$id)
 }
 
@@ -59,8 +65,14 @@ export function schemaDiagramm (model: Model, schema: Schema): string {
     .flatMap(s => getDependencies(model, s))
     .filter(s => s.toSchema === schema)
   const dependenciesFrom = getDependencies(model, schema)
-  const dependencies = [...dependenciesTo, ...dependenciesFrom]
-  const endpoints = [...getEndpointsFromSchemas([schema]), ...getEndpointsFromDependencies(dependencies)]
+  const dependencies = [
+    ...dependenciesTo,
+    ...dependenciesFrom
+  ].filter(d => shouldIncludeInDiagram(d, schema))
+  const endpoints = [
+    ...getEndpointsFromSchemas([schema]),
+    ...getEndpointsFromDependencies(dependencies)
+  ].filter(e => shouldIncludeInDiagram(e, schema))
   return toDiagram(dependencies, endpoints, model, getModuleId(schema))
 }
 
@@ -73,18 +85,26 @@ function getEndpointsFromDependencies (dependencies: Dependency[]): Endpoint[] {
   )
 }
 
-function isEnum (e: Endpoint): boolean {
-  if ('name' in e && e.name !== undefined) {
-    return !('enum' in e.schema.definitions[e.name])
-  }
-  return !('enum' in e.schema)
-}
-
 function getEndpointsFromSchemas (schemas: Schema[]): Endpoint[] {
   return schemas.flatMap(s => [
     { schema: s },
     ...Object.keys(s.definitions).map(n => ({ schema: s, name: n }))
   ])
+}
+
+function shouldIncludeInDiagram (e: Endpoint | Dependency, schema?: Schema): boolean {
+  if ('fromSchema' in e) {
+    if (e.type !== 'ENUM') {
+      return true
+    }
+    return e.toSchema === schema
+  } else {
+    if (schema === e.schema) {
+      return true
+    }
+    const definition = ('name' in e && e.name !== undefined) ? e.schema.definitions[e.name] : e.schema
+    return !('enum' in definition)
+  }
 }
 
 function safeId (obj: string | Schema | Module): string {
@@ -128,7 +148,7 @@ function toMermaidType (type: DependencyType): string | undefined {
     case 'IS_IMPLEMENTED_BY': return '<|--'
     case 'CONTAINS': return 'o--'
     case 'REFERENCES': return '..>'
-    case 'ENUM': return undefined
+    case 'ENUM': return '..>'
   }
 }
 function unique<T> (arr: T[]): T[] {
