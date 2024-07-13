@@ -12,6 +12,7 @@ namespace Module {
   class _Module_Object_yaml["Object"]
 }
 _Module_Object_yaml ..> _Module2_Object2_yaml :obj2
+_Module2_Object2_yaml ..> Type :type
 _Module2_Object2_yaml o-- AdditionalProperties 
 click _Module2_Object2_yaml href "./Object2.yaml.html" "Object 2"
 click Type href "./Object2.yaml.html" "Object 2"
@@ -36,7 +37,7 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 ## Properties
 | Name | Type | Description |
 |------|------|-------------|
-| id | string |  |
+| id | String |  |
 | type | [Type](#Type) |  |
 | (other) | [AdditionalProperties](#AdditionalProperties) | Additional Properties |
 
@@ -57,8 +58,8 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 
 | Name | Type | Description |
 |------|------|-------------|
-| key | string |  |
-| value | string |  |
+| key | String |  |
+| value | String |  |
 
 ## Verification Errors
 | Type | Description |

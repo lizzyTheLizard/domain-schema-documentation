@@ -7,7 +7,6 @@ This is a 2nd Module
 classDiagram
 namespace Module 2 {
   class _Module2_Object2_yaml["Object 2"]
-  class Type["Type"]
   class AdditionalProperties["AdditionalProperties"]
 }
 namespace Module {
@@ -16,7 +15,6 @@ namespace Module {
 _Module_Object_yaml ..> _Module2_Object2_yaml :obj2
 _Module2_Object2_yaml o-- AdditionalProperties 
 click _Module2_Object2_yaml href "./Object2.yaml.html" "Object 2"
-click Type href "./Object2.yaml.html" "Object 2"
 click AdditionalProperties href "./Object2.yaml.html" "Object 2"
 click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 ```

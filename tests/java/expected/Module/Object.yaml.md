@@ -33,8 +33,8 @@ click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
 ## Properties
 | Name | Type | Description |
 |------|------|-------------|
-| ids | [string] |  |
-| name | string |  |
+| ids | [String] |  |
+| name | String |  |
 | obj2 | [Object 2](../Module2/Object2.yaml.md) |  |
 | (other) | * | Additional Properties |
 

@@ -13,6 +13,7 @@ namespace Module {
 _Module_Interface_yaml <|-- _Module_Object_yaml 
 _Module_Interface_yaml <|-- OtherObject 
 _Module_Interface_yaml <|-- Interface3 
+_Module_Interface_yaml ..> TestProp :testProp
 click _Module_Interface_yaml href "./Interface.yaml.html" "Interface"
 click TestProp href "./Interface.yaml.html" "Interface"
 click Interface3 href "./Interface.yaml.html" "Interface"
@@ -58,8 +59,8 @@ This is a test property
 
 | Name | Type | Description |
 |------|------|-------------|
-| id | string |  |
-| wrongType | string |  |
+| id | String |  |
+| wrongType | String |  |
 
 ## Verification Errors
 | Type | Description |

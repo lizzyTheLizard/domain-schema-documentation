@@ -7,8 +7,6 @@ This is a first module
 classDiagram
 namespace Module {
   class _Module_Interface_yaml["Interface"]
-  class TestProp["TestProp"]
-  class Interface3["Interface3"]
   class OtherObject["OtherObject"]
   class _Module_Object_yaml["Object"]
 }
@@ -20,8 +18,6 @@ _Module_Interface_yaml <|-- OtherObject
 _Module_Interface_yaml <|-- Interface3 
 _Module_Object_yaml ..> _Module2_Object2_yaml :obj2
 click _Module_Interface_yaml href "./Interface.yaml.html" "Interface"
-click TestProp href "./Interface.yaml.html" "Interface"
-click Interface3 href "./Interface.yaml.html" "Interface"
 click OtherObject href "./Interface.yaml.html" "Interface"
 click _Module_Object_yaml href "./Object.yaml.html" "Object"
 click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
