@@ -133,7 +133,12 @@ export class InputValidator {
   }
 
   private validateAjv (parsed: unknown, schemaFile: string, name: string): void {
-    if (this.#ajv.validate(schemaFile, parsed)) return
+    try {
+      if (this.#ajv.validate(schemaFile, parsed)) return
+    } catch (e: unknown) {
+      const error = e as Error
+      throw new Error(`Invalid ${name}: ${error.message}`)
+    }
     const errors = this.#ajv.errors
     if (!errors) {
       throw new Error(`Invalid ${name}: ${this.#ajv.errorsText()}`)
