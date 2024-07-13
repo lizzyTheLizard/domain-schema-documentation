@@ -43,7 +43,7 @@ export function moduleDiagram (model: Model, module: Module): string {
   const dependenciesFrom = getSchemasForModule(model, module)
     .flatMap(s => getDependencies(model, s))
   const dependencies = [...dependenciesTo, ...dependenciesFrom]
-  const endpoints = [...getEndpointsFromSchemas(getSchemasForModule(model, module)), ...getEndpointsFromDependencies(dependencies)]
+  const endpoints = [...getEndpointsFromSchemas(getSchemasForModule(model, module)), ...getEndpointsFromDependencies(dependencies)].filter(e => isEnum(e))
   return toDiagram(dependencies, endpoints, model, module.$id)
 }
 
@@ -71,6 +71,13 @@ function getEndpointsFromDependencies (dependencies: Dependency[]): Endpoint[] {
     { schema: d.fromSchema, name: d.fromDefinitionName },
     { schema: d.toSchema, name: d.toDefinitionName }]
   )
+}
+
+function isEnum (e: Endpoint): boolean {
+  if ('name' in e && e.name !== undefined) {
+    return !('enum' in e.schema.definitions[e.name])
+  }
+  return !('enum' in e.schema)
 }
 
 function getEndpointsFromSchemas (schemas: Schema[]): Endpoint[] {

@@ -113,18 +113,29 @@ function getDependencyType (fromSchema: Schema, toSchema: Schema, toDefinition: 
 
   switch (toType) {
     case 'Aggregate':
-      console.error(`Aggregate ${toSchema.$id} is included in ${fromSchema.$id} using $ref. This is unusual, normally you want to reference another aggregate using x-references`)
+      if (!loggedErrors.includes(toSchema.$id)) {
+        console.error(`Aggregate ${toSchema.$id} is included in ${fromSchema.$id} and maybe others using $ref. This is unusual, normally you want to reference another aggregate using x-references`)
+        loggedErrors.push(toSchema.$id)
+      }
       return 'REFERENCES'
     case 'ReferenceData':
-      console.error(`ReferenceData ${toSchema.$id} is included in ${fromSchema.$id} using $ref. This is unusual, normally you want to reference reference data using x-references`)
+      if (!loggedErrors.includes(toSchema.$id)) {
+        console.error(`ReferenceData ${toSchema.$id} is included in ${fromSchema.$id} and maybe others using $ref. This is unusual, normally you want to reference reference data using x-references`)
+        loggedErrors.push(toSchema.$id)
+      }
       return 'REFERENCES'
     case 'ValueObject':
       return 'CONTAINS'
     case 'Entity':
       if (fromType === 'ValueObject' || fromType === 'ReferenceData') {
-        console.error(`Entity ${toSchema.$id} is included in ${fromSchema.$id} using $ref. This is unusual, normally you want to reference entities using x-references`)
+        if (!loggedErrors.includes(toSchema.$id)) {
+          console.error(`Entity ${toSchema.$id} is included in ${fromSchema.$id} and maybe others using $ref. This is unusual, normally you want to reference entities using x-references`)
+          loggedErrors.push(toSchema.$id)
+        }
         return 'REFERENCES'
       }
       return 'CONTAINS'
   }
 }
+
+const loggedErrors: string[] = []

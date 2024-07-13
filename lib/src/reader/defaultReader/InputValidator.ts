@@ -139,8 +139,7 @@ export class InputValidator {
       throw new Error(`Invalid ${name}: ${this.#ajv.errorsText()}`)
     }
     const schema = this.#ajv.getSchema(schemaFile)
-    console.error(`Invalid ${name}`)
-    console.error(betterAjvErrors(schema, parsed, errors))
+    console.error(betterAjvErrors(schema, parsed, errors, { json: JSON.stringify(parsed, null, ' ') }))
     throw new Error(`Invalid ${name}. See logs for details`)
   }
 

@@ -105,4 +105,12 @@ describe('InputValidator', () => {
     expect(() => { target.validateExamples({ ...intSchema, examples: [{ field1: 'T1', wrong: 1 }] }) }).toThrow(new Error('Invalid example 0 in Schema \'/Module/Schema2.yaml\'. See logs for details'))
     expect(() => { target.validateExamples({ ...intSchema, examples: [{ field1: 'T1', field2: 'something' }] }) }).not.toThrow()
   })
+
+  test('x-schema-type', () => {
+    const schemaFile = { $id: '/Module/Schema.yaml', title: 'Schema', type: 'object', properties: { field1: { type: 'string', const: 'T1' } }, definitions: {}, 'x-errors': [], 'x-links': [], 'x-todos': [], required: [] } as any as Schema
+    expect(() => { target.validateSchemaFile({ ...schemaFile, 'x-schema-type': 'Aggregate' }, 'file.yaml') }).not.toThrow()
+    expect(() => { target.validateSchemaFile({ ...schemaFile }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
+    expect(() => { target.validateSchemaFile({ ...schemaFile, 'x-schema-type': 2 }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
+    expect(() => { target.validateSchemaFile({ ...schemaFile, 'x-schema-type': 'WRONG' }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
+  })
 })
