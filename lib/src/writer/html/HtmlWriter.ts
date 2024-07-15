@@ -55,6 +55,7 @@ function registerHandlebarsHelpers (model: Model, options: HtmlWriterOptions): v
   Handlebars.registerHelper('htmlGetType', (schema: Schema, property: Property) => htmlGetType(schema, getType(model, schema, property), options))
   Handlebars.registerHelper('htmlIntent', (input: string, intent: number) => input.split('\n').map(l => ' '.repeat(intent) + l).join('\n'))
   Handlebars.registerHelper('htmlAdditionalPropertyType', (schema: Schema, definition: Definition) => htmlAdditionalPropertyType(model, schema, definition, options))
+  Handlebars.registerHelper('htmlUrlEncode', (input: string) => encodeURIComponent(input))
   Handlebars.registerPartial('htmlSubSchema', options.subSchemaTemplate)
 }
 

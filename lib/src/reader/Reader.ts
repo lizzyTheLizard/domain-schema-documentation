@@ -11,6 +11,16 @@ export interface Link {
   href: string
 }
 
+/** A tag for a schema */
+export interface Tag {
+  /** Tag name */
+  name: string
+  /** The tag value */
+  value?: string
+  /** The color of the tag */
+  color?: string
+}
+
 /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
 export interface ImplementationError {
   text: string
@@ -105,6 +115,8 @@ export interface SchemaCommon {
   'x-todos': string[]
   /** Links to other resources */
   'x-links': Link[]
+  /** Tags for this schema */
+  'x-tags': Tag[]
   /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
   'x-errors': ImplementationError[]
 }
@@ -123,6 +135,8 @@ export interface Module {
   links: Link[]
   /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
   errors: ImplementationError[]
+  /** Tags for this module */
+  tags: Tag[]
 }
 
 /** The application definition */
@@ -137,6 +151,8 @@ export interface Application {
   links: Link[]
   /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
   errors: ImplementationError[]
+  /** Tags for this application */
+  tags: Tag[]
 }
 
 /** The full model that is read from the input folder */

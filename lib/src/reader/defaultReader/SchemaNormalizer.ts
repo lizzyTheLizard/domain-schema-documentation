@@ -29,6 +29,7 @@ export function normalizeSchema (schema: NonNormalizedSchema): Schema {
     ...remainingSchema,
     ...normaliezedDefinition.result,
     'x-links': schema['x-links'] ?? [],
+    'x-tags': schema['x-tags'] ?? [],
     'x-errors': schema['x-errors'] ?? [],
     'x-todos': schema['x-todos'] ?? [],
     definitions

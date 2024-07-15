@@ -1,5 +1,6 @@
 # Interface
-> - [ ] 4 validation errors
+![Static Badge](https://img.shields.io/badge/Validator%20Errors-4-red)
+
 This is an interface
 ```mermaid
 classDiagram

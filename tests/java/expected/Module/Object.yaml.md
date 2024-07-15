@@ -1,4 +1,5 @@
 # Object
+
 This is an integration test for the application
 ```mermaid
 classDiagram

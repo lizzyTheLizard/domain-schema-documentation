@@ -1,5 +1,6 @@
 # Test Application
-> - [ ] 2 validation errors
+![Static Badge](https://img.shields.io/badge/Validator%20Errors-2-red)
+
 This is an integration test for the application
 
 ## Modules

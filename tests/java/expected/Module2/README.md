@@ -1,5 +1,6 @@
 # Module 2
-> - [ ] 1 validation error
+![Static Badge](https://img.shields.io/badge/Validator%20Errors-1-red)
+
 This is a 2nd Module
 
 ## Schemas

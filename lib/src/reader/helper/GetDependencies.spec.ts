@@ -1,33 +1,21 @@
-import { type Application, type Module, type Schema } from '../Reader'
 import { getDependencies } from './GetDependencies'
+import { testModel, testSchema } from '../../testData'
+import { type Schema, type Model } from '../Reader'
 
 describe('GetDependencies', () => {
-  const application: Application = { title: 'Application', description: 'Application description', errors: [], todos: [], links: [] }
-  const module: Module = { $id: '/Module', title: 'Module', description: 'Module description', errors: [], todos: [], links: [] }
-  const schema: Schema = {
-    $id: '/Module/Schema.yaml',
-    'x-schema-type': 'Entity',
-    title: 'Schema 1',
-    type: 'object',
-    properties: {},
-    required: [],
-    definitions: {},
-    'x-errors': [],
-    'x-links': [],
-    'x-todos': []
-  }
-
   test('no dependencies', async () => {
-    const model = { application, modules: [module], schemas: [schema] }
+    const model = testModel()
+    const schema = testSchema()
     expect(getDependencies(model, schema)).toEqual([])
   })
 
   test('property ref', async () => {
-    const schema2 = { ...schema, $id: '/Module/Schema2.yaml', properties: { reference: { $ref: './Schema.yaml' } } }
-    const model = { application, modules: [module], schemas: [schema, schema2] }
+    const schema1: Schema = { ...testSchema(), 'x-schema-type': 'Entity' }
+    const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { $ref: './Schema.yaml' } } }
+    const model: Model = { ...testModel(), schemas: [schema1, schema2] }
     expect(getDependencies(model, schema2)).toEqual([{
       fromSchema: schema2,
-      toSchema: schema,
+      toSchema: schema1,
       type: 'CONTAINS',
       dependencyName: 'reference',
       array: false
@@ -35,9 +23,9 @@ describe('GetDependencies', () => {
   })
 
   test('property ref aggregate 2 aggregate', async () => {
-    const schema1: Schema = { ...schema, 'x-schema-type': 'Aggregate' }
-    const schema2: Schema = { ...schema, 'x-schema-type': 'Aggregate', $id: '/Module/Schema2.yaml', properties: { reference: { $ref: './Schema.yaml' } } }
-    const model = { application, modules: [module], schemas: [schema1, schema2] }
+    const schema1 = testSchema()
+    const schema2: Schema = { ...testSchema(), 'x-schema-type': 'Aggregate', $id: '/Module/Schema2.yaml', properties: { reference: { $ref: './Schema.yaml' } } }
+    const model: Model = { ...testModel(), schemas: [schema1, schema2] }
     expect(getDependencies(model, schema2)).toEqual([{
       fromSchema: schema2,
       toSchema: schema1,
@@ -48,11 +36,12 @@ describe('GetDependencies', () => {
   })
 
   test('property ref array', async () => {
-    const schema2: Schema = { ...schema, $id: '/Module/Schema2.yaml', properties: { reference: { type: 'array', items: { $ref: './Schema.yaml' } } } }
-    const model = { application, modules: [module], schemas: [schema, schema2] }
+    const schema1: Schema = { ...testSchema(), 'x-schema-type': 'Entity' }
+    const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { type: 'array', items: { $ref: './Schema.yaml' } } } }
+    const model: Model = { ...testModel(), schemas: [schema1, schema2] }
     expect(getDependencies(model, schema2)).toEqual([{
       fromSchema: schema2,
-      toSchema: schema,
+      toSchema: schema1,
       type: 'CONTAINS',
       dependencyName: 'reference',
       array: true
@@ -60,11 +49,12 @@ describe('GetDependencies', () => {
   })
 
   test('property references', async () => {
-    const schema2: Schema = { ...schema, $id: '/Module/Schema2.yaml', properties: { reference: { type: 'string', 'x-references': './Schema.yaml' } } }
-    const model = { application, modules: [module], schemas: [schema, schema2] }
+    const schema1 = testSchema()
+    const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { type: 'string', 'x-references': './Schema.yaml' } } }
+    const model: Model = { ...testModel(), schemas: [schema1, schema2] }
     expect(getDependencies(model, schema2)).toEqual([{
       fromSchema: schema2,
-      toSchema: schema,
+      toSchema: schema1,
       type: 'REFERENCES',
       dependencyName: 'reference',
       array: false
@@ -72,11 +62,12 @@ describe('GetDependencies', () => {
   })
 
   test('property references array', async () => {
-    const schema2: Schema = { ...schema, $id: '/Module/Schema2.yaml', properties: { reference: { type: 'array', items: { type: 'string', 'x-references': './Schema.yaml' } } } }
-    const model = { application, modules: [module], schemas: [schema, schema2] }
+    const schema1 = testSchema()
+    const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { type: 'array', items: { type: 'string', 'x-references': './Schema.yaml' } } } }
+    const model: Model = { ...testModel(), schemas: [schema1, schema2] }
     expect(getDependencies(model, schema2)).toEqual([{
       fromSchema: schema2,
-      toSchema: schema,
+      toSchema: schema1,
       type: 'REFERENCES',
       dependencyName: 'reference',
       array: true
@@ -84,36 +75,21 @@ describe('GetDependencies', () => {
   })
 
   test('oneOf', async () => {
-    const schema2: Schema = {
-      $id: '/Module/Schema2.yaml',
-      'x-schema-type': 'Aggregate',
-      title: 'Schema 2',
-      type: 'object',
-      oneOf: [{ $ref: './Schema.yaml' }],
-      properties: {},
-      required: [],
-      definitions: {},
-      'x-errors': [],
-      'x-links': [],
-      'x-todos': []
-    }
-    const model = { application, modules: [module], schemas: [schema, schema2] }
+    const schema1 = testSchema()
+    const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', oneOf: [{ $ref: './Schema.yaml' }], properties: {} }
+    const model: Model = { ...testModel(), schemas: [schema1, schema2] }
     expect(getDependencies(model, schema2)).toEqual([{
       fromSchema: schema2,
-      toSchema: schema,
+      toSchema: schema1,
       type: 'IS_IMPLEMENTED_BY',
       array: false
     }])
   })
 
   test('dependency ref', async () => {
-    const schema2: Schema = {
-      ...schema,
-      $id: '/Module/Schema2.yaml',
-      properties: { reference: { $ref: '#/definitions/Reference' } },
-      definitions: { Reference: { type: 'object', properties: { reference2: { $ref: './Schema.yaml' } }, required: [] } }
-    }
-    const model = { application, modules: [module], schemas: [schema, schema, schema2] }
+    const schema1: Schema = { ...testSchema(), 'x-schema-type': 'Entity' }
+    const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { $ref: '#/definitions/Reference' } }, definitions: { Reference: { type: 'object', properties: { reference2: { $ref: './Schema.yaml' } }, required: [] } } }
+    const model: Model = { ...testModel(), schemas: [schema1, schema2] }
     expect(getDependencies(model, schema2)).toEqual([{
       fromSchema: schema2,
       toSchema: schema2,
@@ -124,7 +100,7 @@ describe('GetDependencies', () => {
     }, {
       fromSchema: schema2,
       fromDefinitionName: 'Reference',
-      toSchema: schema,
+      toSchema: schema1,
       type: 'CONTAINS',
       dependencyName: 'reference2',
       array: false
@@ -132,23 +108,19 @@ describe('GetDependencies', () => {
   })
 
   test('dependency ref to main', async () => {
-    const schema1: Schema = {
-      ...schema,
-      properties: { reference: { $ref: '#/definitions/Reference' } },
-      definitions: { Reference: { type: 'object', properties: { reference2: { $ref: '#' } }, required: [] } }
-    }
-    const model = { application, modules: [module], schemas: [schema, schema1] }
-    expect(getDependencies(model, schema1)).toEqual([{
-      fromSchema: schema1,
-      toSchema: schema1,
+    const schema: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { $ref: '#/definitions/Reference' } }, definitions: { Reference: { type: 'object', properties: { reference2: { $ref: '#' } }, required: [] } } }
+    const model: Model = { ...testModel(), schemas: [schema] }
+    expect(getDependencies(model, schema)).toEqual([{
+      fromSchema: schema,
+      toSchema: schema,
       toDefinitionName: 'Reference',
       type: 'CONTAINS',
       dependencyName: 'reference',
       array: false
     }, {
-      fromSchema: schema1,
+      fromSchema: schema,
       fromDefinitionName: 'Reference',
-      toSchema: schema1,
+      toSchema: schema,
       type: 'CONTAINS',
       dependencyName: 'reference2',
       array: false
@@ -156,11 +128,11 @@ describe('GetDependencies', () => {
   })
 
   test('enum reference', async () => {
-    const schema1: Schema = { ...schema, properties: { reference: { $ref: '#/definitions/Reference' } }, definitions: { Reference: { type: 'string', enum: ['A'] } } }
-    const model = { application, modules: [module], schemas: [schema1] }
-    expect(getDependencies(model, schema1)).toEqual([{
-      fromSchema: schema1,
-      toSchema: schema1,
+    const schema: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { $ref: '#/definitions/Reference' } }, definitions: { Reference: { type: 'string', enum: ['A'] } } }
+    const model: Model = { ...testModel(), schemas: [schema] }
+    expect(getDependencies(model, schema)).toEqual([{
+      fromSchema: schema,
+      toSchema: schema,
       toDefinitionName: 'Reference',
       type: 'ENUM',
       dependencyName: 'reference',
@@ -169,11 +141,11 @@ describe('GetDependencies', () => {
   })
 
   test('additionalProperties', async () => {
-    const schema1: Schema = { ...schema, additionalProperties: { $ref: '#/definitions/Reference' }, definitions: { Reference: { type: 'string', enum: ['A'] } } }
-    const model = { application, modules: [module], schemas: [schema1] }
-    expect(getDependencies(model, schema1)).toEqual([{
-      fromSchema: schema1,
-      toSchema: schema1,
+    const schema: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', additionalProperties: { $ref: '#/definitions/Reference' }, definitions: { Reference: { type: 'string', enum: ['A'] } } }
+    const model: Model = { ...testModel(), schemas: [schema] }
+    expect(getDependencies(model, schema)).toEqual([{
+      fromSchema: schema,
+      toSchema: schema,
       toDefinitionName: 'Reference',
       type: 'ENUM',
       array: false

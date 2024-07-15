@@ -33,7 +33,8 @@ class DefaultInputNormalizer implements InputNormalizer {
       ...nonNormalizedApplication,
       errors: nonNormalizedApplication.errors ?? [],
       todos: nonNormalizedApplication.todos ?? [],
-      links: nonNormalizedApplication.links ?? []
+      links: nonNormalizedApplication.links ?? [],
+      tags: nonNormalizedApplication.tags ?? []
     }
     this.#applications.push(application)
   }
@@ -44,7 +45,8 @@ class DefaultInputNormalizer implements InputNormalizer {
       ...nonNormalizedModule,
       errors: nonNormalizedModule.errors ?? [],
       todos: nonNormalizedModule.todos ?? [],
-      links: nonNormalizedModule.links ?? []
+      links: nonNormalizedModule.links ?? [],
+      tags: nonNormalizedModule.tags ?? []
     }
     this.#modules.push(module)
   }

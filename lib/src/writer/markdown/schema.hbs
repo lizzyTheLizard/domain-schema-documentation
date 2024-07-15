@@ -1,4 +1,8 @@
 # {{{title}}}
+{{#each x-tags}}
+![Static Badge](https://img.shields.io/badge/{{mdUrlEncode name}}{{#if value}}-{{mdUrlEncode value}}{{/if}}{{#if color}}-{{color}}{{/if}})
+{{/each}}
+
 {{#each x-todos}}
 > - [ ] {{this}}
 {{/each}}

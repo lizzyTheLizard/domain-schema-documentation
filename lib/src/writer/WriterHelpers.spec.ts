@@ -7,37 +7,10 @@ import {
   writeOutput
 } from './WriterHelpers'
 import path from 'path'
-import { type Application, type Model, type Module, type Schema } from '../reader/Reader'
+import { type Model } from '../reader/Reader'
+import { testModel } from '../testData'
 
 describe('writerHelpers', () => {
-  const application: Application = {
-    title: 'Test Application',
-    description: 'Test Application Description',
-    todos: [],
-    links: [],
-    errors: [{ type: 'NOT_IN_DOMAIN_MODEL', text: 'test' }]
-  }
-  const module: Module = {
-    $id: '/test',
-    title: 'Test Module',
-    description: 'Test Module Description',
-    todos: [],
-    links: [],
-    errors: [{ type: 'NOT_IN_DOMAIN_MODEL', text: 'test' }]
-  }
-  const schema: Schema = {
-    $id: '/test/Schema.yaml',
-    title: 'Test Schema',
-    description: 'Test Schema Description',
-    'x-schema-type': 'Aggregate',
-    type: 'object',
-    properties: { id: { type: 'string' } },
-    definitions: {},
-    required: [],
-    'x-errors': [{ type: 'NOT_IN_DOMAIN_MODEL', text: 'test' }],
-    'x-todos': [],
-    'x-links': []
-  }
   test('loadTemplate', () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const filename = path.join(tmpDir.name, 'valid.hbs')
@@ -75,38 +48,38 @@ describe('writerHelpers', () => {
   })
 
   test('enhanceApplication', async () => {
-    const model: Model = { application, modules: [module], schemas: [schema] }
+    const model: Model = testModel()
 
     const result = enhanceApplication(model)
 
     expect(result).toEqual({
-      ...application,
-      classDiagram: 'classDiagram\nclass _test["Test Module"]\nclick _test href "./test/index.html" "Test Module"',
-      modules: [module]
+      ...model.application,
+      classDiagram: result.classDiagram,
+      modules: [model.modules[0]]
     })
   })
 
   test('enhanceModule', async () => {
-    const model: Model = { application, modules: [module], schemas: [schema] }
+    const model: Model = testModel()
 
-    const result = enhanceModule(model, module)
+    const result = enhanceModule(model, model.modules[0])
 
     expect(result).toEqual({
-      ...module,
+      ...model.modules[0],
       classDiagram: result.classDiagram,
-      schemas: [schema]
+      schemas: [model.schemas[0]]
     })
   })
 
   test('enhanceSchema', async () => {
-    const model: Model = { application, modules: [module], schemas: [schema] }
+    const model: Model = testModel()
 
-    const result = enhanceSchema(model, schema)
+    const result = enhanceSchema(model, model.schemas[0])
 
     expect(result).toEqual({
-      ...schema,
+      ...model.schemas[0],
       classDiagram: result.classDiagram,
-      module,
+      module: model.modules[0],
       hasDefinitions: false
     })
   })

@@ -1,5 +1,6 @@
 # Module
-> - [ ] 1 validation error
+![Static Badge](https://img.shields.io/badge/Validator%20Errors-1-red)
+
 This is a first module
 
 ## Schemas
@@ -33,6 +34,5 @@ click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
 | WRONG | Schema &#x27;Interface&#x27; has 4 validation errors |
 
 ## Links
-1. [This is an existing link]()
-1. [](https://example.com)
+1. [This is an existing link](https://example.com)
 1. [Java-Files](./java)

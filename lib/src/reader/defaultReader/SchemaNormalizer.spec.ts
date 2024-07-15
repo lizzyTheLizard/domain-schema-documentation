@@ -17,7 +17,8 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [link],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
 
@@ -32,7 +33,8 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [],
       'x-errors': [],
-      'x-todos': ['todo']
+      'x-todos': ['todo'],
+      'x-tags': []
     })
   })
 
@@ -48,7 +50,24 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [],
       'x-errors': [error],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
+    })
+  })
+
+  test('keepTags', () => {
+    const schema = { ...common, 'x-tags': [{ name: 'test' }], oneOf: [{ $ref: './Schema2.yaml' }] }
+    const result = normalizeSchema(schema)
+    expect(result).toEqual({
+      ...common,
+      definitions: {},
+      oneOf: [{ $ref: './Schema2.yaml' }],
+      properties: {},
+      required: [],
+      'x-links': [],
+      'x-errors': [],
+      'x-todos': [],
+      'x-tags': [{ name: 'test' }]
     })
   })
 
@@ -63,7 +82,8 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
 
@@ -78,7 +98,8 @@ describe('SchemaNormalizer', () => {
       oneOf: [{ $ref: './Schema2.yaml' }],
       'x-links': [],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
 
@@ -93,7 +114,8 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
 
@@ -107,7 +129,8 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
 
@@ -121,7 +144,8 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
 
@@ -135,7 +159,8 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
 
@@ -149,7 +174,8 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
 
@@ -163,7 +189,8 @@ describe('SchemaNormalizer', () => {
       enum: ['A'],
       'x-links': [],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
 
@@ -180,7 +207,8 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
 
@@ -198,7 +226,8 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
   test('additionalProperties dependencies', async () => {
@@ -216,7 +245,8 @@ describe('SchemaNormalizer', () => {
       required: [],
       'x-links': [],
       'x-errors': [],
-      'x-todos': []
+      'x-todos': [],
+      'x-tags': []
     })
   })
 })

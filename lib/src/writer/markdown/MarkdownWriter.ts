@@ -52,6 +52,7 @@ function registerHandlebarsHelpers (model: Model, options: MarkdownWriterOptions
   Handlebars.registerHelper('mdHasValue', (obj: any[] | undefined, property: any) => obj?.includes(property))
   Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input, null, 2))
   Handlebars.registerHelper('mdAdditionalPropertyType', (schema: Schema, definition: Definition) => mdAdditionalPropertyType(model, schema, definition, options))
+  Handlebars.registerHelper('mdUrlEncode', (input: string) => encodeURIComponent(input))
   Handlebars.registerPartial('mdSubSchema', options.subSchemaTemplate)
 }
 

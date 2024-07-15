@@ -1,53 +1,14 @@
-import { type RefProperty, type Schema, type Module, type Application, type ArrayProperty, type BasicProperty } from '../../reader/Reader'
+import { type RefProperty, type Schema, type Module, type ArrayProperty, type BasicProperty, type Model } from '../../reader/Reader'
 import { getFullJavaClassName, getJavaPackageName, getJavaPropertyType, getSimpleJavaClassName } from './JavaHelper'
 import { type JavaPluginOptions } from './JavaPlugin'
+import { testModule, testSchema, testModel } from '../../testData'
 
 describe('JavaHelper', () => {
-  const application: Application = { title: 'Application', description: 'Application description', errors: [], todos: [], links: [] }
-  const module: Module = {
-    $id: '/Module',
-    title: 'Module',
-    description: 'Module description',
-    errors: [],
-    todos: [],
-    links: []
-  }
-  const module2: Module = {
-    $id: '/Module2',
-    title: 'Module 2',
-    description: 'Module 2 description',
-    errors: [],
-    todos: [],
-    links: []
-  }
-  const schema: Schema = {
-    $id: '/Module/Schema.yaml',
-    'x-schema-type': 'Entity',
-    title: 'Schema 1',
-    type: 'object',
-    properties: {},
-    required: [],
-    definitions: {},
-    'x-errors': [],
-    'x-links': [],
-    'x-todos': []
-
-  }
-  const schema2: Schema = {
-    $id: '/Module2/Schema2.yaml',
-    'x-schema-type': 'Entity',
-    title: 'Schema 2',
-    type: 'object',
-    properties: {},
-    required: [],
-    definitions: {},
-    'x-errors': [],
-    'x-links': [],
-    'x-todos': []
-  }
-
   test('getJavaPropertyType', () => {
-    const model = { application, modules: [module, module2], schemas: [schema, schema2] }
+    const schema = testSchema()
+    const module2: Module = { ...testModule(), $id: '/Module2' }
+    const schema2: Schema = { ...testSchema(), $id: '/Module2/Schema2.yaml' }
+    const model: Model = { ...testModel(), modules: [testModule(), module2], schemas: [schema, schema2] }
     const options = { mainPackageName: undefined, modelPackageName: undefined, basicTypeMap: { string: 'String' } } as any as JavaPluginOptions
     const options2 = { mainPackageName: 'com.example', modelPackageName: 'model', basicTypeMap: { string: 'com.example.CustomString' } } as any as JavaPluginOptions
     const refProperty: RefProperty = { $ref: '../Module2/Schema2.yaml' }
@@ -68,6 +29,7 @@ describe('JavaHelper', () => {
   })
 
   test('getJavaPackageName', () => {
+    const schema = testSchema()
     const options = { mainPackageName: undefined, modelPackageName: undefined } as any as JavaPluginOptions
     expect(getJavaPackageName(schema, options)).toEqual('module')
     expect(getJavaPackageName(schema.$id, options)).toEqual('module')
@@ -77,6 +39,7 @@ describe('JavaHelper', () => {
   })
 
   test('getFullJavaClassName', () => {
+    const schema = testSchema()
     const options = { mainPackageName: undefined, modelPackageName: undefined } as any as JavaPluginOptions
     expect(getFullJavaClassName(schema, options)).toEqual('module.Schema')
     expect(getFullJavaClassName(schema.$id, options)).toEqual('module.Schema')
@@ -86,6 +49,7 @@ describe('JavaHelper', () => {
   })
 
   test('getSimpleJavaClassName', () => {
+    const schema = testSchema()
     expect(getSimpleJavaClassName(schema)).toEqual('Schema')
     expect(getSimpleJavaClassName(schema, 'Definition')).toEqual('SchemaDefinition')
     expect(getSimpleJavaClassName(schema.$id, 'Definition')).toEqual('SchemaDefinition')

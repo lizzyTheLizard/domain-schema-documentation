@@ -28,6 +28,22 @@ allOf:
               type: string
             href:
               type: string
+          required:
+            - text
+            - href
+      x-tags:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            value:
+              type: string
+            color:
+              type: string
+          required:
+            - name
     required:
     - $id
     - x-schema-type

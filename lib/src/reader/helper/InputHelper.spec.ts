@@ -7,36 +7,12 @@ import {
   getSchemasForModuleAndTyp,
   resolveRelativeId
 } from './InputHelper'
-import { type Application, type Module, type Schema, type Model } from '../Reader'
+import { testModel, testModule, testSchema } from '../../testData'
 
 describe('InputHelper', () => {
-  const application: Application = { title: 'Application', description: 'Application description', errors: [], todos: [], links: [] }
-  const module: Module = { $id: '/Module', title: 'Module', description: 'Module description', errors: [], todos: [], links: [] }
-  const schema1: Schema = {
-    $id: '/Module/Schema1.yaml',
-    'x-schema-type': 'Aggregate',
-    title: 'Schema 1',
-    type: 'object',
-    properties: {},
-    required: [],
-    definitions: {},
-    'x-errors': [],
-    'x-links': [],
-    'x-todos': []
-  }
-  const schema2: Schema = {
-    $id: '/Module2/Schema2.yaml',
-    'x-schema-type': 'ValueObject',
-    title: 'Schema 2',
-    type: 'object',
-    properties: {},
-    required: [],
-    definitions: {},
-    'x-errors': [],
-    'x-links': [],
-    'x-todos': []
-  }
-  const model: Model = { application, modules: [module], schemas: [schema1, schema2] }
+  const module = testModule()
+  const schema1 = testSchema()
+  const model = { ...testModel(), modules: [module], schemas: [schema1] }
 
   test('getSchemasForModule', async () => {
     expect(getSchemasForModule(model, module)).toEqual([schema1])
@@ -49,7 +25,7 @@ describe('InputHelper', () => {
 
   test('getModuleId', async () => {
     expect(getModuleId('/Module/Test/Schema.yaml')).toEqual('/Module/Test')
-    expect(getModuleId(schema1)).toEqual('/Module')
+    expect(getModuleId(schema1)).toEqual(module.$id)
   })
 
   test('getSchema', async () => {

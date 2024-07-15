@@ -6,6 +6,9 @@
 </nav>
 
 <h1>{{{title}}}</h1>
+{{#each tags}}
+<img alt="Static Badge" src="https://img.shields.io/badge/{{htmlUrlEncode name}}{{#if value}}-{{htmlUrlEncode value}}{{/if}}{{#if color}}-{{color}}{{/if}}">
+{{/each}}
 
 {{#if todos}}
 <div class="alert alert-danger" role="alert">

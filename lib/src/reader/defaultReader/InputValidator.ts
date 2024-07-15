@@ -1,5 +1,5 @@
 import Ajv, { type Format, type AnySchema, type Options } from 'ajv'
-import type { Module, Schema, Definition, SchemaType, ImplementationError, Link } from '../Reader'
+import type { Module, Schema, Definition, SchemaType, ImplementationError, Link, Tag } from '../Reader'
 import { resolveRelativeId } from '../helper/InputHelper'
 import betterAjvErrors from 'better-ajv-errors'
 import * as fs from 'fs'
@@ -100,6 +100,7 @@ export class InputValidator {
       .addKeyword('x-enum-description')
       .addKeyword('x-todos')
       .addKeyword('x-links')
+      .addKeyword('x-tags')
       .addKeyword('x-errors')
     if (this.options.discriminator === 'ALLOW') ajv.addKeyword('discriminator')
     this.options.allowedKeywords.forEach(f => ajv.addKeyword(f))
@@ -167,7 +168,7 @@ export class InputValidator {
       }
       return
     }
-    if (!('x-enum-description' in subSchema)) {
+    if (!('x-enum-description' in subSchema) || subSchema['x-enum-description'] === null || subSchema['x-enum-description'] === undefined) {
       return
     }
     const enumValues = subSchema.enum as string[]
@@ -240,6 +241,7 @@ export interface NonNormalizedSchema {
   additionalProperties?: NonNormalizedSubSchema | boolean
   'x-todos'?: string[]
   'x-links'?: Link[]
+  'x-tags'?: Tag[]
   'x-errors'?: ImplementationError[]
 }
 
@@ -260,6 +262,7 @@ export interface NonNormalizedApplication {
   todos?: string[]
   links?: Link[]
   errors?: ImplementationError[]
+  tags?: Tag[]
 }
 
 export interface NonNormalizedModule {
@@ -269,4 +272,5 @@ export interface NonNormalizedModule {
   todos?: string[]
   links?: Link[]
   errors?: ImplementationError[]
+  tags?: Tag[]
 }

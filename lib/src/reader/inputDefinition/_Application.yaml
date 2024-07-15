@@ -20,6 +20,22 @@ properties:
           type: string
         href:
           type: string
+      required:
+      - text
+      - href
+  tags:
+    type: array
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        color:
+          type: string
+      required:
+        - name
 required:
     - title
     - description

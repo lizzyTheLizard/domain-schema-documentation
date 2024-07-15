@@ -1,5 +1,6 @@
 # Object 2
-> - [ ] 3 validation errors
+![Static Badge](https://img.shields.io/badge/Validator%20Errors-3-red)
+
 An Object in Module 2
 ```mermaid
 classDiagram

@@ -1,4 +1,4 @@
-import { run, defaultReader, javaPlugin, markdownWriter } from 'domain-schema-documentation'
+import { run, defaultReader, javaPlugin, markdownWriter, htmlWriter } from 'domain-schema-documentation'
 import { compareOutput, handleError } from 'test-shared'
 import { promises as fs } from 'fs'
 import * as path from 'path'
@@ -12,7 +12,7 @@ fs.rm(output, { recursive: true, force: true })
   .then(async () => {
     await run({
       reader: defaultReader(input),
-      writers: [markdownWriter(output)],
+      writers: [markdownWriter(output), htmlWriter(output)],
       plugins: [javaPlugin(output, { srcDir: src, ignoreAdditionalFiles: false })]
     })
   })
