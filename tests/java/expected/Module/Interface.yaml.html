@@ -47,7 +47,7 @@
       </nav>
       
       <h1>Interface</h1>
-      <img alt="Static Badge" src="https://img.shields.io/badge/Validator%20Errors-4-red">
+      <img alt="Static Badge" src="https://img.shields.io/badge/Validator%20Errors-6-red">
       
       
       <section>
@@ -123,6 +123,14 @@
             <tr>
               <td>NOT_IN_DOMAIN_MODEL</td>
               <td>Value &#x27;Test3&#x27; should not exist in enum &#x27;com.example.module.model.InterfaceInterface3&#x27;</td>
+            </tr>
+            <tr>
+              <td>MISSING_IN_IMPLEMENTATION</td>
+              <td>Property &#x27;constV&#x27; is missing in class &#x27;com.example.module.model.InterfaceOtherObject&#x27;</td>
+            </tr>
+            <tr>
+              <td>MISSING_IN_IMPLEMENTATION</td>
+              <td>Property &#x27;constB&#x27; is missing in class &#x27;com.example.module.model.InterfaceOtherObject&#x27;</td>
             </tr>
             <tr>
               <td>WRONG</td>
@@ -215,6 +223,16 @@
             <tr>
               <td>wrongType</td>
               <td>String</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>constV</td>
+              <td>String<br>"Test"</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>constB</td>
+              <td>Boolean<br>true</td>
               <td></td>
             </tr>
           </tbody>

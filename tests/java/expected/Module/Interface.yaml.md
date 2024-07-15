@@ -1,5 +1,5 @@
 # Interface
-![Static Badge](https://img.shields.io/badge/Validator%20Errors-4-red)
+![Static Badge](https://img.shields.io/badge/Validator%20Errors-6-red)
 
 This is an interface
 ```mermaid
@@ -62,12 +62,16 @@ This is a test property
 |------|------|-------------|
 | id | String |  |
 | wrongType | String |  |
+| constV | String<br>"Test" |  |
+| constB | Boolean<br>true |  |
 
 ## Verification Errors
 | Type | Description |
 |------|-------------|
 | WRONG | Interface &#x27;com.example.module.model.Interface&#x27; is invalid: This is suppose to be an interface but is a &#x27;class&#x27;&#x27; |
 | NOT_IN_DOMAIN_MODEL | Value &#x27;Test3&#x27; should not exist in enum &#x27;com.example.module.model.InterfaceInterface3&#x27; |
+| MISSING_IN_IMPLEMENTATION | Property &#x27;constV&#x27; is missing in class &#x27;com.example.module.model.InterfaceOtherObject&#x27; |
+| MISSING_IN_IMPLEMENTATION | Property &#x27;constB&#x27; is missing in class &#x27;com.example.module.model.InterfaceOtherObject&#x27; |
 | WRONG | Property &#x27;wrongType&#x27; has type &#x27;Integer&#x27; in class &#x27;com.example.module.model.InterfaceOtherObject&#x27; but should have type &#x27;String&#x27; |
 | NOT_IN_DOMAIN_MODEL | Property &#x27;wrongProperty&#x27; should not exist in class &#x27;com.example.module.model.InterfaceOtherObject&#x27; |
 

@@ -1,4 +1,4 @@
-import Ajv, { type Format, type AnySchema, type Options } from 'ajv'
+import Ajv, { type Format, type AnySchema, type Options, type Schema as AjvSchema } from 'ajv'
 import type { Module, Schema, Definition, SchemaType, ImplementationError, Link, Tag } from '../Reader'
 import { resolveRelativeId } from '../helper/InputHelper'
 import betterAjvErrors from 'better-ajv-errors'
@@ -71,6 +71,7 @@ export class InputValidator {
     this.validateId(inputSchema, fileLocation, expectedId)
     this.validateEnumDocumentation(fileLocation, inputSchema)
     this.validateRequired(fileLocation, inputSchema)
+    this.validateConsts(fileLocation, inputSchema)
     return parsed as NonNormalizedSchema
   }
 
@@ -133,9 +134,9 @@ export class InputValidator {
     s.examples.forEach((e, i) => { this.validateAjv(e, s.$id, `example ${i} in Schema '${s.$id}'`) })
   }
 
-  private validateAjv (parsed: unknown, schemaFile: string, name: string): void {
+  private validateAjv (parsed: unknown, schemaOrSchemaId: string | AjvSchema, name: string): void {
     try {
-      if (this.#ajv.validate(schemaFile, parsed)) return
+      if (this.#ajv.validate(schemaOrSchemaId, parsed)) return
     } catch (e: unknown) {
       const error = e as Error
       throw new Error(`Invalid ${name}: ${error.message}`)
@@ -144,7 +145,7 @@ export class InputValidator {
     if (!errors) {
       throw new Error(`Invalid ${name}: ${this.#ajv.errorsText()}`)
     }
-    const schema = this.#ajv.getSchema(schemaFile)
+    const schema = typeof schemaOrSchemaId === 'string' ? this.#ajv.getSchema(schemaOrSchemaId) : schemaOrSchemaId
     console.error(betterAjvErrors(schema, parsed, errors, { json: JSON.stringify(parsed, null, ' ') }))
     throw new Error(`Invalid ${name}. See logs for details`)
   }
@@ -196,6 +197,19 @@ export class InputValidator {
       .forEach(r => {
         throw new Error(`Invalid file ${fileLocation}. It has a required property '${r}' that is not defined`)
       })
+  }
+
+  private validateConsts (fileLocation: string, subSchema: unknown): void {
+    if (subSchema == null || typeof subSchema !== 'object') return
+    Object.entries(subSchema).forEach(([_, value]) => {
+      this.validateConsts(fileLocation, value)
+    })
+    if (!('const' in subSchema)) return
+    const constValue = subSchema.const
+    if (!('type' in subSchema) || subSchema.type === 'object') {
+      throw new Error(`Invalid constant ${JSON.stringify(constValue)} in ${fileLocation}. Constants are only supported for basic properties`)
+    }
+    this.validateAjv(constValue, subSchema, `constant ${JSON.stringify(constValue)} in ${fileLocation}`)
   }
 
   public validateReferences (root: Schema | Module, subSchema: unknown): void {

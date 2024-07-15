@@ -23,7 +23,7 @@
 {{#if oneOf}}
 ## One Of
 {{#each oneOf}}
-1. {{mdGetType .. this}}
+1. {{{mdGetType .. this}}}
 {{/each}}
 {{/if}}
 
@@ -41,7 +41,7 @@
 | Name | Type | Description |
 |------|------|-------------|
 {{#each properties}}
-| {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{mdGetType .. this}} | {{{mdMultiline description}}} |
+| {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{{mdGetType .. this}}} | {{{mdMultiline description}}} |
 {{/each}}
 {{#if additionalProperties}}
 | (other) | {{mdAdditionalPropertyType . .}} | Additional Properties |

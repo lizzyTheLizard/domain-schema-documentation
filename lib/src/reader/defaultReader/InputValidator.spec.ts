@@ -115,4 +115,14 @@ describe('InputValidator', () => {
     expect(() => { target.validateSchemaFile({ ...schema, 'x-schema-type': 2 }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
     expect(() => { target.validateSchemaFile({ ...schema, 'x-schema-type': 'WRONG' }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
   })
+
+  test('validate consts', () => {
+    const schema: Schema = testSchema()
+    expect(() => { target.validateSchemaFile({ ...schema, properties: { key: { type: 'string', const: 2 } } }, 'file.yaml') }).toThrow(new Error('Invalid constant 2 in file.yaml. See logs for details'))
+    expect(() => { target.validateSchemaFile({ ...schema, properties: { key: { const: 2 } } }, 'file.yaml') }).toThrow(new Error('Invalid constant 2 in file.yaml. Constants are only supported for basic properties'))
+    expect(() => { target.validateSchemaFile({ ...schema, properties: { key: { type: 'object', properties: {}, additionalProperties: true, const: { key: 'value' } } } }, 'file.yaml') }).toThrow(new Error('Invalid constant {"key":"value"} in file.yaml. Constants are only supported for basic properties'))
+    expect(() => { target.validateSchemaFile({ ...schema, properties: { key: { type: 'string', const: 'test' } } }, 'file.yaml') }).not.toThrow()
+    expect(() => { target.validateSchemaFile({ ...schema, properties: { key: { type: 'integer', const: 2 } } }, 'file.yaml') }).not.toThrow()
+    expect(() => { target.validateSchemaFile({ ...schema, properties: { key: { type: 'number', const: 3 } } }, 'file.yaml') }).not.toThrow()
+  })
 })

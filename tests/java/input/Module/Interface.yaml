@@ -31,3 +31,9 @@ definitions:
         type: string
       wrongType:
         type: string
+      constV:
+        type: string
+        const: "Test"
+      constB:
+        type: boolean
+        const: true

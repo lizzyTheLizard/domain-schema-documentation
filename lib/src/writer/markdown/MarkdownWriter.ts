@@ -47,7 +47,7 @@ function applyDefaults (outputFolder: string, options?: Partial<MarkdownWriterOp
 function registerHandlebarsHelpers (model: Model, options: MarkdownWriterOptions): void {
   Handlebars.registerHelper('mdMultiline', (input: string) => mdMultiline(input))
   Handlebars.registerHelper('mdRelativeLink', (fromId: string, toId: string) => relativeLink(fromId, toId))
-  Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(schema, getType(model, schema, property), options))
+  Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(model, schema, property, options))
   Handlebars.registerHelper('mdGetProperty', (obj: any | undefined, property: string) => obj?.[property])
   Handlebars.registerHelper('mdHasValue', (obj: any[] | undefined, property: any) => obj?.includes(property))
   Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input, null, 2))
@@ -61,15 +61,22 @@ function mdMultiline (input: string): string {
   return input.split('\n').map(l => l.trim()).join('<br>')
 }
 
-function mdGetType (schema: Schema, type: PropertyType, options: MarkdownWriterOptions): string {
+function mdGetType (model: Model, schema: Schema, property: Property, options: MarkdownWriterOptions): string {
+  const type = getType(model, schema, property)
+  const result = mdGetTypeInternal(schema, type, options)
+  if ('const' in property) return `${result}<br>${JSON.stringify(property.const)}`
+  return result
+}
+
+function mdGetTypeInternal (schema: Schema, type: PropertyType, options: MarkdownWriterOptions): string {
   switch (type.type) {
-    case 'array': return `[${mdGetType(schema, type.array, options)}]`
+    case 'array': return `[${mdGetTypeInternal(schema, type.array, options)}]`
     case 'reference': return `[${type.name}](${relativeLink(path.dirname(schema.$id), type.$id)}.md)`
     case 'self': return `[${type.name}](./)`
     case 'definition': return `[${type.name}](#${type.name})`
     case 'local':
       if (type.references) {
-        return `References ${type.references.map(r => mdGetType(schema, r, options)).join(', ')}`
+        return `References ${type.references.map(r => mdGetTypeInternal(schema, r, options)).join(', ')}`
       } else {
         return options.typeName(type.name)
       }
@@ -81,7 +88,7 @@ function mdAdditionalPropertyType (model: Model, schema: Schema, definition: Def
   if (additionalProperty === false) throw new Error('Additional properties are not enabled')
   if (additionalProperty === true) return '*'
   const propertyType = getType(model, schema, additionalProperty)
-  return mdGetType(schema, propertyType, options)
+  return mdGetTypeInternal(schema, propertyType, options)
 }
 
 async function writeSchemaFiles (model: Model, options: MarkdownWriterOptions): Promise<void> {

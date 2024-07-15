@@ -52,22 +52,29 @@ function registerHandlebarsHelpers (model: Model, options: HtmlWriterOptions): v
   Handlebars.registerHelper('htmlGetProperty', (obj: any | undefined, property: string) => obj?.[property])
   Handlebars.registerHelper('htmlHasProperty', (obj: any[] | undefined, property: any) => obj?.includes(property))
   Handlebars.registerHelper('htmlJson', (input: unknown) => JSON.stringify(input))
-  Handlebars.registerHelper('htmlGetType', (schema: Schema, property: Property) => htmlGetType(schema, getType(model, schema, property), options))
+  Handlebars.registerHelper('htmlGetType', (schema: Schema, property: Property) => htmlGetType(model, schema, property, options))
   Handlebars.registerHelper('htmlIntent', (input: string, intent: number) => input.split('\n').map(l => ' '.repeat(intent) + l).join('\n'))
   Handlebars.registerHelper('htmlAdditionalPropertyType', (schema: Schema, definition: Definition) => htmlAdditionalPropertyType(model, schema, definition, options))
   Handlebars.registerHelper('htmlUrlEncode', (input: string) => encodeURIComponent(input))
   Handlebars.registerPartial('htmlSubSchema', options.subSchemaTemplate)
 }
 
-function htmlGetType (schema: Schema, type: PropertyType, options: HtmlWriterOptions): string {
+function htmlGetType (model: Model, schema: Schema, property: Property, options: HtmlWriterOptions): string {
+  const type = getType(model, schema, property)
+  const result = htmlGetTypeInternal(schema, type, options)
+  if ('const' in property) return `${result}<br>${JSON.stringify(property.const)}`
+  return result
+}
+
+function htmlGetTypeInternal (schema: Schema, type: PropertyType, options: HtmlWriterOptions): string {
   switch (type.type) {
-    case 'array': return `[${htmlGetType(schema, type.array, options)}]`
+    case 'array': return `[${htmlGetTypeInternal(schema, type.array, options)}]`
     case 'reference': return `<a href="${relativeLink(path.dirname(schema.$id), type.$id)}.html">${type.name}</a>`
     case 'self': return `<a href="">${type.name}</a>`
     case 'definition': return `<a href="#${type.name}">${type.name}</a>`
     case 'local':
       if (type.references) {
-        return `References ${type.references.map(r => htmlGetType(schema, r, options)).join(', ')}`
+        return `References ${type.references.map(r => htmlGetTypeInternal(schema, r, options)).join(', ')}`
       } else {
         return options.typeName(type.name)
       }
@@ -79,7 +86,7 @@ function htmlAdditionalPropertyType (model: Model, schema: Schema, definition: D
   if (addionalProperties === false) throw new Error('Additional properties are not enabled')
   if (addionalProperties === true) return '*'
   const propertyType = getType(model, schema, addionalProperties)
-  return htmlGetType(schema, propertyType, options)
+  return htmlGetTypeInternal(schema, propertyType, options)
 }
 
 async function writeSchemaFiles (model: Model, options: HtmlWriterOptions): Promise<void> {

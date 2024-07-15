@@ -31,7 +31,7 @@ click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
 ## Verification Errors
 | Type | Description |
 |------|-------------|
-| WRONG | Schema &#x27;Interface&#x27; has 4 validation errors |
+| WRONG | Schema &#x27;Interface&#x27; has 6 validation errors |
 
 ## Links
 1. [This is an existing link](https://example.com)

@@ -55,6 +55,7 @@ export interface BasicProperty {
   format?: string
   /** A reference to another schema, if the value of this property is an ID of this type. Used for documentation */
   'x-references'?: string | string[]
+  const?: unknown
 }
 
 /** A type definition. Can be the root of a schema, or a sub-definition */
