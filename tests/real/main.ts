@@ -24,7 +24,7 @@ const runOptions: RunOptions = {
 
 fs.rm(output, { recursive: true, force: true })
   .then(async () => { await run(runOptions) })
-  .then(async () => { await compareOutput(output, expected, '/README.md') })
+  .then(async () => { await compareOutput(output, expected, '/README.md,/.gitkeep') })
   .catch(error => { handleError(error) })
 
 function uidVerifier (uid: string): boolean {
