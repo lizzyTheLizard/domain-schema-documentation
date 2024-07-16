@@ -25,9 +25,8 @@
     section {
       margin-bottom: 50px;
     }
-    .title-badge {
-      font-size: 0.3em;
-      vertical-align: top;
+    .badges {
+      margin-bottom: 15px;
     }
     .json {
       border: 1px solid black;
@@ -40,47 +39,45 @@
     <main class="container">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="../../index.html">Application</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Application</a></li>
           <li class="breadcrumb-item"><a href="./index.html">Module</a></li>
           <li class="breadcrumb-item active" aria-current="page">Interface</li>
         </ol>
       </nav>
       
       <h1>Interface</h1>
-      <img alt="Static Badge" src="https://img.shields.io/badge/Validator%20Errors-6-red">
+      <div class="badges">
+        <img alt="Static Badge" src="https://img.shields.io/badge/Validator%20Errors-1-red">
+      </div>
       
       
       <section>
-        <p>This is an interface</p>
+        <p>An interface</p>
         <div class="mermaid">
           <pre class="mermaidDefinition">
             classDiagram
       namespace Module {
-        class _Module_Interface_yaml["Interface"]
-        class TestProp["TestProp"]
-        class Interface3["Interface3"]
-        class OtherObject["OtherObject"]
-        class _Module_Object_yaml["Object"]
+        class _Module_Interface_yml["Interface"]
+        class Interface1["Interface1"]
+        class Interface2["Interface2"]
+        class SubInterface3["SubInterface3"]
       }
-      _Module_Interface_yaml <|-- _Module_Object_yaml 
-      _Module_Interface_yaml <|-- OtherObject 
-      _Module_Interface_yaml <|-- Interface3 
-      _Module_Interface_yaml ..> TestProp :testProp
-      click _Module_Interface_yaml href "./Interface.yaml.html" "Interface"
-      click TestProp href "./Interface.yaml.html" "Interface"
-      click Interface3 href "./Interface.yaml.html" "Interface"
-      click OtherObject href "./Interface.yaml.html" "Interface"
-      click _Module_Object_yaml href "./Object.yaml.html" "Object"
+      SubInterface3 <|-- _Module_Interface_yml 
+      _Module_Interface_yml <|-- Interface1 
+      _Module_Interface_yml <|-- Interface2 
+      click _Module_Interface_yml href "./Interface.yml.html" "Interface"
+      click Interface1 href "./Interface.yml.html" "Interface"
+      click Interface2 href "./Interface.yml.html" "Interface"
+      click SubInterface3 href "./Object.yaml.html" "Object"
           </pre>
         </div>
       </section>
       
       <section>
-        <h2>One Of</h2>
+        <h2>Implemented By</h2>
         <ul>
-          <li><a href="./Object.yaml.html">Object</a></li>
-          <li><a href="#OtherObject">OtherObject</a></li>
-          <li><a href="#Interface3">Interface3</a></li>
+          <li><a href="#Interface1">Interface1</a></li>
+          <li><a href="#Interface2">Interface2</a></li>
         </ul>
       </section>
       
@@ -90,15 +87,76 @@
         <table class="table">
           <thead>
             <tr>
-              <th>Name</th>
+              <th>Property</th>
               <th>Type</th>
               <th>Description</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>testProp</td>
-              <td><a href="#TestProp">TestProp</a></td>
+              <td>kind*</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      
+      
+      <h2>Subschemas</h2>
+      <a id="Interface1"></a><h3>Class Interface1</h3>
+      
+      
+      <section>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>kind*</td>
+              <td>String<br>"INSIDE1"</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>name</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      
+      <a id="Interface2"></a><h3>Class Interface2</h3>
+      
+      
+      <section>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>kind*</td>
+              <td>String<br>"INSIDE2"</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>key</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>value</td>
+              <td>String</td>
               <td></td>
             </tr>
           </tbody>
@@ -120,26 +178,6 @@
               <td>WRONG</td>
               <td>Interface &#x27;com.example.module.model.Interface&#x27; is invalid: This is suppose to be an interface but is a &#x27;class&#x27;&#x27;</td>
             </tr>
-            <tr>
-              <td>NOT_IN_DOMAIN_MODEL</td>
-              <td>Value &#x27;Test3&#x27; should not exist in enum &#x27;com.example.module.model.InterfaceInterface3&#x27;</td>
-            </tr>
-            <tr>
-              <td>MISSING_IN_IMPLEMENTATION</td>
-              <td>Property &#x27;constV&#x27; is missing in class &#x27;com.example.module.model.InterfaceOtherObject&#x27;</td>
-            </tr>
-            <tr>
-              <td>MISSING_IN_IMPLEMENTATION</td>
-              <td>Property &#x27;constB&#x27; is missing in class &#x27;com.example.module.model.InterfaceOtherObject&#x27;</td>
-            </tr>
-            <tr>
-              <td>WRONG</td>
-              <td>Property &#x27;wrongType&#x27; has type &#x27;Integer&#x27; in class &#x27;com.example.module.model.InterfaceOtherObject&#x27; but should have type &#x27;String&#x27;</td>
-            </tr>
-            <tr>
-              <td>NOT_IN_DOMAIN_MODEL</td>
-              <td>Property &#x27;wrongProperty&#x27; should not exist in class &#x27;com.example.module.model.InterfaceOtherObject&#x27;</td>
-            </tr>
           </tbody>
         </table>
       </section>
@@ -148,95 +186,9 @@
         <h2>Links</h2>
         <ul>
           <li><a href="./java/Interface.java">Java-File</a></li>
-          <li><a href="./java/InterfaceTestProp.java">Java-File (TestProp)</a></li>
-          <li><a href="./java/InterfaceInterface3.java">Java-File (Interface3)</a></li>
-          <li><a href="./java/InterfaceOtherObject.java">Java-File (OtherObject)</a></li>
+          <li><a href="./java/InterfaceInterface1.java">Java-File (Interface1)</a></li>
+          <li><a href="./java/InterfaceInterface2.java">Java-File (Interface2)</a></li>
         </ul>
-      </section>
-      
-      
-      <h2>Subschemas</h2>
-      <a id="TestProp"></a><h3>TestProp   (Enum)  </h3>
-      <section>
-        <p>This is a test property</p>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Test</td>
-              <td>Test description</td>
-            </tr>
-            <tr>
-              <td>Test2</td>
-              <td>Test2 description</td>
-            </tr>
-          </tbody>
-        </table>
-      
-      </section>
-      <a id="Interface3"></a><h3>Interface3   (Enum)  </h3>
-      <section>
-        <p></p>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Test</td>
-              <td>Test description</td>
-            </tr>
-            <tr>
-              <td>Test2</td>
-              <td>Test2 description</td>
-            </tr>
-          </tbody>
-        </table>
-      
-      </section>
-      <a id="OtherObject"></a><h3>OtherObject    (Object)</h3>
-      <section>
-        <p></p>
-      
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>id</td>
-              <td>String</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>wrongType</td>
-              <td>String</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>constV</td>
-              <td>String<br>"Test"</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>constB</td>
-              <td>Boolean<br>true</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
       </section>
       
     </main>

@@ -3,7 +3,7 @@ import { compareOutput, handleError } from 'test-shared'
 import { promises as fs } from 'fs'
 import * as path from 'path'
 
-const input: string = path.join(__dirname, 'input')
+const input: string = path.join(__dirname, '..', 'shared', 'input')
 const output: string = path.join(__dirname, 'out')
 const expected: string = path.join(__dirname, 'expected')
 const src: string = path.join(__dirname, 'src')

@@ -113,7 +113,7 @@ export const defaultJavaFormatMap: Record<FormatName, string> = {
   ipv4: 'java.net.Inet4Address',
   ipv6: 'java.net.Inet6Address',
   regex: 'String',
-  uuid: ' java.util.UUID',
+  uuid: 'java.util.UUID',
   'json-pointer': 'String',
   'json-pointer-uri-fragment': 'String',
   'relative-json-pointer': 'String',

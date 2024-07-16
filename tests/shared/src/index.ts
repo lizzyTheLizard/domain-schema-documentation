@@ -17,10 +17,11 @@ export function handleError (error: unknown): void {
  * Compare the output of the generator with the expected output
  * @param outputFolder The folder with the generated output
  * @param expectedFolder The folder with the expected output
+ * @param excludeFilter File/directory name exclude filter. Comma separated minimatch patterns. See [Glob patterns](https://github.com/gliviu/dir-compare#glob-patterns).
  */
-export async function compareOutput (outputFolder: string, expectedFolder?: string): Promise<void> {
+export async function compareOutput (outputFolder: string, expectedFolder?: string, excludeFilter?: string): Promise<void> {
   expectedFolder = expectedFolder ?? path.join(__dirname, '..', 'expected')
-  const result = await compare(outputFolder, expectedFolder, { compareContent: true })
+  const result = await compare(outputFolder, expectedFolder, { compareContent: true, excludeFilter })
   if (result.same) {
     console.log('Directories are identical')
     process.exit(0)

@@ -14,6 +14,6 @@ public enum {{{javaClassName this}}}{{#each (javaImplementedInterfaces this)}}{{
 {{#if ../x-enum-description}}
 {{{javaComment (javaEnumDoc .. this) 2}}}
 {{/if}}
-  {{{this}}}{{#if @last}}{{else}},{{/if}}
+  {{{this}}}{{#if @last}};{{else}},{{/if}}
 {{/each}}
 }

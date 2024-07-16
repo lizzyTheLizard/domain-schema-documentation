@@ -1,19 +1,16 @@
-<a id="{{{name}}}"></a><h3>{{{name}}} {{#if oneOf}} (OneOf){{/if}} {{#if enum}} (Enum) {{/if}} {{#if properties}} (Object){{/if}}</h3>
+<a id="{{{name}}}"></a><h3>{{htmlKind .}} {{{name}}}</h3>
+{{#if description}}
 <section>
   <p>{{description}}</p>
-{{#if oneOf}}
-  <ul>
-{{#each oneOf}}
-    <li>{{{htmlGetType ../schema this}}}</li>
-{{/each}}
-  </ul>
 </section>
 {{/if}}
+
 {{#if enum}}
+<section>
   <table class="table">
     <thead>
       <tr>
-        <th>Name</th>
+        <th>Enum</th>
         <th>Description</th>
       </tr>
     </thead>
@@ -26,25 +23,29 @@
 {{/each}}
     </tbody>
   </table>
+</section>
 {{/if}}
 
 {{#if properties}}
+{{#each properties}}
+{{#if @first}}
+<section>
   <table class="table">
     <thead>
       <tr>
-        <th>Name</th>
+        <th>Property</th>
         <th>Type</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
-{{#each properties}}
+{{/if}}
       <tr>
         <td>{{@key}}{{#if (htmlHasProperty ../required @key)}}*{{/if}}</td>
         <td>{{{htmlGetType ../schema this}}}</td>
         <td>{{description}}</td>
       </tr>
-{{/each}}
+{{#if @last}}
 {{#if additionalProperties}}
       <tr>
         <td>(other)</td>
@@ -54,5 +55,18 @@
 {{/if}}
     </tbody>
   </table>
-{{/if}}
 </section>
+{{/if}}
+{{/each}}
+{{/if}}
+
+{{#if oneOf}}
+<section>
+Implemented by
+  <ul>
+{{#each oneOf}}
+    <li>{{{htmlGetType ../schema this}}}</li>
+{{/each}}
+  </ul>
+</section>
+{{/if}}

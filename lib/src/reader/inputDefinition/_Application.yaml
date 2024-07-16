@@ -36,6 +36,7 @@ properties:
           type: string
       required:
         - name
+        - color
 required:
     - title
     - description

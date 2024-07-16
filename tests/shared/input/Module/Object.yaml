@@ -1,8 +1,8 @@
 $id: /Module/Object.yaml
 title: Object
-description: This is an integration test for the application
+description: A simple object
 type: object
-x-schema-type: Aggregate
+x-schema-type: Entity
 examples:
   - id: "1"
     name: "Test"
@@ -11,5 +11,40 @@ properties:
     type: string
   name:
     type: string
+  subObject:
+    type: object
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+  subEnum:
+    type: string
+    enum: ['A', 'B']
+    x-enum-description:
+      A: 'Value A'
+      B: 'Value B'
+  subInterface:
+    type: object
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    oneOf:
+      - $ref: '#'
+      - type: object
+        properties:
+          key:
+            type: string
+          value:
+            type: string
+      - type: object
+        oneOf:
+          - $ref: '#'
+          - $ref: ./Interface.yml
 additionalProperties:
   type: integer
+required:
+  - id
+  - name

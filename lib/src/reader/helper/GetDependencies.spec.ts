@@ -148,7 +148,7 @@ describe('GetDependencies', () => {
       toSchema: schema,
       toDefinitionName: 'Reference',
       type: 'ENUM',
-      array: false
+      array: true
     }])
   })
 })

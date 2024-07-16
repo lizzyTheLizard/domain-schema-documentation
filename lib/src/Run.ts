@@ -69,6 +69,9 @@ function getModuleErrors (model: Model): ImplementationError[] {
   return model.modules.flatMap(m => {
     const count = m.errors.length
     if (count === 0) return []
+    if (count === 1) {
+      return [{ text: `Module '${m.title}' has 1 validation error`, type: 'WRONG' }]
+    }
     return [{ text: `Module '${m.title}' has ${count} validation errors`, type: 'WRONG' }]
   })
 }
@@ -77,6 +80,9 @@ function getSchemaErrors (model: Model, module: Module): ImplementationError[] {
   return getSchemasForModule(model, module).flatMap(s => {
     const count = s['x-errors'].length
     if (count === 0) return []
+    if (count === 1) {
+      return [{ text: `Schema '${s.title}' has 1 validation error`, type: 'WRONG' }]
+    }
     return [{ text: `Schema '${s.title}' has ${count} validation errors`, type: 'WRONG' }]
   })
 }

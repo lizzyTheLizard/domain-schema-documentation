@@ -1,7 +1,7 @@
 import { type Writer, applyWriterOptionsDefaults, type WriterBaseOptions } from '../Writer'
-import { type Definition, type Model, type Property, type Schema } from '../../reader/Reader'
+import { type Tag, type Definition, type Model, type Property, type Schema } from '../../reader/Reader'
 import path from 'path'
-import { enhanceApplication, enhanceModule, enhanceSchema, loadTemplate } from '../WriterHelpers'
+import { definitionKind, enhanceApplication, enhanceModule, enhanceSchema, loadTemplate, shieldIoBadgeUrl } from '../WriterHelpers'
 import Handlebars from 'handlebars'
 import { relativeLink } from '../../reader/helper/InputHelper'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
@@ -55,7 +55,8 @@ function registerHandlebarsHelpers (model: Model, options: HtmlWriterOptions): v
   Handlebars.registerHelper('htmlGetType', (schema: Schema, property: Property) => htmlGetType(model, schema, property, options))
   Handlebars.registerHelper('htmlIntent', (input: string, intent: number) => input.split('\n').map(l => ' '.repeat(intent) + l).join('\n'))
   Handlebars.registerHelper('htmlAdditionalPropertyType', (schema: Schema, definition: Definition) => htmlAdditionalPropertyType(model, schema, definition, options))
-  Handlebars.registerHelper('htmlUrlEncode', (input: string) => encodeURIComponent(input))
+  Handlebars.registerHelper('htmlBadge', (input: Tag) => `<img alt="Static Badge" src="${shieldIoBadgeUrl(input)}">`)
+  Handlebars.registerHelper('htmlKind', (def: Definition) => definitionKind(def))
   Handlebars.registerPartial('htmlSubSchema', options.subSchemaTemplate)
 }
 

@@ -1,0 +1,25 @@
+$id: /Module/Tags.yaml
+title: Tags
+description: An example for tags etc.
+type: object
+x-schema-type: ValueObject
+properties:
+  id:
+    type: string
+x-tags:
+  - name: Color-Tag
+    value: Blue
+    color: blue
+  - name: Without Value
+    color: green
+x-todos:
+   -  A Todo
+x-links:
+  - text: Link
+    href: 'http://www.google.com'
+  - text: Local-Link
+    href: './Module/index.yaml'
+x-errors:
+  - text: "An error"
+    type: "WRONG"
+

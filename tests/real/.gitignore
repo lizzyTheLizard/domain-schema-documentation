@@ -1,0 +1,8 @@
+# We cannot upload the "real" example, so just leave it empty
+expected/*
+!expected/.gitkeep
+model/*
+!model/index.yml
+original/*
+TODO
+cleanModel.sh

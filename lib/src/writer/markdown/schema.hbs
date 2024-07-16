@@ -1,24 +1,16 @@
 # {{{title}}}
 {{#each x-tags}}
-![Static Badge](https://img.shields.io/badge/{{mdUrlEncode name}}{{#if value}}-{{mdUrlEncode value}}{{/if}}{{#if color}}-{{color}}{{/if}})
+{{mdBadge this}}
 {{/each}}
 
 {{#each x-todos}}
-> - [ ] {{this}}
+> - {{this}}
 {{/each}}
+
 {{{mdMultiline description}}}
 ```mermaid
 {{{classDiagram}}}
 ```
-
-{{#if examples}}
-## Examples
-{{#each examples}}
-```json
-{{{mdJson this}}}
-```
-{{/each}}
-{{/if}}
 
 {{#if oneOf}}
 ## One Of
@@ -29,7 +21,7 @@
 
 {{#if enum}}
 ## Enum-Values
-| Name | Description |
+| Enum | Description |
 |------|-------------|
 {{#each enum}}
 | {{this}} | {{{mdMultiline (mdGetProperty ../[x-enum-description] this)}}} |
@@ -37,36 +29,50 @@
 {{/if}}
 
 {{#if properties}}
-## Properties
-| Name | Type | Description |
-|------|------|-------------|
 {{#each properties}}
+{{#if @first}}
+## Properties
+| Property | Type | Description |
+|------|------|-------------|
+{{/if}}
 | {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{{mdGetType .. this}}} | {{{mdMultiline description}}} |
-{{/each}}
+{{#if @last}}
 {{#if additionalProperties}}
 | (other) | {{mdAdditionalPropertyType . .}} | Additional Properties |
 {{/if}}
 {{/if}}
-
-{{#if hasDefinitions}}
-## Subschemas
-{{#each definitions}}
-{{> mdSubSchema this schema=.. name=@key}}
 {{/each}}
 {{/if}}
 
-{{#if x-errors}}
+{{#each examples}}
+{{#if @first}}
+## Examples
+{{/if}}
+```json
+{{{mdJson this}}}
+```
+{{/each}}
+
+
+{{#each definitions}}
+{{#if @first}}
+## Subschemas
+{{/if}}
+{{> mdSubSchema this schema=.. name=@key}}
+{{/each}}
+
+{{#each x-errors}}
+{{#if @first}}
 ## Verification Errors
 | Type | Description |
 |------|-------------|
-{{#each x-errors}}
+{{/if}}
 | {{type}} | {{text}} |
 {{/each}}
-{{/if}}
 
-{{#if x-links}}
-## Links
 {{#each x-links}}
+{{#if @first}}
+## Links
+{{/if}}
 1. [{{{text}}}]({{href}})
 {{/each}}
-{{/if}}

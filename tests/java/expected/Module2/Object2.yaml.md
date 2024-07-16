@@ -1,5 +1,5 @@
 # Object 2
-![Static Badge](https://img.shields.io/badge/Validator%20Errors-3-red)
+
 
 An Object in Module 2
 ```mermaid
@@ -12,14 +12,25 @@ namespace Module 2 {
 namespace Module {
   class _Module_Object_yaml["Object"]
 }
-_Module_Object_yaml ..> _Module2_Object2_yaml :obj2
 _Module2_Object2_yaml ..> Type :type
-_Module2_Object2_yaml o-- AdditionalProperties 
+_Module2_Object2_yaml o-- _Module_Object_yaml :reference1
+_Module2_Object2_yaml ..> _Module_Object_yaml :reference2
+_Module2_Object2_yaml o--" N" AdditionalProperties 
 click _Module2_Object2_yaml href "./Object2.yaml.html" "Object 2"
 click Type href "./Object2.yaml.html" "Object 2"
 click AdditionalProperties href "./Object2.yaml.html" "Object 2"
 click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 ```
+
+
+
+## Properties
+| Property | Type | Description |
+|------|------|-------------|
+| id | String |  |
+| type | [Type](#Type) |  |
+| reference1 | [Object](../Module/Object.yaml.md) |  |
+| reference2 | References [Object](../Module/Object.yaml.md) |  |
 
 ## Examples
 ```json
@@ -34,40 +45,24 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 ```
 
 
-
-## Properties
-| Name | Type | Description |
-|------|------|-------------|
-| id | String |  |
-| type | [Type](#Type) |  |
-| (other) | [AdditionalProperties](#AdditionalProperties) | Additional Properties |
-
 ## Subschemas
-### Type (Enum)
+### Enum Type
 
-
-
-| Name | Description |
+| Enum | Description |
 |------|-------------|
 | type1 | Description of type1 |
 | type2 | Description of type2 |
 
-### AdditionalProperties (Object)
+
+### Class AdditionalProperties
 
 
-
-
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 | key | String |  |
 | value | String |  |
 
-## Verification Errors
-| Type | Description |
-|------|-------------|
-| MISSING_IN_IMPLEMENTATION | &#x27;com.example.module2.model.Object2&#x27; should exist but is missing in the implementation |
-| MISSING_IN_IMPLEMENTATION | &#x27;com.example.module2.model.Object2Type&#x27; should exist but is missing in the implementation |
-| MISSING_IN_IMPLEMENTATION | &#x27;com.example.module2.model.Object2AdditionalProperties&#x27; should exist but is missing in the implementation |
+
 
 ## Links
 1. [Java-File](./java/Object2.java)

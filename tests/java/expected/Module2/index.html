@@ -25,9 +25,8 @@
     section {
       margin-bottom: 50px;
     }
-    .title-badge {
-      font-size: 0.3em;
-      vertical-align: top;
+    .badges {
+      margin-bottom: 15px;
     }
     .json {
       border: 1px solid black;
@@ -46,7 +45,6 @@
       </nav>
       
       <h1>Module 2</h1>
-      <img alt="Static Badge" src="https://img.shields.io/badge/Validator%20Errors-1-red">
       
       
       <section>
@@ -65,8 +63,9 @@
       namespace Module {
         class _Module_Object_yaml["Object"]
       }
-      _Module_Object_yaml ..> _Module2_Object2_yaml :obj2
-      _Module2_Object2_yaml o-- AdditionalProperties 
+      _Module2_Object2_yaml o-- _Module_Object_yaml :reference1
+      _Module2_Object2_yaml ..> _Module_Object_yaml :reference2
+      _Module2_Object2_yaml o--" N" AdditionalProperties 
       click _Module2_Object2_yaml href "./Object2.yaml.html" "Object 2"
       click AdditionalProperties href "./Object2.yaml.html" "Object 2"
       click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
@@ -83,30 +82,13 @@
           <tbody>
             <tr>
               <td><a href="./Object2.yaml.html">Object 2</a></td>
-              <td>Other</td>
+              <td>Aggregate</td>
               <td>An Object in Module 2</td>
             </tr>
           </tbody>
         </table>
       </section>
       
-      <section>
-        <h2>Verification Errors</h2>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>WRONG</td>
-              <td>Schema &#x27;Object 2&#x27; has 3 validation errors</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
       
       <section>
         <h2>Links</h2>

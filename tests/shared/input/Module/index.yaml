@@ -1,3 +1,19 @@
 $id: /Module
 title: Module
 description: This is an integration test for the application
+tags:
+  - name: Color-Tag
+    value: Blue
+    color: blue
+  - name: Without Value
+    color: green
+todos:
+   -  A Todo
+links:
+  - text: Link
+    href: 'http://www.google.com'
+  - text: Local-Link
+    href: './Module/index.yaml'
+errors:
+  - text: "An error"
+    type: "WRONG"

@@ -1,14 +1,16 @@
 import * as tmp from 'tmp'
 import * as fs from 'fs'
 import {
+  definitionKind,
   enhanceApplication,
   enhanceModule, enhanceSchema,
   loadTemplate,
+  shieldIoBadgeUrl,
   writeOutput
 } from './WriterHelpers'
 import path from 'path'
 import { type Model } from '../reader/Reader'
-import { testModel } from '../testData'
+import { testEnumSchema, testInterfaceSchema, testModel, testSchema } from '../testData'
 
 describe('writerHelpers', () => {
   test('loadTemplate', () => {
@@ -79,8 +81,18 @@ describe('writerHelpers', () => {
     expect(result).toEqual({
       ...model.schemas[0],
       classDiagram: result.classDiagram,
-      module: model.modules[0],
-      hasDefinitions: false
+      module: model.modules[0]
     })
+  })
+
+  test('shieldIoBadgeUrl', () => {
+    expect(shieldIoBadgeUrl({ name: 'test', color: 'blue' })).toEqual('https://img.shields.io/badge/test-blue')
+    expect(shieldIoBadgeUrl({ name: 'Complex Name', value: 'weird-value__&slash', color: 'blue' })).toEqual('https://img.shields.io/badge/Complex%20Name-weird--value__%26slash-blue')
+  })
+
+  test('definitionKind', () => {
+    expect(definitionKind(testSchema())).toEqual('Class')
+    expect(definitionKind(testEnumSchema())).toEqual('Enum')
+    expect(definitionKind(testInterfaceSchema())).toEqual('Interface')
   })
 })
