@@ -25,9 +25,8 @@
     section {
       margin-bottom: 50px;
     }
-    .title-badge {
-      font-size: 0.3em;
-      vertical-align: top;
+    .badges {
+      margin-bottom: 15px;
     }
     .json {
       border: 1px solid black;
@@ -45,8 +44,17 @@
       </nav>
       
       <h1>Test Application</h1>
-      <img alt="Static Badge" src="https://img.shields.io/badge/Validator%20Errors-2-red">
+      <div class="badges">
+        <img alt="Static Badge" src="https://img.shields.io/badge/Color--Tag-Blue-blue">
+        <img alt="Static Badge" src="https://img.shields.io/badge/Without%20Value-green">
+        <img alt="Static Badge" src="https://img.shields.io/badge/Validator%20Errors-2-red">
+      </div>
       
+      <div class="alert alert-danger" role="alert">
+        <ul>
+          <li>A Todo</li>
+        </ul>
+      </div>
       
       <section>
         <p>This is an integration test for the application</p>
@@ -59,7 +67,7 @@
             classDiagram
       class _Module["Module"]
       class _Module2["Module 2"]
-      _Module ..> _Module2
+      _Module2 ..> _Module
       click _Module href "./Module/index.html" "Module"
       click _Module2 href "./Module2/index.html" "Module 2"
           </pre>
@@ -74,7 +82,7 @@
           <tbody>
             <tr>
               <td><a href="./Module/index.html">Module</a></td>
-              <td>This is a first module</td>
+              <td>This is an integration test for the application</td>
             </tr>
             <tr>
               <td><a href="./Module2/index.html">Module 2</a></td>
@@ -96,16 +104,23 @@
           <tbody>
             <tr>
               <td>WRONG</td>
-              <td>Module &#x27;Module&#x27; has 1 validation errors</td>
+              <td>An error</td>
             </tr>
             <tr>
               <td>WRONG</td>
-              <td>Module &#x27;Module 2&#x27; has 1 validation errors</td>
+              <td>Module &#x27;Module&#x27; has 3 validation errors</td>
             </tr>
           </tbody>
         </table>
       </section>
       
+      <section>
+        <h2>Links</h2>
+        <ul>
+          <li><a href="http://www.google.com">Link</a></li>
+          <li><a href="./Module/index.yaml">Local-Link</a></li>
+        </ul>
+      </section>
       
     </main>
     <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>

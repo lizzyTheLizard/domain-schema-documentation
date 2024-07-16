@@ -1,9 +1,9 @@
 package com.example.module2.model;
 
 import lombok.*;
-import com.example.module.model.Object;
-import java.util.UUID;
 import java.util.Map;
+import java.util.UUID;
+import com.example.module.model.Object;
 
 // An Object in Module 2
 @Builder

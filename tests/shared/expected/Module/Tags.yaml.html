@@ -40,35 +40,33 @@
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="../index.html">Application</a></li>
-          <li class="breadcrumb-item"><a href="./index.html">Module 2</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Object 2</li>
+          <li class="breadcrumb-item"><a href="./index.html">Module</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Tags</li>
         </ol>
       </nav>
       
-      <h1>Object 2</h1>
+      <h1>Tags</h1>
+      <div class="badges">
+        <img alt="Static Badge" src="https://img.shields.io/badge/Color--Tag-Blue-blue">
+        <img alt="Static Badge" src="https://img.shields.io/badge/Without%20Value-green">
+        <img alt="Static Badge" src="https://img.shields.io/badge/Validator%20Errors-1-red">
+      </div>
       
+      <div class="alert alert-danger" role="alert">
+        <ul>
+          <li>A Todo</li>
+        </ul>
+      </div>
       
       <section>
-        <p>An Object in Module 2</p>
+        <p>An example for tags etc.</p>
         <div class="mermaid">
           <pre class="mermaidDefinition">
             classDiagram
-      namespace Module 2 {
-        class _Module2_Object2_yaml["Object 2"]
-        class Type["Type"]
-        class AdditionalProperties["AdditionalProperties"]
-      }
       namespace Module {
-        class _Module_Object_yaml["Object"]
+        class _Module_Tags_yaml["Tags"]
       }
-      _Module2_Object2_yaml ..> Type :type
-      _Module2_Object2_yaml o-- _Module_Object_yaml :reference1
-      _Module2_Object2_yaml ..> _Module_Object_yaml :reference2
-      _Module2_Object2_yaml o--" N" AdditionalProperties 
-      click _Module2_Object2_yaml href "./Object2.yaml.html" "Object 2"
-      click Type href "./Object2.yaml.html" "Object 2"
-      click AdditionalProperties href "./Object2.yaml.html" "Object 2"
-      click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
+      click _Module_Tags_yaml href "./Tags.yaml.html" "Tags"
           </pre>
         </div>
       </section>
@@ -91,100 +89,35 @@
               <td>String</td>
               <td></td>
             </tr>
-            <tr>
-              <td>type</td>
-              <td><a href="#Type">Type</a></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>reference1</td>
-              <td><a href="../Module/Object.yaml.html">Object</a></td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>reference2</td>
-              <td>References <a href="../Module/Object.yaml.html">Object</a></td>
-              <td></td>
-            </tr>
           </tbody>
         </table>
       </section>
       
-      <section>
-        <h2>Examples</h2>
-        <pre class="json">
-        {"id":"1","type":"type1","additional":{"key":"key","value":"value"}}
-        </pre>
-      </section>
-      
-      <h2>Subschemas</h2>
-      <a id="Type"></a><h3>Type</h3>
-      <section>
-        <p></p>
-      </section>
       
       
       <section>
-        <h4>Enum-Values</h2>
+        <h2>Verification Errors</h2>
         <table class="table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>type1</td>
-              <td>Description of type1</td>
-            </tr>
-            <tr>
-              <td>type2</td>
-              <td>Description of type2</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-      
-      <a id="AdditionalProperties"></a><h3>AdditionalProperties</h3>
-      <section>
-        <p></p>
-      </section>
-      
-      
-      
-      <section>
-        <h4>Properties</h2>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Name</th>
               <th>Type</th>
               <th>Description</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>key</td>
-              <td>String</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>value</td>
-              <td>String</td>
-              <td></td>
+              <td>WRONG</td>
+              <td>An error</td>
             </tr>
           </tbody>
         </table>
       </section>
       
-      
       <section>
         <h2>Links</h2>
         <ul>
-          <li><a href="./java/Object2.java">Java-File</a></li>
-          <li><a href="./java/Object2Type.java">Java-File (Type)</a></li>
-          <li><a href="./java/Object2AdditionalProperties.java">Java-File (AdditionalProperties)</a></li>
+          <li><a href="http://www.google.com">Link</a></li>
+          <li><a href="./Module/index.yaml">Local-Link</a></li>
         </ul>
       </section>
       

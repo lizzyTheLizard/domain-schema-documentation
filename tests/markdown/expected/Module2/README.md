@@ -25,5 +25,3 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 | [Object 2](./Object2.yaml.md) | Aggregate | An Object in Module 2 |
 
 
-## Links
-1. [Java-Files](./java)

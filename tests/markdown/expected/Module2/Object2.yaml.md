@@ -68,7 +68,3 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 | value | String |  |
 
 
-## Links
-1. [Java-File](./java/Object2.java)
-1. [Java-File (Type)](./java/Object2Type.java)
-1. [Java-File (AdditionalProperties)](./java/Object2AdditionalProperties.java)

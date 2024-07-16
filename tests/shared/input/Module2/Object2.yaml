@@ -2,7 +2,7 @@ $id: /Module2/Object2.yaml
 title: Object 2
 description: An Object in Module 2
 type: object
-x-schema-type: Other
+x-schema-type: Aggregate
 examples:
   - id: "1"
     type: "type1"
@@ -20,6 +20,13 @@ properties:
     x-enum-description:
       type1: Description of type1
       type2: Description of type2
+  reference1:
+    type: object
+    $ref: '../Module/Object.yaml'
+  reference2:
+    type: string
+    format: uuid
+    x-references: '../Module/Object.yaml'
 additionalProperties: 
   type: object
   properties:

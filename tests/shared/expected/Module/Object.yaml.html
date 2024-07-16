@@ -25,9 +25,8 @@
     section {
       margin-bottom: 50px;
     }
-    .title-badge {
-      font-size: 0.3em;
-      vertical-align: top;
+    .badges {
+      margin-bottom: 15px;
     }
     .json {
       border: 1px solid black;
@@ -40,7 +39,7 @@
     <main class="container">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="../../index.html">Application</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Application</a></li>
           <li class="breadcrumb-item"><a href="./index.html">Module</a></li>
           <li class="breadcrumb-item active" aria-current="page">Object</li>
         </ol>
@@ -50,14 +49,40 @@
       
       
       <section>
-        <p>This is an integration test for the application</p>
+        <p>A simple object</p>
         <div class="mermaid">
           <pre class="mermaidDefinition">
             classDiagram
       namespace Module {
         class _Module_Object_yaml["Object"]
+        class SubObject["SubObject"]
+        class SubEnum["SubEnum"]
+        class SubInterface["SubInterface"]
+        class SubInterface2["SubInterface2"]
+        class SubInterface3["SubInterface3"]
+        class _Module_Interface_yml["Interface"]
       }
+      namespace Module 2 {
+        class _Module2_Object2_yaml["Object 2"]
+      }
+      _Module2_Object2_yaml o-- _Module_Object_yaml :reference1
+      _Module2_Object2_yaml ..> _Module_Object_yaml :reference2
+      _Module_Object_yaml o-- SubObject :subObject
+      _Module_Object_yaml ..> SubEnum :subEnum
+      _Module_Object_yaml o-- SubInterface :subInterface
+      SubInterface <|-- _Module_Object_yaml 
+      SubInterface <|-- SubInterface2 
+      SubInterface <|-- SubInterface3 
+      SubInterface3 <|-- _Module_Object_yaml 
+      SubInterface3 <|-- _Module_Interface_yml 
       click _Module_Object_yaml href "./Object.yaml.html" "Object"
+      click SubObject href "./Object.yaml.html" "Object"
+      click SubEnum href "./Object.yaml.html" "Object"
+      click SubInterface href "./Object.yaml.html" "Object"
+      click SubInterface2 href "./Object.yaml.html" "Object"
+      click SubInterface3 href "./Object.yaml.html" "Object"
+      click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
+      click _Module_Interface_yml href "./Interface.yml.html" "Interface"
           </pre>
         </div>
       </section>
@@ -76,19 +101,29 @@
           </thead>
           <tbody>
             <tr>
-              <td>id</td>
+              <td>id*</td>
               <td>String</td>
               <td></td>
             </tr>
             <tr>
-              <td>name</td>
+              <td>name*</td>
               <td>String</td>
               <td></td>
             </tr>
             <tr>
-              <td>(other)</td>
-              <td>Integer</td>
-              <td>Additional Properties</td>
+              <td>subObject</td>
+              <td><a href="#SubObject">SubObject</a></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>subEnum</td>
+              <td><a href="#SubEnum">SubEnum</a></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>subInterface</td>
+              <td><a href="#SubInterface">SubInterface</a></td>
+              <td></td>
             </tr>
           </tbody>
         </table>
@@ -99,6 +134,149 @@
         <pre class="json">
         {"id":"1","name":"Test"}
         </pre>
+      </section>
+      
+      <h2>Subschemas</h2>
+      <a id="SubObject"></a><h3>SubObject</h3>
+      <section>
+        <p></p>
+      </section>
+      
+      
+      
+      <section>
+        <h4>Properties</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>key</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>value</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <a id="SubEnum"></a><h3>SubEnum</h3>
+      <section>
+        <p></p>
+      </section>
+      
+      
+      <section>
+        <h4>Enum-Values</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>A</td>
+              <td>Value A</td>
+            </tr>
+            <tr>
+              <td>B</td>
+              <td>Value B</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      
+      <a id="SubInterface"></a><h3>SubInterface</h3>
+      <section>
+        <p></p>
+      </section>
+      
+      <section>
+        <h4>One Of</h2>
+        <ul>
+          <li><a href="">Object</a></li>
+          <li><a href="#SubInterface2">SubInterface2</a></li>
+          <li><a href="#SubInterface3">SubInterface3</a></li>
+        </ul>
+      </section>
+      
+      
+      <section>
+        <h4>Properties</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>key</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>value</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <a id="SubInterface2"></a><h3>SubInterface2</h3>
+      <section>
+        <p></p>
+      </section>
+      
+      
+      
+      <section>
+        <h4>Properties</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>key</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>value</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <a id="SubInterface3"></a><h3>SubInterface3</h3>
+      <section>
+        <p></p>
+      </section>
+      
+      <section>
+        <h4>One Of</h2>
+        <ul>
+          <li><a href="">Object</a></li>
+          <li><a href="./Interface.yml.html">Interface</a></li>
+        </ul>
       </section>
       
       
