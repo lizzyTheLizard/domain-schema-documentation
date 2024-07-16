@@ -4,5 +4,5 @@ public enum ObjectSubEnum {
   // Value A
   A,
   // Value B
-  B
+  B;
 }

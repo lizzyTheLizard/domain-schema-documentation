@@ -12,7 +12,7 @@ public class InterfaceInterface2 implements Interface {
   private final static String kind = "INSIDE2";
   private String key;
   private String value;
-  private Map<String, Integer> additionalProperties;
+  private Map<String, Integer> additionalProperties = new HashMap();
 }
 
 
