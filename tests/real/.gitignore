@@ -1,0 +1,7 @@
+# We cannot upload the "real" example, so just leave it empty
+expected/*
+model/*
+!model/index.yml
+original/*
+TODO
+cleanModel.sh

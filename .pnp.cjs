@@ -39,6 +39,10 @@ const RAW_RUNTIME_STATE =
       "reference": "workspace:tests/js-module"\
     },\
     {\
+      "name": "test-real",\
+      "reference": "workspace:tests/real"\
+    },\
+    {\
       "name": "test-shared",\
       "reference": "workspace:tests/shared"\
     },\
@@ -57,6 +61,8 @@ const RAW_RUNTIME_STATE =
     ["test-java", ["workspace:tests/java"]],\
     ["test-js-commonjs", ["workspace:tests/js-commonjs"]],\
     ["test-js-module", ["workspace:tests/js-module"]],\
+    ["test-markdown", ["workspace:tests/markdown"]],\
+    ["test-real", ["workspace:tests/real"]],\
     ["test-shared", ["workspace:tests/shared"]],\
     ["test-ts", ["workspace:tests/ts"]]\
   ],\
@@ -7704,6 +7710,32 @@ const RAW_RUNTIME_STATE =
           ["test-js-module", "workspace:tests/js-module"],\
           ["domain-schema-documentation", "workspace:."],\
           ["test-shared", "workspace:tests/shared"]\
+        ],\
+        "linkType": "SOFT"\
+      }]\
+    ]],\
+    ["test-markdown", [\
+      ["workspace:tests/markdown", {\
+        "packageLocation": "./tests/markdown/",\
+        "packageDependencies": [\
+          ["test-markdown", "workspace:tests/markdown"],\
+          ["@types/node", "npm:20.14.7"],\
+          ["domain-schema-documentation", "workspace:."],\
+          ["test-shared", "workspace:tests/shared"],\
+          ["tsx", "npm:4.15.7"]\
+        ],\
+        "linkType": "SOFT"\
+      }]\
+    ]],\
+    ["test-real", [\
+      ["workspace:tests/real", {\
+        "packageLocation": "./tests/real/",\
+        "packageDependencies": [\
+          ["test-real", "workspace:tests/real"],\
+          ["@types/node", "npm:20.14.7"],\
+          ["domain-schema-documentation", "workspace:."],\
+          ["test-shared", "workspace:tests/shared"],\
+          ["tsx", "npm:4.15.7"]\
         ],\
         "linkType": "SOFT"\
       }]\
