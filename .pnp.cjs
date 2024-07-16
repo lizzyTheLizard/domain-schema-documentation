@@ -39,6 +39,10 @@ const RAW_RUNTIME_STATE =
       "reference": "workspace:tests/js-module"\
     },\
     {\
+      "name": "test-markdown",\
+      "reference": "workspace:tests/markdown"\
+    },\
+    {\
       "name": "test-real",\
       "reference": "workspace:tests/real"\
     },\

@@ -6243,6 +6243,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"test-markdown@workspace:tests/markdown":
+  version: 0.0.0-use.local
+  resolution: "test-markdown@workspace:tests/markdown"
+  dependencies:
+    "@types/node": "npm:^20.14.7"
+    domain-schema-documentation: "workspace:*"
+    test-shared: "workspace:*"
+    tsx: "npm:^4.15.7"
+  languageName: unknown
+  linkType: soft
+
 "test-real@workspace:tests/real":
   version: 0.0.0-use.local
   resolution: "test-real@workspace:tests/real"
