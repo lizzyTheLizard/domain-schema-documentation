@@ -56,7 +56,7 @@ describe('SchemaNormalizer', () => {
   })
 
   test('keepTags', () => {
-    const schema = { ...common, 'x-tags': [{ name: 'test' }], oneOf: [{ $ref: './Schema2.yaml' }] }
+    const schema = { ...common, 'x-tags': [{ name: 'test', color: 'blue' }], oneOf: [{ $ref: './Schema2.yaml' }] }
     const result = normalizeSchema(schema)
     expect(result).toEqual({
       ...common,
@@ -67,7 +67,7 @@ describe('SchemaNormalizer', () => {
       'x-links': [],
       'x-errors': [],
       'x-todos': [],
-      'x-tags': [{ name: 'test' }]
+      'x-tags': [{ name: 'test', color: 'blue' }]
     })
   })
 
