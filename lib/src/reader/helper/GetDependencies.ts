@@ -1,4 +1,4 @@
-import { type Definition, type Property, type Schema, type Model } from '../Reader'
+import { type Definition, type Property, type Schema, type Model, type InterfaceDefinition } from '../Reader'
 import { getSchema, resolveRelativeId } from './InputHelper'
 
 /**
@@ -37,17 +37,23 @@ export function getDependencies (model: Model, schema: Schema): Dependency[] {
 
 function getDependenciesForDefinition (model: Model, s: Schema, fromDefinitionName?: string): Dependency[] {
   const d: Definition = fromDefinitionName !== undefined ? s.definitions[fromDefinitionName] : s
+  const results: Dependency[] = []
   if ('oneOf' in d) {
-    return d.oneOf
+    results.push(...(d as InterfaceDefinition).oneOf
       .flatMap(oneOf => getDependenciesForProperty(model, s, oneOf, fromDefinitionName))
-      .map(d => ({ ...d, type: 'IS_IMPLEMENTED_BY' }))
+      .map(d => ({ ...d, type: 'IS_IMPLEMENTED_BY' } satisfies Dependency))
+    )
   }
   if ('properties' in d) {
-    return Object.entries(d.properties)
+    results.push(...Object.entries(d.properties)
       .flatMap(([name, p]) => getDependenciesForProperty(model, s, p, fromDefinitionName)
         .map(d => ({ ...d, dependencyName: name })))
+    )
   }
-  return []
+  if ('additionalProperties' in d && typeof d.additionalProperties !== 'boolean' && d.additionalProperties !== undefined) {
+    results.push(...getDependenciesForProperty(model, s, d.additionalProperties, fromDefinitionName))
+  }
+  return results
 }
 
 function getDependenciesForProperty (model: Model, fromSchema: Schema, p: Property, fromDefinitionName?: string): Dependency[] {
@@ -107,18 +113,29 @@ function getDependencyType (fromSchema: Schema, toSchema: Schema, toDefinition: 
 
   switch (toType) {
     case 'Aggregate':
-      console.error(`Aggregate ${toSchema.$id} is included in ${fromSchema.$id} using $ref. This is unusual, normally you want to reference another aggregate using x-references`)
+      if (!loggedErrors.includes(toSchema.$id)) {
+        console.error(`Aggregate ${toSchema.$id} is included in ${fromSchema.$id} and maybe others using $ref. This is unusual, normally you want to reference another aggregate using x-references`)
+        loggedErrors.push(toSchema.$id)
+      }
       return 'REFERENCES'
     case 'ReferenceData':
-      console.error(`ReferenceData ${toSchema.$id} is included in ${fromSchema.$id} using $ref. This is unusual, normally you want to reference reference data using x-references`)
+      if (!loggedErrors.includes(toSchema.$id)) {
+        console.error(`ReferenceData ${toSchema.$id} is included in ${fromSchema.$id} and maybe others using $ref. This is unusual, normally you want to reference reference data using x-references`)
+        loggedErrors.push(toSchema.$id)
+      }
       return 'REFERENCES'
     case 'ValueObject':
       return 'CONTAINS'
     case 'Entity':
       if (fromType === 'ValueObject' || fromType === 'ReferenceData') {
-        console.error(`Entity ${toSchema.$id} is included in ${fromSchema.$id} using $ref. This is unusual, normally you want to reference entities using x-references`)
+        if (!loggedErrors.includes(toSchema.$id)) {
+          console.error(`Entity ${toSchema.$id} is included in ${fromSchema.$id} and maybe others using $ref. This is unusual, normally you want to reference entities using x-references`)
+          loggedErrors.push(toSchema.$id)
+        }
         return 'REFERENCES'
       }
       return 'CONTAINS'
   }
 }
+
+const loggedErrors: string[] = []

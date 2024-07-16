@@ -1,4 +1,5 @@
 # Object
+
 This is an integration test for the application
 ```mermaid
 classDiagram
@@ -23,7 +24,8 @@ click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
     "1",
     "2"
   ],
-  "name": "Test"
+  "name": "Test",
+  "other": "False"
 }
 ```
 
@@ -32,9 +34,10 @@ click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
 ## Properties
 | Name | Type | Description |
 |------|------|-------------|
-| ids | [string] |  |
-| name | string |  |
+| ids | [String] |  |
+| name | String |  |
 | obj2 | [Object 2](../Module2/Object2.yaml.md) |  |
+| (other) | * | Additional Properties |
 
 
 

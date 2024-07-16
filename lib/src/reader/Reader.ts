@@ -11,6 +11,16 @@ export interface Link {
   href: string
 }
 
+/** A tag for a schema */
+export interface Tag {
+  /** Tag name */
+  name: string
+  /** The tag value */
+  value?: string
+  /** The color of the tag */
+  color?: string
+}
+
 /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
 export interface ImplementationError {
   text: string
@@ -45,10 +55,11 @@ export interface BasicProperty {
   format?: string
   /** A reference to another schema, if the value of this property is an ID of this type. Used for documentation */
   'x-references'?: string | string[]
+  const?: unknown
 }
 
 /** A type definition. Can be the root of a schema, or a sub-definition */
-export type Definition = EnumDefinition | ObjectDefinition | InterfaceDefinition
+export type Definition = InterfaceDefinition | EnumDefinition | ObjectDefinition
 
 interface DefinitionCommon {
   /** The description of the definition, as defined in JSON Schema */
@@ -75,13 +86,12 @@ export interface ObjectDefinition extends DefinitionCommon {
   properties: Record<string, Property>
   /** The required properties of the object, as defined in JSON Schema */
   required: string[]
+  additionalProperties?: boolean | Property
 }
 
 /** An Interface definition */
-export interface InterfaceDefinition extends DefinitionCommon {
-  /** The type of the definition, as defined in JSON Schema */
-  type: 'object'
-  /** The implementing shemas, as defined in JSON Schema */
+export interface InterfaceDefinition extends ObjectDefinition {
+  /** The implementing schemas, as defined in JSON Schema */
   oneOf: RefProperty[]
 }
 
@@ -103,11 +113,13 @@ export interface SchemaCommon {
   /** The type of the schema, used for documentation */
   'x-schema-type': SchemaType
   /** TODOS that still needs to be changed on the domain model, for documentation */
-  'x-todos'?: string[]
+  'x-todos': string[]
   /** Links to other resources */
-  'x-links'?: Link[]
+  'x-links': Link[]
+  /** Tags for this schema */
+  'x-tags': Tag[]
   /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
-  'x-errors'?: ImplementationError[]
+  'x-errors': ImplementationError[]
 }
 
 /** A module in the application */
@@ -119,11 +131,13 @@ export interface Module {
   /** The description of the module */
   description: string
   /** TODOS that still needs to be changed on the domain model, for documentation */
-  todos?: string[]
+  todos: string[]
   /** Links to other resources */
-  links?: Link[]
+  links: Link[]
   /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
-  errors?: ImplementationError[]
+  errors: ImplementationError[]
+  /** Tags for this module */
+  tags: Tag[]
 }
 
 /** The application definition */
@@ -133,11 +147,13 @@ export interface Application {
   /** The description of the application */
   description: string
   /** TODOS that still needs to be changed on the domain model, for documentation */
-  todos?: string[]
+  todos: string[]
   /** Links to other resources */
-  links?: Link[]
+  links: Link[]
   /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */
-  errors?: ImplementationError[]
+  errors: ImplementationError[]
+  /** Tags for this application */
+  tags: Tag[]
 }
 
 /** The full model that is read from the input folder */

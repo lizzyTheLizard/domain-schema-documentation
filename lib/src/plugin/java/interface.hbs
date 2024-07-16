@@ -10,4 +10,11 @@ import {{this}};
 {{javaComment description 0}}
 {{/if}}
 public interface {{javaClassName this}}{{#each (javaImplementedInterfaces this)}}{{#if @first}} extends {{/if}}{{this}}{{#unless @last}}, {{/unless}}{{/each}} {
+{{#each properties}}
+{{#if description}}
+{{{javaComment description 2}}}
+{{/if}}
+  {{{javaPropertyType .. @key}}} get{{{javaCleanName @key}}}();
+  void set{{{javaCleanName @key}}}({{{javaPropertyType .. @key}}} value);
+{{/each}}
 }

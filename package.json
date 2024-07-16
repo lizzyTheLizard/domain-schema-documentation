@@ -1,6 +1,6 @@
 {
   "name": "domain-schema-documentation",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "scripts": {
     "audit": "yarn workspaces foreach -A npm audit",
     "build": "yarn workspaces foreach -A run build",
@@ -18,6 +18,7 @@
   "dependencies": {
     "ajv": "^8.16.0",
     "ajv-formats": "^3.0.1",
+    "better-ajv-errors": "^1.2.0",
     "handlebars": "^4.7.8",
     "java-parser": "2.2.0",
     "minimist": "^1.2.8",

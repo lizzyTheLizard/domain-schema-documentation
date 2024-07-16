@@ -1,15 +1,13 @@
-import { type Writer } from '../Writer'
-import { type Model, type Property, type Schema } from '../../reader/Reader'
+import { type Writer, applyWriterOptionsDefaults, type WriterBaseOptions } from '../Writer'
+import { type Definition, type Model, type Property, type Schema } from '../../reader/Reader'
 import path from 'path'
-import { enhanceApplication, enhanceModule, enhanceSchema, loadTemplate, writeOutput } from '../WriterHelpers'
+import { enhanceApplication, enhanceModule, enhanceSchema, loadTemplate } from '../WriterHelpers'
 import Handlebars from 'handlebars'
 import { relativeLink } from '../../reader/helper/InputHelper'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
 
 /** Options for the HTML writer. */
-export interface HtmlWriterOptions {
-  /** Write output to a single output file relativeFilename in the output dir */
-  write: (output: string, relativeFilename: string) => Promise<void>
+export interface HtmlWriterOptions extends WriterBaseOptions {
   /** Template for the mail HTML-Template. All the files will use this template */
   basicTemplate: Handlebars.TemplateDelegate
   /** Template for the application documentation */
@@ -40,12 +38,12 @@ export function htmlWriter (outputFolder: string, optionsOrUndefined?: Partial<H
 
 function applyDefaults (outputFolder: string, options?: Partial<HtmlWriterOptions>): HtmlWriterOptions {
   return {
+    ...applyWriterOptionsDefaults(outputFolder, options),
     schemaTemplate: options?.schemaTemplate ?? loadTemplate(path.join(__dirname, 'schema.hbs')),
     moduleTemplate: options?.moduleTemplate ?? loadTemplate(path.join(__dirname, 'module.hbs')),
     applicationTemplate: options?.applicationTemplate ?? loadTemplate(path.join(__dirname, 'application.hbs')),
-    basicTemplate: options?.basicTemplate ?? loadTemplate(path.join(__dirname, 'basic.hbs')),
-    write: options?.write ?? (async (o, f) => { await writeOutput(o, f, outputFolder) }),
-    subSchemaTemplate: options?.subSchemaTemplate ?? loadTemplate(path.join(__dirname, 'subSchema.hbs'))
+    subSchemaTemplate: options?.subSchemaTemplate ?? loadTemplate(path.join(__dirname, 'subSchema.hbs')),
+    basicTemplate: options?.basicTemplate ?? loadTemplate(path.join(__dirname, 'basic.hbs'))
   }
 }
 
@@ -54,24 +52,41 @@ function registerHandlebarsHelpers (model: Model, options: HtmlWriterOptions): v
   Handlebars.registerHelper('htmlGetProperty', (obj: any | undefined, property: string) => obj?.[property])
   Handlebars.registerHelper('htmlHasProperty', (obj: any[] | undefined, property: any) => obj?.includes(property))
   Handlebars.registerHelper('htmlJson', (input: unknown) => JSON.stringify(input))
-  Handlebars.registerHelper('htmlGetType', (schema: Schema, property: Property) => htmlGetType(schema, getType(model, schema, property)))
+  Handlebars.registerHelper('htmlGetType', (schema: Schema, property: Property) => htmlGetType(model, schema, property, options))
   Handlebars.registerHelper('htmlIntent', (input: string, intent: number) => input.split('\n').map(l => ' '.repeat(intent) + l).join('\n'))
+  Handlebars.registerHelper('htmlAdditionalPropertyType', (schema: Schema, definition: Definition) => htmlAdditionalPropertyType(model, schema, definition, options))
+  Handlebars.registerHelper('htmlUrlEncode', (input: string) => encodeURIComponent(input))
   Handlebars.registerPartial('htmlSubSchema', options.subSchemaTemplate)
 }
 
-function htmlGetType (schema: Schema, type: PropertyType): string {
+function htmlGetType (model: Model, schema: Schema, property: Property, options: HtmlWriterOptions): string {
+  const type = getType(model, schema, property)
+  const result = htmlGetTypeInternal(schema, type, options)
+  if ('const' in property) return `${result}<br>${JSON.stringify(property.const)}`
+  return result
+}
+
+function htmlGetTypeInternal (schema: Schema, type: PropertyType, options: HtmlWriterOptions): string {
   switch (type.type) {
-    case 'array': return `[${htmlGetType(schema, type.array)}]`
+    case 'array': return `[${htmlGetTypeInternal(schema, type.array, options)}]`
     case 'reference': return `<a href="${relativeLink(path.dirname(schema.$id), type.$id)}.html">${type.name}</a>`
     case 'self': return `<a href="">${type.name}</a>`
     case 'definition': return `<a href="#${type.name}">${type.name}</a>`
     case 'local':
       if (type.references) {
-        return `References ${type.references.map(r => htmlGetType(schema, r)).join(', ')}`
+        return `References ${type.references.map(r => htmlGetTypeInternal(schema, r, options)).join(', ')}`
       } else {
-        return type.name
+        return options.typeName(type.name)
       }
   }
+}
+
+function htmlAdditionalPropertyType (model: Model, schema: Schema, definition: Definition, options: HtmlWriterOptions): string {
+  const addionalProperties = 'additionalProperties' in definition ? definition.additionalProperties ?? false : false
+  if (addionalProperties === false) throw new Error('Additional properties are not enabled')
+  if (addionalProperties === true) return '*'
+  const propertyType = getType(model, schema, addionalProperties)
+  return htmlGetTypeInternal(schema, propertyType, options)
 }
 
 async function writeSchemaFiles (model: Model, options: HtmlWriterOptions): Promise<void> {

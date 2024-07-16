@@ -7,6 +7,9 @@
 </nav>
 
 <h1>{{{title}}}</h1>
+{{#each x-tags}}
+<img alt="Static Badge" src="https://img.shields.io/badge/{{htmlUrlEncode name}}{{#if value}}-{{htmlUrlEncode value}}{{/if}}{{#if color}}-{{color}}{{/if}}">
+{{/each}}
 
 {{#if x-todos}}
 <div class="alert alert-danger" role="alert">
@@ -79,6 +82,13 @@
         <td>{{description}}</td>
       </tr>
 {{/each}}
+{{#if additionalProperties}}
+      <tr>
+        <td>(other)</td>
+        <td>{{{htmlAdditionalPropertyType . .}}}</td>
+        <td>Additional Properties</td>
+      </tr>
+{{/if}}
     </tbody>
   </table>
 </section>

@@ -3,6 +3,6 @@ title: Module
 description: This is a first module
 links:
   - text: 'This is an existing link'
-  - href: 'https://example.com'
+    href: 'https://example.com'
 todo:
   - 'This is a todo item'

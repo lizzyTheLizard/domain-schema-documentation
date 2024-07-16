@@ -4,9 +4,10 @@ import { cleanName, getModuleId } from '../../reader/helper/InputHelper'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
 
-export type JavaType = JavaClassType | JavaCollectionType
+export type JavaType = JavaClassType | JavaCollectionType | JavaMapType
 interface JavaClassType { type: 'CLASS', fullName: string }
 interface JavaCollectionType { type: 'COLLECTION', items: JavaType }
+interface JavaMapType { type: 'MAP', items: JavaType }
 
 /**
  * Gets the Java type for a given property.
@@ -19,6 +20,23 @@ interface JavaCollectionType { type: 'COLLECTION', items: JavaType }
 export function getJavaPropertyType (model: Model, schema: Schema, property: Property, options: JavaPluginOptions): JavaType {
   const propertyType = getType(model, schema, property)
   return getJavaPropertyTypeInternal(propertyType, schema, options)
+}
+
+/**
+ * Gets the Java type for the additonal properties of a schema.
+ * @param model The model the property is in
+ * @param schema The schema the property is in
+ * @param additionalProperties The addional property value. Note; undefined or false is not allowed here as this function assumes there are additional properties.
+ * @param options The Java plugin options
+ * @returns The Java type for the property
+ */
+export function getJavaAdditionalPropertyType (model: Model, schema: Schema, additionalProperties: true | Property, options: JavaPluginOptions): JavaType {
+  if (additionalProperties === true) {
+    return { type: 'MAP', items: { type: 'CLASS', fullName: 'Object' } }
+  }
+  const propertyType = getType(model, schema, additionalProperties)
+  const internalType = getJavaPropertyTypeInternal(propertyType, schema, options)
+  return { type: 'MAP', items: internalType }
 }
 
 function getJavaPropertyTypeInternal (propertyType: PropertyType, schema: Schema, options: JavaPluginOptions): JavaType {

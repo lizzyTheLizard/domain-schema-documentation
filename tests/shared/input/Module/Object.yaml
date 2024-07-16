@@ -11,3 +11,5 @@ properties:
     type: string
   name:
     type: string
+additionalProperties:
+  type: integer

@@ -21,8 +21,11 @@ public class {{{javaClassName this}}}{{#each (javaImplementedInterfaces this)}}{
 {{#if description}}
 {{{javaComment description 2}}}
 {{/if}}
-  private {{{javaPropertyType .. @key}}} {{{@key}}};
+  private{{#if const}} final static{{/if}} {{{javaPropertyType .. @key}}} {{{@key}}}{{#if const}} = {{{javaConstantValue this}}}{{/if}};
 {{/each}}
+{{#if additionalProperties}}
+  private {{{javaAdditionalPropertiesType .}}} additionalProperties;
+{{/if}}
 }
 
 

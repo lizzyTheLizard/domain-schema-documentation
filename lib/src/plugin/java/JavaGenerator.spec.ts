@@ -1,42 +1,13 @@
 import * as tmp from 'tmp'
-import { type InterfaceDefinition, type Application, type Module, type Schema, type EnumDefinition } from '../../reader/Reader'
+import { type Module, type Schema } from '../../reader/Reader'
 import { javaGenerator } from './JavaGenerator'
 import { defaultJavaBasicTypeMap, defaultJavaFormatMap, type JavaPluginOptions } from './JavaPlugin'
 import { loadTemplate } from '../../writer/WriterHelpers'
 import { promises as fs } from 'fs'
 import path from 'path'
+import { testApplication, testModule, testSchema, testInterfaceSchema, testEnumSchema, testModel } from '../../testData'
 
 describe('JavaGenerator', () => {
-  const application: Application = { title: 'Application', description: 'Application description' }
-  const module: Module = { $id: '/Module', title: 'Module', description: 'Module description' }
-  const module2: Module = { $id: '/Module2', title: 'Module 2', description: 'Module description' }
-  const schema: Schema = {
-    $id: '/Module/Schema.yaml',
-    'x-schema-type': 'Entity',
-    title: 'Schema 1',
-    type: 'object',
-    properties: {},
-    required: [],
-    definitions: {}
-  }
-  const enumSchema: Schema & EnumDefinition = {
-    $id: '/Module/EnumSchema.yaml',
-    'x-schema-type': 'Entity',
-    title: 'Schema 1',
-    type: 'string',
-    definitions: {},
-    enum: ['A', 'B'],
-    description: 'Enum description',
-    'x-enum-description': { A: 'Description A', B: 'Description B' }
-  }
-  const oneOfSchema: Schema & InterfaceDefinition = {
-    $id: '/Module2/Schema2.yaml',
-    'x-schema-type': 'Other',
-    title: 'OneOf Schema',
-    type: 'object',
-    oneOf: [{ $ref: '../Module/Schema.yaml' }, { $ref: '#/definitions/SubSchema' }],
-    definitions: { SubSchema: { type: 'object', properties: {}, required: [] } }
-  }
   const options: JavaPluginOptions = {
     mainPackageName: 'com.example',
     modelPackageName: 'model',
@@ -51,7 +22,7 @@ describe('JavaGenerator', () => {
 
   test('empty model', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const model = { application, modules: [], schemas: [] }
+    const model = { application: testApplication(), modules: [], schemas: [] }
     await javaGenerator(model, tmpDir.name, options)
 
     const files = await fs.readdir(tmpDir.name)
@@ -60,8 +31,7 @@ describe('JavaGenerator', () => {
 
   test('simple model', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const model = { application, modules: [module], schemas: [schema] }
-    await javaGenerator(model, tmpDir.name, options)
+    await javaGenerator(testModel(), tmpDir.name, options)
 
     const baseFiles = await fs.readdir(tmpDir.name)
     expect(baseFiles).toEqual(['Module'])
@@ -74,10 +44,59 @@ describe('JavaGenerator', () => {
     expect(content).toContain('public class Schema {')
   })
 
+  test('additionalProperties', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const schema: Schema = { ...testSchema(), additionalProperties: { type: 'integer' } }
+    const model = { ...testModel(), schemas: [schema] }
+    await javaGenerator(model, tmpDir.name, options)
+
+    const baseFiles = await fs.readdir(tmpDir.name)
+    expect(baseFiles).toEqual(['Module'])
+    const moduleFiles = await fs.readdir(path.join(tmpDir.name, 'Module'))
+    expect(moduleFiles).toEqual(['java'])
+    const javaFiles = await fs.readdir(path.join(tmpDir.name, 'Module', 'java'))
+    expect(javaFiles).toEqual(['Schema.java'])
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
+    expect(content).toContain('import java.util.Map;')
+    expect(content).toContain('  private Map<String, Integer> additionalProperties;')
+  })
+
+  test('additionalProperties false', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const schema: Schema = { ...testSchema(), additionalProperties: false }
+    const model = { ...testModel(), schemas: [schema] }
+    await javaGenerator(model, tmpDir.name, options)
+
+    const baseFiles = await fs.readdir(tmpDir.name)
+    expect(baseFiles).toEqual(['Module'])
+    const moduleFiles = await fs.readdir(path.join(tmpDir.name, 'Module'))
+    expect(moduleFiles).toEqual(['java'])
+    const javaFiles = await fs.readdir(path.join(tmpDir.name, 'Module', 'java'))
+    expect(javaFiles).toEqual(['Schema.java'])
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
+    expect(content).not.toContain('import java.util.Map;')
+  })
+
+  test('additionalProperties true', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const schema: Schema = { ...testSchema(), additionalProperties: true }
+    const model = { ...testModel(), schemas: [schema] }
+    await javaGenerator(model, tmpDir.name, options)
+
+    const baseFiles = await fs.readdir(tmpDir.name)
+    expect(baseFiles).toEqual(['Module'])
+    const moduleFiles = await fs.readdir(path.join(tmpDir.name, 'Module'))
+    expect(moduleFiles).toEqual(['java'])
+    const javaFiles = await fs.readdir(path.join(tmpDir.name, 'Module', 'java'))
+    expect(javaFiles).toEqual(['Schema.java'])
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
+    expect(content).toContain('import java.util.Map;')
+    expect(content).toContain('  private Map<String, Object> additionalProperties;')
+  })
+
   test('lombok', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const model = { application, modules: [module], schemas: [schema] }
-    await javaGenerator(model, tmpDir.name, { ...options, useLombok: true })
+    await javaGenerator(testModel(), tmpDir.name, { ...options, useLombok: true })
 
     const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
     expect(content).toContain('import lombok.*;')
@@ -86,8 +105,7 @@ describe('JavaGenerator', () => {
 
   test('no lombok', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const model = { application, modules: [module], schemas: [schema] }
-    await javaGenerator(model, tmpDir.name, { ...options, useLombok: false })
+    await javaGenerator(testModel(), tmpDir.name, { ...options, useLombok: false })
 
     const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
     expect(content).not.toContain('import lombok.*;')
@@ -95,8 +113,10 @@ describe('JavaGenerator', () => {
   })
 
   test('implements interface', async () => {
+    const module2: Module = { ...testModule(), $id: '/Module2', title: 'Module 2' }
+    const schema2: Schema = { ...testInterfaceSchema(), $id: '/Module2/Schema2.yaml', oneOf: [{ $ref: '../Module/Schema.yaml' }] }
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const model = { application, modules: [module, module2], schemas: [schema, oneOfSchema] }
+    const model = { ...testModel(), modules: [testModule(), module2], schemas: [testSchema(), schema2] }
     await javaGenerator(model, tmpDir.name, options)
 
     const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
@@ -105,54 +125,66 @@ describe('JavaGenerator', () => {
   })
 
   test('SubSchema', async () => {
+    const schema2: Schema = { ...testInterfaceSchema(), oneOf: [{ $ref: '#/definitions/SubSchema' }], definitions: { SubSchema: { type: 'object', properties: {}, required: [] } } }
+
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const model = { application, modules: [module, module2], schemas: [schema, oneOfSchema] }
+    const model = { ...testModel(), schemas: [testSchema(), schema2] }
     await javaGenerator(model, tmpDir.name, options)
 
-    const content = (await fs.readFile(tmpDir.name + '/Module2/java/Schema2SubSchema.java', 'utf-8')).toString()
-    expect(content).not.toContain('import com.example.module2.model.Schema2;')
-    expect(content).toContain('public class Schema2SubSchema implements Schema2 {')
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/InterfaceSubSchema.java', 'utf-8')).toString()
+    expect(content).toContain('public class InterfaceSubSchema implements Interface {')
   })
 
   test('Interface', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const model = { application, modules: [module, module2], schemas: [schema, oneOfSchema] }
+    const model = { ...testModel(), schemas: [testSchema(), testInterfaceSchema()] }
     await javaGenerator(model, tmpDir.name, options)
 
-    const content = (await fs.readFile(tmpDir.name + '/Module2/java/Schema2.java', 'utf-8')).toString()
-    expect(content).toContain('package com.example.module2.model;')
-    expect(content).toContain('public interface Schema2 {')
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/Interface.java', 'utf-8')).toString()
+    expect(content).toContain('package com.example.module.model;')
+    expect(content).toContain('public interface Interface {')
+  })
+
+  test('Interface with properties', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const schema2: Schema = { ...testInterfaceSchema(), properties: { prop: { type: 'string' } }, required: [] }
+    const model = { ...testModel(), schemas: [testSchema(), schema2] }
+    await javaGenerator(model, tmpDir.name, options)
+
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/Interface.java', 'utf-8')).toString()
+    expect(content).toContain('public interface Interface {')
+    expect(content).toContain('String getProp();')
+    expect(content).toContain('void setProp(String value);')
   })
 
   test('Enum', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const model = { application, modules: [module], schemas: [enumSchema] }
+    const model = { ...testModel(), schemas: [testEnumSchema()] }
     await javaGenerator(model, tmpDir.name, options)
 
-    const content = (await fs.readFile(tmpDir.name + '/Module/java/EnumSchema.java', 'utf-8')).toString()
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/Enum.java', 'utf-8')).toString()
     expect(content).toContain('package com.example.module.model;')
-    expect(content).toContain('public enum EnumSchema {')
-    expect(content).toContain('A,')
-    expect(content).toContain('B')
+    expect(content).toContain('public enum Enum {')
+    expect(content).toContain('A')
   })
 
-  test('Descriptions', async () => {
+  test('Enum Descriptions', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const model = { application, modules: [module], schemas: [enumSchema] }
+    const schema2 = { ...testEnumSchema(), description: 'Enum description', 'x-enum-description': { A: 'Description A' } }
+    const model = { ...testModel(), schemas: [schema2] }
     await javaGenerator(model, tmpDir.name, options)
 
-    const content = (await fs.readFile(tmpDir.name + '/Module/java/EnumSchema.java', 'utf-8')).toString()
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/Enum.java', 'utf-8')).toString()
     expect(content).toContain('// Enum description')
     expect(content).toContain('  // Description A')
   })
 
   test('Links', async () => {
-    schema['x-links'] = undefined; module.links = undefined
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const schema2: Schema = { ...schema, definitions: { definition1: { type: 'object', properties: {}, required: [] } } }
-    const model = { application, modules: [module], schemas: [schema2] }
+    const schema: Schema = { ...testSchema(), definitions: { definition1: { type: 'object', properties: {}, required: [] } } }
+    const model = { ...testModel(), schemas: [schema] }
     await javaGenerator(model, tmpDir.name, options)
-    expect(schema2['x-links']).toEqual([{ text: 'Java-File', href: './java/Schema.java' }, { text: 'Java-File (definition1)', href: './java/SchemaDefinition1.java' }])
-    expect(module.links).toEqual([{ text: 'Java-Files', href: './java' }])
+    expect(schema['x-links']).toEqual([{ text: 'Java-File', href: './java/Schema.java' }, { text: 'Java-File (definition1)', href: './java/SchemaDefinition1.java' }])
+    expect(model.modules[0].links).toEqual([{ text: 'Java-Files', href: './java' }])
   })
 })

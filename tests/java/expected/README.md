@@ -1,5 +1,6 @@
 # Test Application
-> - [ ] 2 validation errors
+![Static Badge](https://img.shields.io/badge/Validator%20Errors-2-red)
+
 This is an integration test for the application
 
 ## Modules
@@ -19,6 +20,6 @@ click _Module2 href "./Module2/index.html" "Module 2"
 ## Verification Errors
 | Type | Description |
 |------|-------------|
-| WRONG | Module &#x27;Module&#x27; has 1 java validation errors |
-| WRONG | Module &#x27;Module 2&#x27; has 1 java validation errors |
+| WRONG | Module &#x27;Module&#x27; has 1 validation errors |
+| WRONG | Module &#x27;Module 2&#x27; has 1 validation errors |
 

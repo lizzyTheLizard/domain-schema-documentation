@@ -1,5 +1,6 @@
 # Module 2
-> - [ ] 1 validation error
+![Static Badge](https://img.shields.io/badge/Validator%20Errors-1-red)
+
 This is a 2nd Module
 
 ## Schemas
@@ -7,14 +8,15 @@ This is a 2nd Module
 classDiagram
 namespace Module 2 {
   class _Module2_Object2_yaml["Object 2"]
-  class Type["Type"]
+  class AdditionalProperties["AdditionalProperties"]
 }
 namespace Module {
   class _Module_Object_yaml["Object"]
 }
 _Module_Object_yaml ..> _Module2_Object2_yaml :obj2
+_Module2_Object2_yaml o-- AdditionalProperties 
 click _Module2_Object2_yaml href "./Object2.yaml.html" "Object 2"
-click Type href "./Object2.yaml.html" "Object 2"
+click AdditionalProperties href "./Object2.yaml.html" "Object 2"
 click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 ```
 | Name | Type | Description |
@@ -24,7 +26,7 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 ## Verification Errors
 | Type | Description |
 |------|-------------|
-| WRONG | Schema &#x27;Object 2&#x27; has 2 java validation errors |
+| WRONG | Schema &#x27;Object 2&#x27; has 3 validation errors |
 
 ## Links
 1. [Java-Files](./java)

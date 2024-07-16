@@ -1,61 +1,45 @@
 import * as tmp from 'tmp'
 import { promises as fs } from 'fs'
-import { type Schema, type Application, type Module } from '../../reader/Reader'
 import { htmlWriter } from './HtmlWriter'
+import { testModel } from '../../testData'
 
 describe('htmlWriter', () => {
-  const application: Application = {
-    title: 'Test Application',
-    description: 'Test Application Description'
-  }
-  const module: Module = {
-    $id: '/test',
-    title: 'Test Module',
-    description: 'Test Module Description'
-  }
-  const schema: Schema = {
-    $id: '/test/Schema.yaml',
-    title: 'Test Schema',
-    description: 'Test Schema Description',
-    'x-schema-type': 'Aggregate',
-    type: 'object',
-    properties: { id: { type: 'string' } },
-    definitions: {},
-    required: []
-  }
   test('Write Application File', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const target = htmlWriter(tmpDir.name)
+    const model = { ...testModel(), modules: [], schemas: [] }
 
-    await target({ application, modules: [], schemas: [] })
+    await target(model)
 
     const files = await fs.readdir(tmpDir.name)
     expect(files).toContain('index.html')
     const content = (await fs.readFile(tmpDir.name + '/index.html', 'utf-8')).toString()
-    expect(content).toContain('<h1>Test Application</h1>')
+    expect(content).toContain('<h1>Title</h1>')
   })
 
   test('Write Module File', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const target = htmlWriter(tmpDir.name)
+    const model = { ...testModel(), schemas: [] }
 
-    await target({ application, modules: [module], schemas: [] })
+    await target(model)
 
-    const files = await fs.readdir(tmpDir.name + '/test')
+    const files = await fs.readdir(tmpDir.name + '/Module')
     expect(files).toContain('index.html')
-    const content = (await fs.readFile(tmpDir.name + '/test/index.html', 'utf-8')).toString()
-    expect(content).toContain('<h1>Test Module</h1>')
+    const content = (await fs.readFile(tmpDir.name + '/Module/index.html', 'utf-8')).toString()
+    expect(content).toContain('<h1>Module</h1>')
   })
 
   test('Write Schema file', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const target = htmlWriter(tmpDir.name)
+    const model = testModel()
 
-    await target({ application, modules: [module], schemas: [schema] })
+    await target(model)
 
-    const files = await fs.readdir(tmpDir.name + '/test')
+    const files = await fs.readdir(tmpDir.name + '/Module')
     expect(files).toContain('Schema.yaml.html')
-    const content = (await fs.readFile(tmpDir.name + '/test/Schema.yaml.html', 'utf-8')).toString()
-    expect(content).toContain('<h1>Test Schema</h1>')
+    const content = (await fs.readFile(tmpDir.name + '/Module/Schema.yaml.html', 'utf-8')).toString()
+    expect(content).toContain('<h1>Schema</h1>')
   })
 })

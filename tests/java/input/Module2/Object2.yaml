@@ -3,6 +3,12 @@ title: Object 2
 description: An Object in Module 2
 type: object
 x-schema-type: Other
+examples:
+  - id: "1"
+    type: "type1"
+    additional: 
+      key: "key"
+      value: "value"
 properties:
   id:
     type: string
@@ -14,4 +20,11 @@ properties:
     x-enum-description:
       type1: Description of type1
       type2: Description of type2
+additionalProperties: 
+  type: object
+  properties:
+    key:
+      type: string
+    value:
+      type: string
 

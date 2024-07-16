@@ -103,7 +103,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
       // No package or type name, nothing to import
       return
     }
-    const importName = getSingleChild(ctx, 'packageOrTypeName').Identifier.map(i => i.image).join('.')
+    const importName = getSubChild(ctx, 'packageOrTypeName').Identifier.map(i => i.image).join('.')
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.imports[importName.split('.').pop()!] = importName
   }
@@ -121,20 +121,20 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
     let declaration: NormalClassDeclarationCtx | RecordDeclarationCtx | EnumDeclarationCtx
     if (ctx.normalClassDeclaration) {
       this.type = 'class'
-      declaration = getSingleChild(ctx, 'normalClassDeclaration')
+      declaration = getSubChild(ctx, 'normalClassDeclaration')
     } else if (ctx.recordDeclaration) {
       this.type = 'record'
-      declaration = getSingleChild(ctx, 'recordDeclaration')
+      declaration = getSubChild(ctx, 'recordDeclaration')
     } else if (ctx.enumDeclaration) {
       this.type = 'enum'
-      declaration = getSingleChild(ctx, 'enumDeclaration')
+      declaration = getSubChild(ctx, 'enumDeclaration')
     } else {
       console.error('Unknown class type', ctx)
       this.error = 'Cannot determine the type of the file. Not a class, record, interface or enum'
       return
     }
-    const typeIdentifier = getSingleChild(declaration, 'typeIdentifier')
-    this.name = getSingle(typeIdentifier, 'Identifier').image
+    const typeIdentifier = getSubChild(declaration, 'typeIdentifier')
+    this.name = getSub(typeIdentifier, 'Identifier').image
     super.classDeclaration(ctx, param)
   }
 
@@ -145,28 +145,28 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
       return
     }
     this.type = 'interface'
-    const normalInterfaceDeclaration = getSingleChild(ctx, 'normalInterfaceDeclaration')
-    const typeIdentifier = getSingleChild(normalInterfaceDeclaration, 'typeIdentifier')
-    this.name = getSingle(typeIdentifier, 'Identifier').image
+    const normalInterfaceDeclaration = getSubChild(ctx, 'normalInterfaceDeclaration')
+    const typeIdentifier = getSubChild(normalInterfaceDeclaration, 'typeIdentifier')
+    this.name = getSub(typeIdentifier, 'Identifier').image
     super.interfaceDeclaration(ctx, param)
   }
 
   public override enumConstant (ctx: EnumConstantCtx, param?: any): any {
-    this.enumValues.push(getSingle(ctx, 'Identifier').image)
+    this.enumValues.push(getSub(ctx, 'Identifier').image)
     super.enumConstant(ctx, param)
   }
 
   // Getting the name of the component is staighforward, we just take the identifier
   private getComponentName (ctx: RecordComponentCtx): string {
-    return getSingle(ctx, 'Identifier').image
+    return getSub(ctx, 'Identifier').image
   }
 
   private getFieldNames (ctx: FieldDeclarationCtx): string[] {
-    const variableDeclaratorList = getSingleChild(ctx, 'variableDeclaratorList')
+    const variableDeclaratorList = getSubChild(ctx, 'variableDeclaratorList')
     return variableDeclaratorList.variableDeclarator.map(v => {
       const variableDeclarator = v.children
-      const variableDeclaratorId = getSingleChild(variableDeclarator, 'variableDeclaratorId')
-      return getSingle(variableDeclaratorId, 'Identifier').image
+      const variableDeclaratorId = getSubChild(variableDeclarator, 'variableDeclaratorId')
+      return getSub(variableDeclaratorId, 'Identifier').image
     })
   }
 
@@ -179,19 +179,19 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   // Here it is getting tricky... The type can be primitive or reference, additionally it can be an array or not.
   // Let's check those cases and redirect to the correct function getPrimitiveType or getReferenceType
   private getType (ctx: RecordComponentCtx | FieldDeclarationCtx): JavaType {
-    const unannType = getSingleChild(ctx, 'unannType')
+    const unannType = getSubChild(ctx, 'unannType')
     if (unannType.unannPrimitiveTypeWithOptionalDimsSuffix !== undefined) {
-      const primitiveTypeWithDims = getSingleChild(unannType, 'unannPrimitiveTypeWithOptionalDimsSuffix')
+      const primitiveTypeWithDims = getSubChild(unannType, 'unannPrimitiveTypeWithOptionalDimsSuffix')
       const isArray = primitiveTypeWithDims.dims !== undefined
-      const primitiveType = getSingleChild(primitiveTypeWithDims, 'unannPrimitiveType')
+      const primitiveType = getSubChild(primitiveTypeWithDims, 'unannPrimitiveType')
       const itemType = this.getPrimitiveType(primitiveType)
       return isArray ? { type: 'COLLECTION', items: itemType } : itemType
     }
     if (unannType.unannReferenceType !== undefined) {
-      const referenceType = getSingleChild(unannType, 'unannReferenceType')
+      const referenceType = getSubChild(unannType, 'unannReferenceType')
       const isArray = referenceType.dims !== undefined
-      const classOrInterfaceType = getSingleChild(referenceType, 'unannClassOrInterfaceType')
-      const classType = getSingleChild(classOrInterfaceType, 'unannClassType')
+      const classOrInterfaceType = getSubChild(referenceType, 'unannClassOrInterfaceType')
+      const classType = getSubChild(classOrInterfaceType, 'unannClassType')
       const itemType = this.getReferenceType(classType)
       return isArray ? { type: 'COLLECTION', items: itemType } : itemType
     }
@@ -204,9 +204,9 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   private getPrimitiveType (ctx: UnannPrimitiveTypeCtx | PrimitiveTypeCtx): JavaType {
     if (ctx.Boolean !== undefined) return { type: 'CLASS', fullName: 'Boolean' }
     if (ctx.numericType !== undefined) {
-      const numericType = getSingleChild(ctx, 'numericType')
+      const numericType = getSubChild(ctx, 'numericType')
       if (numericType.floatingPointType !== undefined) {
-        const floatingPointType = getSingleChild(numericType, 'floatingPointType')
+        const floatingPointType = getSubChild(numericType, 'floatingPointType')
         if (floatingPointType.Float !== undefined) return { type: 'CLASS', fullName: 'Float' }
         if (floatingPointType.Double !== undefined) return { type: 'CLASS', fullName: 'Double' }
         console.error('Unknown floating point type: Not float nor double', ctx)
@@ -214,7 +214,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
         return { type: 'CLASS', fullName: 'Object' }
       }
       if (numericType.integralType !== undefined) {
-        const integralType = getSingleChild(numericType, 'integralType')
+        const integralType = getSubChild(numericType, 'integralType')
         if (integralType.Byte !== undefined) return { type: 'CLASS', fullName: 'Byte' }
         if (integralType.Short !== undefined) return { type: 'CLASS', fullName: 'Short' }
         if (integralType.Int !== undefined) return { type: 'CLASS', fullName: 'Integer' }
@@ -237,11 +237,15 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   // Otherwise we need to get the full name of the class
   private getReferenceType (ctx: UnannClassTypeCtx | ClassTypeCtx): JavaType {
     const className = this.getFullClassName(ctx)
-    if (!this.isCollectionType(className)) {
-      return { type: 'CLASS', fullName: className }
+    if (this.isCollectionType(className)) {
+      const typeArgument = this.getTypeArgumentFromCollection(ctx, 0)
+      return { type: 'COLLECTION', items: typeArgument }
     }
-    const typeArgument = this.getTypeArgumentFromCollection(ctx)
-    return { type: 'COLLECTION', items: typeArgument }
+    if (this.isMapType(className)) {
+      const typeArgument = this.getTypeArgumentFromCollection(ctx, 1)
+      return { type: 'MAP', items: typeArgument }
+    }
+    return { type: 'CLASS', fullName: className }
   }
 
   private getFullClassName (ctx: UnannClassTypeCtx | ClassTypeCtx): string {
@@ -251,7 +255,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
     // Check if the class is imported
     if (classNameAsWritten in this.imports) return this.imports[classNameAsWritten]
     // Check if this is 'String' or an boxed primitive type. Those need no imports
-    if (['String', 'Integer', 'Boolean', 'Float', 'Double', 'Byte', 'Short', 'Long', 'Char'].includes(classNameAsWritten)) return classNameAsWritten
+    if (['String', 'Integer', 'Boolean', 'Float', 'Double', 'Byte', 'Short', 'Long', 'Char', 'Object'].includes(classNameAsWritten)) return classNameAsWritten
     // Otherwise it is in the same package
     return this.javaPackageName + '.' + classNameAsWritten
   }
@@ -260,20 +264,24 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
     return fullName === 'java.util.List' || fullName === 'java.util.Set' || fullName === 'java.util.Collection'
   }
 
-  private getTypeArgumentFromCollection (ctx: UnannClassTypeCtx | ClassTypeCtx): JavaType {
-    const typeArguments = getSingleChild(ctx, 'typeArguments')
-    const typeArgument = getSingleChild(typeArguments, 'typeArgumentList')
-    const type = getSingleChild(typeArgument, 'typeArgument')
-    const referenceType = getSingleChild(type, 'referenceType')
+  private isMapType (fullName: string): boolean {
+    return fullName === 'java.util.Map'
+  }
+
+  private getTypeArgumentFromCollection (ctx: UnannClassTypeCtx | ClassTypeCtx, argumentNumber: number): JavaType {
+    const typeArguments = getSubChild(ctx, 'typeArguments')
+    const typeArgument = getSubChild(typeArguments, 'typeArgumentList')
+    const type = getSubChild(typeArgument, 'typeArgument', argumentNumber)
+    const referenceType = getSubChild(type, 'referenceType')
     const isArray = referenceType.dims !== undefined
     if (referenceType.primitiveType !== undefined) {
-      const primitiveType = getSingleChild(referenceType, 'primitiveType')
+      const primitiveType = getSubChild(referenceType, 'primitiveType')
       const itemType = this.getPrimitiveType(primitiveType)
       return isArray ? { type: 'COLLECTION', items: itemType } : itemType
     }
     if (referenceType.classOrInterfaceType !== undefined) {
-      const classOrInterfaceType = getSingleChild(referenceType, 'classOrInterfaceType')
-      const classType = getSingleChild(classOrInterfaceType, 'classType')
+      const classOrInterfaceType = getSubChild(referenceType, 'classOrInterfaceType')
+      const classType = getSubChild(classOrInterfaceType, 'classType')
       const itemType = this.getReferenceType(classType)
       return isArray ? { type: 'COLLECTION', items: itemType } : itemType
     }
@@ -283,28 +291,36 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   }
 }
 
-function getSingleChild<
+function getSubChild<
     ContextType extends Partial<Record<IdentifierType, Array<{ children: ReturnType }>>>,
     IdentifierType extends keyof ContextType,
     ReturnType = NonNullable<ContextType[IdentifierType]>[0]['children']
-  > (ctx: ContextType, identifier: IdentifierType): ReturnType {
-  const node = getSingle(ctx, identifier)
+  > (ctx: ContextType, identifier: IdentifierType, i?: number): ReturnType {
+  const node = getSub(ctx, identifier, i)
   return node.children
 }
 
-function getSingle<
+function getSub<
     ContextType extends Partial<Record<IdentifierType, ReturnType[]>>,
     IdentifierType extends keyof ContextType,
     ReturnType = NonNullable<ContextType[IdentifierType]>[0]
-  > (ctx: ContextType, identifier: IdentifierType): ReturnType {
+  > (ctx: ContextType, identifier: IdentifierType, i?: number): ReturnType {
   const result = ctx[identifier]
   if (result === undefined) {
     console.error(`Context node does not have required attribute '${String(identifier)}'`, ctx)
     throw new Error('Cannot determine java type. Check logs for more information.')
   }
-  if (result.length !== 1) {
-    console.error(`Required attribute '${String(identifier)}' is not unique`, ctx)
-    throw new Error('Cannot determine java type. Check logs for more information.')
+  if (i === undefined) {
+    if (result.length !== 1) {
+      console.error(`Required attribute '${String(identifier)}' is not unique`, ctx)
+      throw new Error('Cannot determine java type. Check logs for more information.')
+    }
+    return result[0]
+  } else {
+    if (result.length < i + 1) {
+      console.error(`Required attribute '${String(identifier)}[${i}]' is not defined`, ctx)
+      throw new Error('Cannot determine java type. Check logs for more information.')
+    }
+    return result[i]
   }
-  return result[0]
 }
