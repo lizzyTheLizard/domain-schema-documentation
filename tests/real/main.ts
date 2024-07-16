@@ -11,7 +11,7 @@ const runOptions: RunOptions = {
   reader: defaultReader(input, {
     // It would be nicer to reqrite those as tags, but this would require a change in the model
     allowedKeywords: ['x-misng-uidprefix', 'x-misng-alias'],
-    allowedFormats: [...defaultFormats, { name: 'uid', avjFormat: (p) => uidVerifier(p) }],
+    allowedFormats: [...defaultFormats, { name: 'uid', avjFormat: (p: string) => uidVerifier(p) }],
     discriminator: 'ALLOW'
   }),
   plugins: [createMisNgTags, javaPlugin(output, {
