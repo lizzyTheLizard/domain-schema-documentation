@@ -3,7 +3,7 @@ import { type Tag, type Definition, type Model, type Property, type Schema } fro
 import path from 'path'
 import Handlebars from 'handlebars'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
-import { enhanceApplication, enhanceModule, enhanceSchema, loadTemplate, shieldIoBadgeUrl } from '../WriterHelpers'
+import { definitionKind, enhanceApplication, enhanceModule, enhanceSchema, loadTemplate, shieldIoBadgeUrl } from '../WriterHelpers'
 import { relativeLink } from '../../reader/helper/InputHelper'
 
 /** Options for the Markdown writer. */
@@ -53,6 +53,7 @@ function registerHandlebarsHelpers (model: Model, options: MarkdownWriterOptions
   Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input, null, 2))
   Handlebars.registerHelper('mdAdditionalPropertyType', (schema: Schema, definition: Definition) => mdAdditionalPropertyType(model, schema, definition, options))
   Handlebars.registerHelper('mdBadge', (input: Tag) => `![Static Badge](${shieldIoBadgeUrl(input)})`)
+  Handlebars.registerHelper('mdKind', (def: Definition) => definitionKind(def))
   Handlebars.registerPartial('mdSubSchema', options.subSchemaTemplate)
 }
 

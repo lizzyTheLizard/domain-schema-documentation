@@ -1,4 +1,4 @@
-import { type Tag, type Application, type Model, type Module, type Schema } from '../reader/Reader'
+import { type Tag, type Application, type Model, type Module, type Schema, type Definition } from '../reader/Reader'
 import { applicationDiagram, moduleDiagram, schemaDiagramm } from './MermaidDiagramGenerator'
 import path from 'path'
 import fs from 'fs'
@@ -96,4 +96,19 @@ export function shieldIoBadgeUrl (tag: Tag): string {
   const value = tag.value !== undefined ? '-' + encodeURIComponent(tag.value.replace('-', '--')) : ''
   const color = '-' + encodeURIComponent(tag.color.replace('-', '--'))
   return `https://img.shields.io/badge/${name}${value}${color}`
+}
+
+/**
+ * Get the kind of object (enum, interface or object)
+ * @param def The definition to check
+ * @returns The kind of the definition
+ */
+export function definitionKind (def: Definition): string {
+  if ('oneOf' in def) {
+    return 'Interface'
+  }
+  if ('enum' in def) {
+    return 'Enum'
+  }
+  return 'Class'
 }

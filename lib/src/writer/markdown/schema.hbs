@@ -21,7 +21,7 @@
 
 {{#if enum}}
 ## Enum-Values
-| Name | Description |
+| Enum | Description |
 |------|-------------|
 {{#each enum}}
 | {{this}} | {{{mdMultiline (mdGetProperty ../[x-enum-description] this)}}} |
@@ -32,7 +32,7 @@
 {{#each properties}}
 {{#if @first}}
 ## Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 {{/if}}
 | {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{{mdGetType .. this}}} | {{{mdMultiline description}}} |

@@ -39,7 +39,7 @@ click _Module_Interface_yml href "./Interface.yml.html" "Interface"
 
 
 ## Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 | id* | String |  |
 | name* | String |  |
@@ -57,54 +57,43 @@ click _Module_Interface_yml href "./Interface.yml.html" "Interface"
 
 
 ## Subschemas
-### SubObject
+### Class SubObject
 
 
 
-
-#### Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 | key | String |  |
 | value | String |  |
-### SubEnum
+### Enum SubEnum
 
 
-
-#### Enum-Values
-| Name | Description |
+| Enum | Description |
 |------|-------------|
 | A | Value A |
 | B | Value B |
 
-### SubInterface
+### Interface SubInterface
 
-
-#### One Of
 1. [Object](./)
 1. [SubInterface2](#SubInterface2)
 1. [SubInterface3](#SubInterface3)
 
 
-#### Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 | key | String |  |
 | value | String |  |
-### SubInterface2
+### Class SubInterface2
 
 
 
-
-#### Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 | key | String |  |
 | value | String |  |
-### SubInterface3
+### Interface SubInterface3
 
-
-#### One Of
 1. [Object](./)
 1. [Interface](./Interface.yml.md)
 

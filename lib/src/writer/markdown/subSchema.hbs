@@ -1,16 +1,10 @@
-### {{{name}}}
+### {{mdKind this}} {{{name}}}
+{{#if description}}
 {{{mdMultiline description}}}
-
-{{#if oneOf}}
-#### One Of
-{{#each oneOf}}
-1. {{{mdGetType ../schema this}}}
-{{/each}}
 {{/if}}
 
 {{#if enum}}
-#### Enum-Values
-| Name | Description |
+| Enum | Description |
 |------|-------------|
 {{#each enum}}
 | {{this}} | {{{mdMultiline (mdGetProperty ../[x-enum-description] this)}}} |
@@ -20,8 +14,7 @@
 {{#if properties}}
 {{#each properties}}
 {{#if @first}}
-#### Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 {{/if}}
 | {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{{mdGetType ../schema this}}} | {{{mdMultiline description}}} |
@@ -30,5 +23,12 @@
 | (other) | {{mdAdditionalPropertyType ../schema .}} | Additional Properties |
 {{/if}}
 {{/if}}
+{{/each}}
+{{/if}}
+
+{{#if oneOf}}
+Implemented by
+{{#each oneOf}}
+1. {{{mdGetType ../schema this}}}
 {{/each}}
 {{/if}}

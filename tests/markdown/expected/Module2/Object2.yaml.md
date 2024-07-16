@@ -25,7 +25,7 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 
 
 ## Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 | id | String |  |
 | type | [Type](#Type) |  |
@@ -46,23 +46,19 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 
 
 ## Subschemas
-### Type
+### Enum Type
 
 
-
-#### Enum-Values
-| Name | Description |
+| Enum | Description |
 |------|-------------|
 | type1 | Description of type1 |
 | type2 | Description of type2 |
 
-### AdditionalProperties
+### Class AdditionalProperties
 
 
 
-
-#### Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 | key | String |  |
 | value | String |  |

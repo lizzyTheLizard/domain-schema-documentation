@@ -17,7 +17,7 @@ click _Module_Tags_yaml href "./Tags.yaml.html" "Tags"
 
 
 ## Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 | id | String |  |
 

@@ -25,30 +25,26 @@ click SubInterface3 href "./Object.yaml.html" "Object"
 
 
 ## Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 | kind* | String |  |
 
 
 
 ## Subschemas
-### Interface1
+### Class Interface1
 
 
 
-
-#### Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 | kind* | String<br>"INSIDE1" |  |
 | name | String |  |
-### Interface2
+### Class Interface2
 
 
 
-
-#### Properties
-| Name | Type | Description |
+| Property | Type | Description |
 |------|------|-------------|
 | kind* | String<br>"INSIDE2" |  |
 | key | String |  |
