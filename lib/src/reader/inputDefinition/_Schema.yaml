@@ -44,6 +44,7 @@ allOf:
               type: string
           required:
             - name
+            - color
     required:
     - $id
     - x-schema-type

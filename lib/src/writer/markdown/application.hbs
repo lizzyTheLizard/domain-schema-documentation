@@ -1,11 +1,12 @@
 # {{{title}}}
 {{#each tags}}
-![Static Badge](https://img.shields.io/badge/{{mdUrlEncode name}}{{#if value}}-{{mdUrlEncode value}}{{/if}}{{#if color}}-{{color}}{{/if}})
+{{mdBadge this}}
 {{/each}}
 
 {{#each todos}}
-> - [ ] {{this}}
+> - {{this}}
 {{/each}}
+
 {{{mdMultiline description}}}
 
 {{#if modules}}
@@ -20,18 +21,18 @@
 {{/each}}
 {{/if}}
 
-{{#if errors}}
+{{#each errors}}
+{{#if @first}}
 ## Verification Errors
 | Type | Description |
 |------|-------------|
-{{#each errors}}
+{{/if}}
 | {{type}} | {{text}} |
 {{/each}}
-{{/if}}
 
-{{#if links}}
-## Links
 {{#each links}}
+{{#if @first}}
+## Links
+{{/if}}
 1. [{{{text}}}]({{href}})
 {{/each}}
-{{/if}}

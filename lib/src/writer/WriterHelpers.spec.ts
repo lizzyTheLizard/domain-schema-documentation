@@ -4,6 +4,7 @@ import {
   enhanceApplication,
   enhanceModule, enhanceSchema,
   loadTemplate,
+  shieldIoBadgeUrl,
   writeOutput
 } from './WriterHelpers'
 import path from 'path'
@@ -79,8 +80,12 @@ describe('writerHelpers', () => {
     expect(result).toEqual({
       ...model.schemas[0],
       classDiagram: result.classDiagram,
-      module: model.modules[0],
-      hasDefinitions: false
+      module: model.modules[0]
     })
+  })
+
+  test('shieldIoBadgeUrl', () => {
+    expect(shieldIoBadgeUrl({ name: 'test', color: 'blue' })).toEqual('https://img.shields.io/badge/test-blue')
+    expect(shieldIoBadgeUrl({ name: 'Complex Name', value: 'weird-value__&slash', color: 'blue' })).toEqual('https://img.shields.io/badge/Complex%20Name-weird--value__%26slash-blue')
   })
 })

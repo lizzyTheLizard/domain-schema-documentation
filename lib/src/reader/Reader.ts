@@ -18,7 +18,7 @@ export interface Tag {
   /** The tag value */
   value?: string
   /** The color of the tag */
-  color?: string
+  color: string
 }
 
 /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */

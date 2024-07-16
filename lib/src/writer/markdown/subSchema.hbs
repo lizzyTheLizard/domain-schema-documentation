@@ -1,13 +1,15 @@
-### {{{name}}}{{#if oneOf}} (OneOf){{/if}}{{#if enum}} (Enum){{/if}}{{#if properties}} (Object){{/if}}
+### {{{name}}}
 {{{mdMultiline description}}}
 
 {{#if oneOf}}
+#### One Of
 {{#each oneOf}}
 1. {{{mdGetType ../schema this}}}
 {{/each}}
 {{/if}}
 
 {{#if enum}}
+#### Enum-Values
 | Name | Description |
 |------|-------------|
 {{#each enum}}
@@ -16,12 +18,17 @@
 {{/if}}
 
 {{#if properties}}
+{{#each properties}}
+{{#if @first}}
+#### Properties
 | Name | Type | Description |
 |------|------|-------------|
-{{#each properties}}
+{{/if}}
 | {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{{mdGetType ../schema this}}} | {{{mdMultiline description}}} |
-{{/each}}
+{{#if @last}}
 {{#if additionalProperties}}
 | (other) | {{mdAdditionalPropertyType ../schema .}} | Additional Properties |
 {{/if}}
+{{/if}}
+{{/each}}
 {{/if}}

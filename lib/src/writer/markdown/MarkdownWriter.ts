@@ -1,9 +1,9 @@
 import { type Writer, applyWriterOptionsDefaults, type WriterBaseOptions } from '../Writer'
-import { type Definition, type Model, type Property, type Schema } from '../../reader/Reader'
+import { type Tag, type Definition, type Model, type Property, type Schema } from '../../reader/Reader'
 import path from 'path'
 import Handlebars from 'handlebars'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
-import { enhanceApplication, enhanceModule, enhanceSchema, loadTemplate } from '../WriterHelpers'
+import { enhanceApplication, enhanceModule, enhanceSchema, loadTemplate, shieldIoBadgeUrl } from '../WriterHelpers'
 import { relativeLink } from '../../reader/helper/InputHelper'
 
 /** Options for the Markdown writer. */
@@ -52,7 +52,7 @@ function registerHandlebarsHelpers (model: Model, options: MarkdownWriterOptions
   Handlebars.registerHelper('mdHasValue', (obj: any[] | undefined, property: any) => obj?.includes(property))
   Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input, null, 2))
   Handlebars.registerHelper('mdAdditionalPropertyType', (schema: Schema, definition: Definition) => mdAdditionalPropertyType(model, schema, definition, options))
-  Handlebars.registerHelper('mdUrlEncode', (input: string) => encodeURIComponent(input))
+  Handlebars.registerHelper('mdBadge', (input: Tag) => `![Static Badge](${shieldIoBadgeUrl(input)})`)
   Handlebars.registerPartial('mdSubSchema', options.subSchemaTemplate)
 }
 

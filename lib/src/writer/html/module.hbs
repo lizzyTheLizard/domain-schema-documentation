@@ -7,18 +7,26 @@
 
 <h1>{{{title}}}</h1>
 {{#each tags}}
-<img alt="Static Badge" src="https://img.shields.io/badge/{{htmlUrlEncode name}}{{#if value}}-{{htmlUrlEncode value}}{{/if}}{{#if color}}-{{color}}{{/if}}">
+{{#if @first}}
+<div class="badges">
+{{/if}}
+  {{{htmlBadge this}}}
+{{#if @last}}
+</div>
+{{/if}}
 {{/each}}
 
-{{#if todos}}
+{{#each todos}}
+{{#if @first}}
 <div class="alert alert-danger" role="alert">
   <ul>
-{{#each todos}}
+{{/if}}
     <li>{{this}}</li>
-{{/each}}
+{{#if @last}}
   </ul>
 </div>
 {{/if}}
+{{/each}}
 
 <section>
   <p>{{description}}</p>
@@ -53,7 +61,8 @@
 </section>
 {{/if}}
 
-{{# if errors}}
+{{#each errors}}
+{{#if @first}}
 <section>
   <h2>Verification Errors</h2>
   <table class="table">
@@ -64,24 +73,27 @@
       </tr>
     </thead>
     <tbody>
-{{#each errors}}
+{{/if}}
       <tr>
         <td>{{type}}</td>
         <td>{{text}}</td>
       </tr>
-{{/each}}
+{{#if @last}}
     </tbody>
   </table>
 </section>
 {{/if}}
+{{/each}}
 
-{{#if links}}
+{{#each links}}
+{{#if @first}}
 <section>
   <h2>Links</h2>
   <ul>
-  {{#each links}}
+{{/if}}
     <li><a href="{{href}}">{{text}}</a></li>
-  {{/each}}
+{{#if @last}}
   </ul>
 </section>
 {{/if}}
+{{/each}}

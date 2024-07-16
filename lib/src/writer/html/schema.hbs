@@ -1,6 +1,6 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{htmlRelativeLink $id '/index.html'}}">Application</a></li>
+    <li class="breadcrumb-item"><a href="{{htmlRelativeLink module.$id '/index.html'}}">Application</a></li>
     <li class="breadcrumb-item"><a href="./index.html">{{module.title}}</a></li>
     <li class="breadcrumb-item active" aria-current="page">{{title}}</li>
   </ol>
@@ -8,18 +8,26 @@
 
 <h1>{{{title}}}</h1>
 {{#each x-tags}}
-<img alt="Static Badge" src="https://img.shields.io/badge/{{htmlUrlEncode name}}{{#if value}}-{{htmlUrlEncode value}}{{/if}}{{#if color}}-{{color}}{{/if}}">
+{{#if @first}}
+<div class="badges">
+{{/if}}
+  {{{htmlBadge this}}}
+{{#if @last}}
+</div>
+{{/if}}
 {{/each}}
 
-{{#if x-todos}}
+{{#each x-todos}}
+{{#if @first}}
 <div class="alert alert-danger" role="alert">
   <ul>
-{{#each x-todos}}
+{{/if}}
     <li>{{this}}</li>
-{{/each}}
+{{#if @last}}
   </ul>
 </div>
 {{/if}}
+{{/each}}
 
 <section>
   <p>{{description}}</p>
@@ -64,6 +72,8 @@
 {{/if}}
 
 {{#if properties}}
+{{#each properties}}
+{{#if @first}}
 <section>
   <h2>Properties</h2>
   <table class="table">
@@ -75,13 +85,13 @@
       </tr>
     </thead>
     <tbody>
-{{#each properties}}
+{{/if}}
       <tr>
         <td>{{@key}}{{#if (htmlHasProperty ../required @key)}}*{{/if}}</td>
         <td>{{{htmlGetType .. this}}}</td>
         <td>{{description}}</td>
       </tr>
-{{/each}}
+{{#if @last}}
 {{#if additionalProperties}}
       <tr>
         <td>(other)</td>
@@ -93,19 +103,31 @@
   </table>
 </section>
 {{/if}}
+{{/each}}
+{{/if}}
 
-{{#if examples}}
+{{#each examples}}
+{{#if @first}}
 <section>
   <h2>Examples</h2>
-{{#each examples}}
+{{/if}}
   <pre class="json">
   {{{htmlJson this}}}
   </pre>
-{{/each}}
+{{#if @last}}
 </section>
 {{/if}}
+{{/each}}
 
-{{# if x-errors}}
+{{#each definitions}}
+{{#if @first}}
+<h2>Subschemas</h2>
+{{/if}}
+{{> htmlSubSchema this schema=.. name=@key}}
+{{/each}}
+
+{{#each x-errors}}
+{{#if @first}}
 <section>
   <h2>Verification Errors</h2>
   <table class="table">
@@ -116,32 +138,27 @@
       </tr>
     </thead>
     <tbody>
-{{#each x-errors}}
+{{/if}}
       <tr>
         <td>{{type}}</td>
         <td>{{text}}</td>
       </tr>
-{{/each}}
+{{#if @last}}
     </tbody>
   </table>
 </section>
 {{/if}}
+{{/each}}
 
-{{#if x-links}}
+{{#each x-links}}
+{{#if @first}}
 <section>
   <h2>Links</h2>
   <ul>
-{{#each x-links}}
+{{/if}}
     <li><a href="{{href}}">{{text}}</a></li>
-{{/each}}
+{{#if @last}}
   </ul>
 </section>
 {{/if}}
-
-
-{{#if hasDefinitions}}
-<h2>Subschemas</h2>
-{{#each definitions}}
-{{> htmlSubSchema this schema=.. name=@key}}
 {{/each}}
-{{/if}}

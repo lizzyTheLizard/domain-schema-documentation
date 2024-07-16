@@ -19,10 +19,13 @@ import {
 } from 'java-parser'
 import { type JavaType } from './JavaHelper'
 
-/**
- * This will get the types from a java class source file.
- * It uses java-parser. While it seems to work fine, it uses a cst instead of an ast, which is a bit more complicated to work with.
+/*
+ * This uses java-parser. While it seems to work fine, it uses a cst instead of an ast, which is a bit more complicated to work with.
  * To deal with this we need some black type magic (see end of file)
+ */
+
+/**
+ * Check that this is a propert class or record and returns all properties
  * @param fileContent The content to parse
  * @returns The parsed properties or an error message
  */
@@ -36,9 +39,7 @@ export function parseClass (fileContent: string): Record<string, JavaType> | str
 }
 
 /**
- * This will check that this is a proper interface
- * It uses java-parser. While it seems to work fine, it uses a cst instead of an ast, which is a bit more complicated to work with.
- * To deal with this we need some black type magic (see end of file)
+ * Check that this is a proper interface
  * @param fileContent The content to parse
  * @returns undefined if it is a proper interface or an error message
  */
@@ -51,9 +52,7 @@ export function parseInterface (fileContent: string): undefined | string {
 }
 
 /**
- * This will get the enum values from a enum
- * It uses java-parser. While it seems to work fine, it uses a cst instead of an ast, which is a bit more complicated to work with.
- * To deal with this we need some black type magic (see end of file)
+ * Check that this is a proper enum and return all enum values
  * @param fileContent The content to parse
  * @returns The enum values or an error message
  */
@@ -88,7 +87,6 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   }
 
   public override fieldDeclaration (ctx: FieldDeclarationCtx): any {
-    if (this.isStaticField(ctx)) return
     const names = this.getFieldNames(ctx)
     const type = this.getType(ctx)
     names.forEach(name => { this.properties[name] = type })
@@ -170,34 +168,32 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
     })
   }
 
-  // A fiels is static if it has the static modifier
-  private isStaticField (ctx: FieldDeclarationCtx): boolean {
-    const modifiers = ctx.fieldModifier ?? []
-    return modifiers.filter(m => m.children.Static).length > 0
-  }
-
   // Here it is getting tricky... The type can be primitive or reference, additionally it can be an array or not.
   // Let's check those cases and redirect to the correct function getPrimitiveType or getReferenceType
   private getType (ctx: RecordComponentCtx | FieldDeclarationCtx): JavaType {
     const unannType = getSubChild(ctx, 'unannType')
+    let isArray: boolean
+    let itemType: JavaType
     if (unannType.unannPrimitiveTypeWithOptionalDimsSuffix !== undefined) {
       const primitiveTypeWithDims = getSubChild(unannType, 'unannPrimitiveTypeWithOptionalDimsSuffix')
-      const isArray = primitiveTypeWithDims.dims !== undefined
       const primitiveType = getSubChild(primitiveTypeWithDims, 'unannPrimitiveType')
-      const itemType = this.getPrimitiveType(primitiveType)
-      return isArray ? { type: 'COLLECTION', items: itemType } : itemType
-    }
-    if (unannType.unannReferenceType !== undefined) {
+      itemType = this.getPrimitiveType(primitiveType)
+      isArray = primitiveTypeWithDims.dims !== undefined
+    } else if (unannType.unannReferenceType !== undefined) {
       const referenceType = getSubChild(unannType, 'unannReferenceType')
-      const isArray = referenceType.dims !== undefined
       const classOrInterfaceType = getSubChild(referenceType, 'unannClassOrInterfaceType')
       const classType = getSubChild(classOrInterfaceType, 'unannClassType')
-      const itemType = this.getReferenceType(classType)
-      return isArray ? { type: 'COLLECTION', items: itemType } : itemType
+      itemType = this.getReferenceType(classType)
+      isArray = referenceType.dims !== undefined
+    } else {
+      console.error('Unknown Type: It is not a primitive nor a reference type', ctx)
+      this.error = 'Cannot determine java type of property. Check logs for more information'
+      return { type: 'CLASS', fullName: 'Object' }
     }
-    console.error('Unknown Type: It is not a primitive nor a reference type', ctx)
-    this.error = 'Cannot determine java type of property. Check logs for more information'
-    return { type: 'CLASS', fullName: 'Object' }
+    if (isArray) {
+      itemType = { type: 'COLLECTION', items: itemType }
+    }
+    return itemType
   }
 
   // Primitive types are easy, we just need to check if it is a boolean or a numeric type and which kind

@@ -51,7 +51,9 @@ function getDependenciesForDefinition (model: Model, s: Schema, fromDefinitionNa
     )
   }
   if ('additionalProperties' in d && typeof d.additionalProperties !== 'boolean' && d.additionalProperties !== undefined) {
-    results.push(...getDependenciesForProperty(model, s, d.additionalProperties, fromDefinitionName))
+    const additionalPropertyDependencies = getDependenciesForProperty(model, s, d.additionalProperties, fromDefinitionName)
+      .map(d => ({ ...d, array: true }))
+    results.push(...additionalPropertyDependencies)
   }
   return results
 }
