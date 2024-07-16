@@ -48,20 +48,20 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 ## Subschemas
 ### Enum Type
 
-
 | Enum | Description |
 |------|-------------|
 | type1 | Description of type1 |
 | type2 | Description of type2 |
 
-### Class AdditionalProperties
 
+### Class AdditionalProperties
 
 
 | Property | Type | Description |
 |------|------|-------------|
 | key | String |  |
 | value | String |  |
+
 
 
 ## Links

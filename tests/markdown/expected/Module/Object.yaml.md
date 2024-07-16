@@ -60,43 +60,45 @@ click _Module_Interface_yml href "./Interface.yml.html" "Interface"
 ### Class SubObject
 
 
-
 | Property | Type | Description |
 |------|------|-------------|
 | key | String |  |
 | value | String |  |
-### Enum SubEnum
 
+### Enum SubEnum
 
 | Enum | Description |
 |------|-------------|
 | A | Value A |
 | B | Value B |
 
+
 ### Interface SubInterface
 
+
+| Property | Type | Description |
+|------|------|-------------|
+| key | String |  |
+| value | String |  |
+
+Implemented by
 1. [Object](./)
 1. [SubInterface2](#SubInterface2)
 1. [SubInterface3](#SubInterface3)
-
-
-| Property | Type | Description |
-|------|------|-------------|
-| key | String |  |
-| value | String |  |
 ### Class SubInterface2
 
 
-
 | Property | Type | Description |
 |------|------|-------------|
 | key | String |  |
 | value | String |  |
+
 ### Interface SubInterface3
 
+
+
+Implemented by
 1. [Object](./)
 1. [Interface](./Interface.yml.md)
-
-
 
 

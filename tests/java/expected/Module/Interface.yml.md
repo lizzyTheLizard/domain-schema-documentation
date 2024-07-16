@@ -36,13 +36,12 @@ click SubInterface3 href "./Object.yaml.html" "Object"
 ### Class Interface1
 
 
-
 | Property | Type | Description |
 |------|------|-------------|
 | kind* | String<br>"INSIDE1" |  |
 | name | String |  |
-### Class Interface2
 
+### Class Interface2
 
 
 | Property | Type | Description |
@@ -50,6 +49,7 @@ click SubInterface3 href "./Object.yaml.html" "Object"
 | kind* | String<br>"INSIDE2" |  |
 | key | String |  |
 | value | String |  |
+
 
 ## Verification Errors
 | Type | Description |
