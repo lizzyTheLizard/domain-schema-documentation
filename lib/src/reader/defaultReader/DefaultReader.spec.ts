@@ -3,10 +3,7 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import { type Reader } from '../Reader'
 import { defaultReader } from './DefaultReader'
-
-const applicationFile = { title: 'Title', description: 'Description' }
-const moduleFile = { $id: '/Module', title: 'Module', description: 'Description' }
-const schemaFile = { $id: '/Module/Schema.yaml', title: 'Schema', 'x-schema-type': 'Aggregate', type: 'object', properties: { key: { type: 'number' } } }
+import { testSchema, testApplication, testModule } from '../../testData'
 
 describe('DefaultReader', () => {
   let tmpDir: tmp.DirResult
@@ -22,13 +19,14 @@ describe('DefaultReader', () => {
   })
 
   test('Read application file', async () => {
+    const application = testApplication()
     const filePath = path.join(tmpDir.name, 'index.yaml')
-    await fs.writeFile(filePath, JSON.stringify(applicationFile))
+    await fs.writeFile(filePath, JSON.stringify(application))
 
     const model = await target()
 
     // Application was read and normalized
-    expect(model.application.title).toEqual(applicationFile.title)
+    expect(model.application.title).toEqual(application.title)
     expect(model.application.errors).toEqual([])
     expect(model.modules).toEqual([])
     expect(model.schemas).toEqual([])
@@ -42,21 +40,22 @@ describe('DefaultReader', () => {
   })
 
   test('Read module file', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
+    const module = testModule()
+    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(testApplication()))
     await fs.mkdir(path.join(tmpDir.name, 'Module'))
     const filePath = path.join(tmpDir.name, 'Module', 'index.yaml')
-    await fs.writeFile(filePath, JSON.stringify(moduleFile))
+    await fs.writeFile(filePath, JSON.stringify(module))
 
     const model = await target()
 
     // Module was read and normalized
     expect(model.modules.length).toEqual(1)
-    expect(model.modules[0].title).toEqual(moduleFile.title)
+    expect(model.modules[0].title).toEqual(module.title)
     expect(model.modules[0].errors).toEqual([])
   })
 
   test('Invalid module file', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
+    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(testApplication()))
     await fs.mkdir(path.join(tmpDir.name, 'Module'))
     const filePath = path.join(tmpDir.name, 'Module', 'index.yaml')
     await fs.writeFile(filePath, JSON.stringify({ wrong: 'value' }))
@@ -65,36 +64,38 @@ describe('DefaultReader', () => {
   })
 
   test('Read schema file (yaml)', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(applicationFile))
+    const schema = testSchema()
+    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(testApplication()))
     await fs.mkdir(path.join(tmpDir.name, 'Module'))
     const filePath = path.join(tmpDir.name, 'Module', 'Schema.yaml')
-    await fs.writeFile(filePath, JSON.stringify(schemaFile))
+    await fs.writeFile(filePath, JSON.stringify(schema))
 
     const model = await target()
 
     // Module was read and normalized
     expect(model.schemas.length).toEqual(1)
-    expect(model.schemas[0].title).toEqual(schemaFile.title)
+    expect(model.schemas[0].title).toEqual(schema.title)
     expect(model.schemas[0]['x-errors']).toEqual([])
   })
 
   test('Read schema file (yml)', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yml'), JSON.stringify(applicationFile))
+    const schema = testSchema()
+    await fs.writeFile(path.join(tmpDir.name, 'index.yml'), JSON.stringify(testApplication()))
     await fs.mkdir(path.join(tmpDir.name, 'Module'))
     const filePath = path.join(tmpDir.name, 'Module', 'Schema.yml')
-    const schemaFile2 = { ...schemaFile, $id: '/Module/Schema.yml' }
+    const schemaFile2 = { ...schema, $id: '/Module/Schema.yml' }
     await fs.writeFile(filePath, JSON.stringify(schemaFile2))
 
     const model = await target()
 
     // Module was read and normalized
     expect(model.schemas.length).toEqual(1)
-    expect(model.schemas[0].title).toEqual(schemaFile.title)
+    expect(model.schemas[0].title).toEqual(schema.title)
     expect(model.schemas[0]['x-errors']).toEqual([])
   })
 
   test('Invalid schema file', async () => {
-    await fs.writeFile(path.join(tmpDir.name, 'index.yml'), JSON.stringify(applicationFile))
+    await fs.writeFile(path.join(tmpDir.name, 'index.yaml'), JSON.stringify(testApplication()))
     await fs.mkdir(path.join(tmpDir.name, 'Module'))
     const filePath = path.join(tmpDir.name, 'Module', 'Schema.yml')
     await fs.writeFile(filePath, JSON.stringify({ wrong: 'value' }))
