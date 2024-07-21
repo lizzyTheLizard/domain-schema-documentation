@@ -48,8 +48,8 @@ export class OpenAPIGenerator {
         version: new Date().toDateString()
       },
       servers: [],
-      components: { schemas: {}, securitySchemes: {} },
       paths: {},
+      components: { schemas: {}, securitySchemes: {} },
       ...structuredClone(this.#currentModule.openApi)
     }
     if (openApiSpec.components.schemas === undefined) { openApiSpec.components.schemas = {} }

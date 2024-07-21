@@ -5,6 +5,45 @@ info:
   version: Sun Jul 21 2024
 servers:
   - url: http:localhost:8080
+paths:
+  /test:
+    put:
+      tags:
+        - Test
+      summary: Test PUT operation
+      description: Some Description
+      operationId: testPut
+      requestBody:
+        description: Update something
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Request"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/Request"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Request"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModuleInterface"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/ModuleInterface"
+        "400":
+          description: Invalid Request supplied
+        "404":
+          description: Not found
+      security:
+        - def_auth:
+            - write:test
+            - read:test
 components:
   schemas:
     Request:
@@ -58,42 +97,3 @@ components:
       type: apiKey
       name: api_key
       in: header
-paths:
-  /test:
-    put:
-      tags:
-        - Test
-      summary: Test PUT operation
-      description: Some Description
-      operationId: testPut
-      requestBody:
-        description: Update something
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Request"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/Request"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/Request"
-        required: true
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ModuleInterface"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/ModuleInterface"
-        "400":
-          description: Invalid Request supplied
-        "404":
-          description: Not found
-      security:
-        - def_auth:
-            - write:test
-            - read:test
