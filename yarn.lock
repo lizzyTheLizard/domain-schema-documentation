@@ -6254,6 +6254,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"test-openapi@workspace:tests/openapi":
+  version: 0.0.0-use.local
+  resolution: "test-openapi@workspace:tests/openapi"
+  dependencies:
+    "@types/node": "npm:^20.14.7"
+    domain-schema-documentation: "workspace:*"
+    test-shared: "workspace:*"
+    tsx: "npm:^4.15.7"
+  languageName: unknown
+  linkType: soft
+
 "test-real@workspace:tests/real":
   version: 0.0.0-use.local
   resolution: "test-real@workspace:tests/real"

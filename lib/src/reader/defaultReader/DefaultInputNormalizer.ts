@@ -60,11 +60,8 @@ class DefaultInputNormalizer implements InputNormalizer {
 
   public toModel (): Model {
     if (this.#applications.length === 0) throw new Error('No application file found')
-    this.#modules.forEach(m => {
-      this.#validator.validateReferences(m, m)
-    })
-    this.#schemas.forEach(m => {
-      this.#validator.validateReferences(m, m)
+    this.#schemas.forEach(s => {
+      this.#validator.validateReferences(s, s)
     })
     this.#schemas.forEach(m => {
       this.#validator.validateExamples(m)

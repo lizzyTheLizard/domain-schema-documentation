@@ -1,63 +1,50 @@
-import path from 'path'
 import { type Plugin } from '../Plugin'
 import { type Module, type Model } from '../../reader/Reader'
-import { writeOutput } from '../../writer/WriterHelpers'
-import * as yaml from 'yaml'
+import { type ModuleWithOpenApi, OpenAPIGenerator, getFileName as getOpenApiSpecFileName } from './OpenApiGenerator'
 
 export interface OpenApiPluginOptions {
-  servers?: string[]
-  securitySchemes: Record<string, any>
+  /**
+   * The source OpenAPI-Specification to validate. If undefined, no validation will be done.
+   * You can also provide a function that takes a module and returns the source directory if the source directory is different for each module.
+   * Default is undefined.
+   */
+  srcSpec: string | ((module: Module) => string) | undefined
 }
 
-// TODO: Implement openApiPlugin
-// TODO: Test
-// TODO: Document
-
-// eslint-disable-next-line jsdoc/require-jsdoc
-export function openApiPlugin (outputFolder: string, options?: OpenApiPluginOptions): Plugin {
+/**
+ * A plugin that generates OpenAPI specifications and validate existing OpenAPI specifications.
+ * TODO: Validate existing specs
+ * TODO: Better integration tests?
+ * TODO: Check full model
+ * TODO: Update documentation
+ * @param outputFolder The folder to write the output to. Should be the same as the output folder of the writer.
+ * @param optionsOrUndefined The options for the plugin. If not provided, the default options will be used.
+ * @returns The plugin
+ */
+export function openApiPlugin (outputFolder: string, optionsOrUndefined?: Partial<OpenApiPluginOptions>): Plugin {
   return async (model: Model) => {
-    addLinks(model)
-    // TODO: Implement validation
-    await generateOpenApiSpecs(model, outputFolder, options)
+    // TODO: Use options or remove it
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const options = applyDefaults(optionsOrUndefined)
+    const generator = new OpenAPIGenerator(model, outputFolder)
+    await Promise.all(model.modules.map(async m => {
+      if (!hasOperations(m)) return
+      await generator.generate(m)
+      m.links.push({ text: 'OpenApiSpec', href: `./${getOpenApiSpecFileName(m)}` })
+    }))
   }
 }
 
-function addLinks (model: Model): Model {
+function applyDefaults (optionsOrUndefined?: Partial<OpenApiPluginOptions>): OpenApiPluginOptions {
   return {
-    application: model.application,
-    modules: model.modules.map(m => ({ ...m, links: [...m.links ?? [], { text: 'OpenApiSpec', href: `./${getFileName(m)}` }] })),
-    schemas: model.schemas
+    srcSpec: optionsOrUndefined?.srcSpec ?? undefined
   }
 }
 
-function getFileName (module: Module): string {
-  return `${path.basename(module.$id).replace(path.extname(module.$id), '')}.openapi.yaml`
-}
-
-async function generateOpenApiSpecs (model: Model, outputFolder: string, options?: OpenApiPluginOptions): Promise<void> {
-  await Promise.all(model.modules.map(async module => {
-    // TODO: If no operations, skip
-    const relativeFilename = path.join(module.$id, getFileName(module))
-    const output = generateOpenApiSpec(model, module, options)
-    const yamlOutput = yaml.stringify(output)
-    await writeOutput(yamlOutput, relativeFilename, outputFolder)
-  }))
-}
-
-function generateOpenApiSpec (model: Model, module: Module, options?: OpenApiPluginOptions): Record<any, any> {
-  return {
-    openapi: '3.0.3',
-    info: {
-      title: module.title,
-      description: module.description
-    },
-    servers: options?.servers?.map(server => ({ url: server })) ?? [],
-    // TODO: Use operations from the input?
-    paths: {},
-    components: {
-      // TODO: Get all relevant schemas
-      schemas: {},
-      securitySchemes: options?.securitySchemes ?? {}
-    }
-  }
+function hasOperations (module: Module): module is ModuleWithOpenApi {
+  if (!('openApi' in module)) return false
+  if (typeof module.openApi !== 'object') return false
+  if (module.openApi === null) return false
+  if (Object.keys(module.openApi).length === 0) return false
+  return true
 }

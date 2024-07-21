@@ -212,7 +212,7 @@ export class InputValidator {
     this.validateAjv(constValue, subSchema, `constant ${JSON.stringify(constValue)} in ${fileLocation}`)
   }
 
-  public validateReferences (root: Schema | Module, subSchema: unknown): void {
+  public validateReferences (root: Schema, subSchema: unknown): void {
     if (subSchema == null || typeof subSchema !== 'object') return
     Object.entries(subSchema).forEach(([_, value]) => {
       this.validateReferences(root, value)
