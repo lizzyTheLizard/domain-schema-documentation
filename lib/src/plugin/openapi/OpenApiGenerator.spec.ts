@@ -1,5 +1,5 @@
 import * as tmp from 'tmp'
-import { type ModuleWithOpenApi, OpenAPIGenerator } from './OpenApiGenerator'
+import { OpenAPIGenerator } from './OpenApiGenerator'
 import { testInterfaceSchema, testModel, testModule, testSchema } from '../../testData'
 import { fullSpec, refSpec, refSpecInterface } from './testData'
 
@@ -17,10 +17,10 @@ describe('OpenAPIGenerator', () => {
   })
 
   test('fill default values', async () => {
-    const module: ModuleWithOpenApi = { ...testModule(), openApi: {} }
+    const module = { ...testModule(), openApi: {} }
     const result = await target.generate(module)
     expect(result).toEqual({
-      openapi: '3.1.0',
+      openapi: '3.0.3',
       info: { title: module.title, description: module.description, version: new Date().toDateString() },
       servers: [],
       paths: {},
@@ -30,7 +30,7 @@ describe('OpenAPIGenerator', () => {
 
   test('overwrite defaults if given', async () => {
     const openApi = fullSpec()
-    const module: ModuleWithOpenApi = { ...testModule(), openApi }
+    const module = { ...testModule(), openApi }
     const result = await target.generate(module)
     expect(result).toEqual({
       ...openApi
@@ -39,7 +39,7 @@ describe('OpenAPIGenerator', () => {
 
   test('$ref in original', async () => {
     const openApi = refSpec()
-    const module: ModuleWithOpenApi = { ...testModule(), openApi }
+    const module = { ...testModule(), openApi }
     const result = await target.generate(module) as any
     expect(result.paths).toEqual(openApi.paths)
     expect(result.components.schemas).toEqual({
@@ -67,7 +67,7 @@ describe('OpenAPIGenerator', () => {
     const openApi = refSpecInterface()
     const schema = testInterfaceSchema()
     const model = { ...testModel(), schemas: [testSchema(), schema] }
-    const module: ModuleWithOpenApi = { ...model.modules[0], openApi }
+    const module = { ...model.modules[0], openApi }
     target = new OpenAPIGenerator(model, tmpDir.name)
     const result = await target.generate(module) as any
     expect((result.paths)['/pet'].put.responses[200].content['application/json'].schema.$ref).toEqual('#/components/schemas/ModuleInterface')

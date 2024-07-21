@@ -18,6 +18,10 @@ errors:
   - text: "An error"
     type: "WRONG"
 openApi:
+  info:
+    title: Test API
+    version: 1.0.0
+    description: This is a test API
   servers:
     - url: http:localhost:8080
   paths:

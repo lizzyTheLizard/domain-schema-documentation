@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Test API
-  version: 1.0.0
-  description: This is a test API
+  title: Module
+  description: This is an integration test for the application
+  version: Sun Jul 21 2024
 servers:
   - url: http:localhost:8080
 paths:
@@ -12,7 +12,7 @@ paths:
         - Test
       summary: Test PUT operation
       description: Some Description
-      operationId: testPut
+      operationId: testGet
       requestBody:
         description: Update something
         content:
@@ -44,6 +44,22 @@ paths:
         - def_auth:
             - write:test
             - read:test
+    get:
+      tags:
+        - Test
+      summary: Test GET operation
+      description: Some Description
+      operationId: testPut
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModuleInterface"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/ModuleInterface"
 components:
   schemas:
     Request:

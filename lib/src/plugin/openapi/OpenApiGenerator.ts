@@ -1,5 +1,5 @@
 import { type SchemaObject } from 'ajv'
-import Ajv2020 from 'ajv/dist/2020'
+import Ajv from 'ajv-draft-04'
 import addFormats from 'ajv-formats'
 import { writeOutput } from '../../writer/WriterHelpers'
 import * as yaml from 'yaml'
@@ -15,26 +15,27 @@ import betterAjvErrors from 'better-ajv-errors'
  * and writes the resulting file to the output folder
  */
 export class OpenAPIGenerator {
-  readonly #ajv: Ajv2020
+  readonly #ajv: Ajv
   readonly #openApiSchema: SchemaObject
-  #currentModule!: ModuleWithOpenApi
+  #currentModule!: Module
   #currentSpec!: OpenApiSpec
   #schemasToProcess!: string[]
   #processedSchemas!: string[]
 
   constructor (private readonly model: Model, private readonly outputFolder: string) {
-    this.#ajv = new Ajv2020({ allErrors: true, strict: false })
+    this.#ajv = new Ajv({ allErrors: true, strict: false })
     addFormats(this.#ajv)
     this.#ajv.addFormat('media-range', true)
-    const schemaFile = path.join(__dirname, 'openapi_31.json')
-    this.#openApiSchema = JSON.parse(fs.readFileSync(schemaFile).toString())
+    const schemaFile = path.join(__dirname, 'openapi_30.yaml')
+    this.#openApiSchema = yaml.parse(fs.readFileSync(schemaFile).toString())
   }
 
-  public async generate (module: ModuleWithOpenApi): Promise<unknown> {
+  public async generate (module: Module & { openApi?: unknown }): Promise<object | undefined> {
+    if (module.openApi === undefined || module.openApi === null) return undefined
     this.#currentModule = module
     this.#schemasToProcess = []
     this.#processedSchemas = []
-    this.#currentSpec = this.createInitialOpenApiSpec()
+    this.#currentSpec = this.createInitialOpenApiSpec(module.openApi)
     this.replaceRefs(this.#currentSpec)
     let currentSchemaId: string | undefined
     while ((currentSchemaId = this.#schemasToProcess.pop()) !== undefined) {
@@ -53,9 +54,9 @@ export class OpenAPIGenerator {
     return this.#currentSpec
   }
 
-  private createInitialOpenApiSpec (): OpenApiSpec {
+  private createInitialOpenApiSpec (input: object): OpenApiSpec {
     const openApiSpec: OpenApiSpec = {
-      openapi: '3.1.0',
+      openapi: '3.0.3',
       info: {
         title: this.#currentModule.title,
         description: this.#currentModule.description,
@@ -64,7 +65,7 @@ export class OpenAPIGenerator {
       servers: [],
       paths: {},
       components: { schemas: {}, securitySchemes: {} },
-      ...structuredClone(this.#currentModule.openApi)
+      ...structuredClone(input)
     }
     if (openApiSpec.components.schemas === undefined) { openApiSpec.components.schemas = {} }
     return openApiSpec
@@ -117,7 +118,7 @@ export class OpenAPIGenerator {
   }
 
   private async validate (): Promise<void> {
-    if (!this.#currentSpec.openapi.startsWith('3.1')) { throw new Error('Only OpenAPI 3.1.X is supported') }
+    if (!this.#currentSpec.openapi.startsWith('3.0')) { throw new Error('Only OpenAPI 3.0.X is supported') }
     try {
       if (this.#ajv.validate(this.#openApiSchema, this.#currentSpec)) return
     } catch (e: unknown) {
@@ -198,10 +199,6 @@ function cleanPropertyCopy (property: Property): unknown {
     copy.items = cleanPropertyCopy(property.items)
   }
   return copy
-}
-
-export interface ModuleWithOpenApi extends Module {
-  openApi: object
 }
 
 interface OpenApiSpec {
