@@ -1,6 +1,5 @@
-import path from 'path'
 import { type Model, type Module, type Property, type Schema } from '../../reader/Reader'
-import { cleanName, getModuleId } from '../../reader/helper/InputHelper'
+import { cleanName, getModuleId, getSchemaName } from '../../reader/helper/InputHelper'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
 
@@ -94,7 +93,6 @@ export function getFullJavaClassName (schemaOrSchemaId: Schema | string, options
  * @returns The simple java class name for this schema
  */
 export function getSimpleJavaClassName (schemaOrSchemaId: Schema | string, definitionName?: string): string {
-  const schemaId = typeof schemaOrSchemaId === 'string' ? schemaOrSchemaId : schemaOrSchemaId.$id
-  const cleanedSchemaId = cleanName(path.basename(schemaId).replace(path.extname(schemaId), ''))
+  const cleanedSchemaId = cleanName(getSchemaName(schemaOrSchemaId))
   return definitionName === undefined ? cleanedSchemaId : cleanedSchemaId + cleanName(definitionName)
 }

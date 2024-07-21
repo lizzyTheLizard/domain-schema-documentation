@@ -1,8 +1,8 @@
 import { writeOutput } from '../../writer/WriterHelpers'
 import * as yaml from 'yaml'
-import path, { extname } from 'path'
+import path from 'path'
 import type { Schema, Model, Module, Definition, Property } from '../../reader/Reader'
-import { cleanName, getSchema } from '../../reader/helper/InputHelper'
+import { cleanName, getModuleId, getModuleName, getSchema, getSchemaName, resolveRelativeIdForModule } from '../../reader/helper/InputHelper'
 
 /**
  * Generates OpenApi-Specifications from module files
@@ -29,13 +29,11 @@ export class OpenAPIGenerator {
       const s = getSchema(this.model, currentSchemaId)
       const schemaCopy = cleanSchemaCopy(s)
       this.replaceRefs(schemaCopy, s.$id)
-      const schemaName = getSchemaName(s.$id)
-      this.#currentSpec.components.schemas[schemaName] = schemaCopy
+      this.#currentSpec.components.schemas[getDefinitionName(s)] = schemaCopy
       Object.entries(s.definitions).forEach(([definitionName, originalDefinition]) => {
         const definitionCopy = cleanDefinitionCopy(originalDefinition)
         this.replaceRefs(definitionCopy, s.$id)
-        const name = schemaName + definitionName
-        this.#currentSpec.components.schemas[name] = definitionCopy
+        this.#currentSpec.components.schemas[getDefinitionName(s, definitionName)] = definitionCopy
       })
     }
     await this.write()
@@ -74,8 +72,7 @@ export class OpenAPIGenerator {
       if (schemaId === undefined) {
         throw new Error(`Unsupported reference ${input.$ref}. Cannot have '#' a reference in OpenApi. Do you mean '#/components?`)
       }
-      const schemaName = getSchemaName(schemaId)
-      input.$ref = '#/components/schemas/' + schemaName
+      input.$ref = '#/components/schemas/' + getDefinitionName(schemaId)
       return
     }
     if (input.$ref.startsWith('#/components/')) {
@@ -85,8 +82,7 @@ export class OpenAPIGenerator {
       if (schemaId === undefined) {
         throw new Error(`Unsupported reference ${input.$ref}. Cannot have '#/definitions' a reference in OpenApi. Do you mean '#/components?`)
       }
-      const schemaName = getSchemaName(schemaId)
-      input.$ref = '#/components/schemas/' + schemaName + input.$ref.substring(14)
+      input.$ref = '#/components/schemas/' + getDefinitionName(schemaId, input.$ref.substring(14))
       return
     }
     if (input.$ref.startsWith('#')) {
@@ -94,7 +90,8 @@ export class OpenAPIGenerator {
     }
     let id: string
     if (input.$ref.startsWith('.')) {
-      id = path.join(this.#currentModule.$id, input.$ref)
+      // TODO: Those are IDs, not filenames
+      id = resolveRelativeIdForModule(this.#currentModule, input.$ref)
     } else if (input.$ref.startsWith('/')) {
       id = input.$ref
     } else {
@@ -104,8 +101,7 @@ export class OpenAPIGenerator {
       this.#processedSchemas.push(id)
       this.#schemasToProcess.push(id)
     }
-    const otherSchemaName = getSchemaName(id)
-    input.$ref = '#/components/schemas/' + otherSchemaName
+    input.$ref = '#/components/schemas/' + getDefinitionName(id)
   }
 
   private async write (): Promise<void> {
@@ -121,12 +117,17 @@ export class OpenAPIGenerator {
  * @returns The filename
  */
 export function getFileName (module: Module): string {
-  return `${path.basename(module.$id).replace(path.extname(module.$id), '')}.openapi.yaml`
+  return `${getModuleName(module)}.openapi.yaml`
 }
 
-function getSchemaName (schemaId: string): string {
-  const name = schemaId.substring(0, schemaId.length - extname(schemaId).length)
-  return cleanName(name)
+function getDefinitionName (schemaOrschemaId: string | Schema, definitionName?: string): string {
+  const moduleId = cleanName(getModuleId(schemaOrschemaId))
+  const schemaName = cleanName(getSchemaName(schemaOrschemaId))
+  const result = moduleId + schemaName
+  if (definitionName === undefined) {
+    return result
+  }
+  return result + cleanName(definitionName)
 }
 
 function cleanSchemaCopy (schema: Schema): unknown {

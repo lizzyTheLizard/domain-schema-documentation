@@ -1,6 +1,4 @@
-/**
- *
- */
+/* eslint-disable jsdoc/require-jsdoc */
 export function fullSpec (): any {
   return {
     openapi: '3.0.2',
@@ -24,9 +22,6 @@ export function fullSpec (): any {
   }
 }
 
-/**
- *
- */
 export function refSpec (): any {
   return {
     paths: {
@@ -55,9 +50,6 @@ export function refSpec (): any {
   }
 }
 
-/**
- *
- */
 export function refSpecInterface (): any {
   return {
     paths: {
