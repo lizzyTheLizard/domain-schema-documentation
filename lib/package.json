@@ -1,7 +1,7 @@
 {
   "name": "lib",
   "scripts": {
-    "build": "tsc && cpy 'src/**/*.hbs' ../dist && cpy 'src/**/*.yaml' ../dist",
+    "build": "tsc && cpy 'src/**/*.hbs' ../dist && cpy 'src/**/*.yaml' ../dist && cpy 'src/**/*.json' ../dist",
     "check": "yarn run check:types && yarn run unit-tests",
     "check:types": "tsc --noEmit --skipLibCheck",
     "unit-tests": "jest"

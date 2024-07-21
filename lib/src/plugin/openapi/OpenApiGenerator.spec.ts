@@ -11,12 +11,16 @@ describe('OpenAPIGenerator', () => {
     tmpDir = tmp.dirSync({ unsafeCleanup: true })
     target = new OpenAPIGenerator(testModel(), tmpDir.name)
   })
+  test('reject invalid', async () => {
+    await expect(target.generate({ ...testModule(), openApi: { ...fullSpec(), wrong: 'value' } })).rejects.toThrow()
+    await expect(target.generate({ ...testModule(), openApi: fullSpec() })).resolves.not.toThrow()
+  })
 
   test('fill default values', async () => {
     const module: ModuleWithOpenApi = { ...testModule(), openApi: {} }
     const result = await target.generate(module)
     expect(result).toEqual({
-      openapi: '3.0.3',
+      openapi: '3.1.0',
       info: { title: module.title, description: module.description, version: new Date().toDateString() },
       servers: [],
       paths: {},

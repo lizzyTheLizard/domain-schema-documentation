@@ -1,7 +1,7 @@
 /* eslint-disable jsdoc/require-jsdoc */
 export function fullSpec (): any {
   return {
-    openapi: '3.0.2',
+    openapi: '3.1.0',
     info: { title: 'test', description: 'test2', version: '1' },
     servers: [{ url: 'www.google.com' }],
     paths: {

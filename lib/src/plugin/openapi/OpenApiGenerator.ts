@@ -1,8 +1,13 @@
+import { type SchemaObject } from 'ajv'
+import Ajv2020 from 'ajv/dist/2020'
+import addFormats from 'ajv-formats'
 import { writeOutput } from '../../writer/WriterHelpers'
 import * as yaml from 'yaml'
 import path from 'path'
 import type { Schema, Model, Module, Definition, Property } from '../../reader/Reader'
 import { cleanName, getModuleId, getModuleName, getSchema, getSchemaName, resolveRelativeIdForModule } from '../../reader/helper/InputHelper'
+import fs from 'fs'
+import betterAjvErrors from 'better-ajv-errors'
 
 /**
  * Generates OpenApi-Specifications from module files
@@ -10,12 +15,20 @@ import { cleanName, getModuleId, getModuleName, getSchema, getSchemaName, resolv
  * and writes the resulting file to the output folder
  */
 export class OpenAPIGenerator {
+  readonly #ajv: Ajv2020
+  readonly #openApiSchema: SchemaObject
   #currentModule!: ModuleWithOpenApi
   #currentSpec!: OpenApiSpec
   #schemasToProcess!: string[]
   #processedSchemas!: string[]
 
-  constructor (private readonly model: Model, private readonly outputFolder: string) {}
+  constructor (private readonly model: Model, private readonly outputFolder: string) {
+    this.#ajv = new Ajv2020({ allErrors: true, strict: false })
+    addFormats(this.#ajv)
+    this.#ajv.addFormat('media-range', true)
+    const schemaFile = path.join(__dirname, 'openapi_31.json')
+    this.#openApiSchema = JSON.parse(fs.readFileSync(schemaFile).toString())
+  }
 
   public async generate (module: ModuleWithOpenApi): Promise<unknown> {
     this.#currentModule = module
@@ -35,13 +48,14 @@ export class OpenAPIGenerator {
         this.#currentSpec.components.schemas[getDefinitionName(s, definitionName)] = definitionCopy
       })
     }
+    await this.validate()
     await this.write()
     return this.#currentSpec
   }
 
   private createInitialOpenApiSpec (): OpenApiSpec {
     const openApiSpec: OpenApiSpec = {
-      openapi: '3.0.3',
+      openapi: '3.1.0',
       info: {
         title: this.#currentModule.title,
         description: this.#currentModule.description,
@@ -100,6 +114,22 @@ export class OpenAPIGenerator {
       this.#schemasToProcess.push(id)
     }
     input.$ref = '#/components/schemas/' + getDefinitionName(id)
+  }
+
+  private async validate (): Promise<void> {
+    if (!this.#currentSpec.openapi.startsWith('3.1')) { throw new Error('Only OpenAPI 3.1.X is supported') }
+    try {
+      if (this.#ajv.validate(this.#openApiSchema, this.#currentSpec)) return
+    } catch (e: unknown) {
+      const error = e as Error
+      throw new Error(`Invalid OpenAPI-Spec in module ${this.#currentModule.$id}: ${error.message}`)
+    }
+    const errors = this.#ajv.errors
+    if (!errors) {
+      throw new Error(`Invalid OpenAPI-Spec in module ${this.#currentModule.$id}: ${this.#ajv.errorsText()}`)
+    }
+    console.error(betterAjvErrors(this.#openApiSchema, this.#currentSpec, errors, { json: JSON.stringify(this.#currentSpec, null, ' ') }))
+    throw new Error(`Invalid OpenAPI-Spec in module ${this.#currentModule.$id}. See logs for details`)
   }
 
   private async write (): Promise<void> {
