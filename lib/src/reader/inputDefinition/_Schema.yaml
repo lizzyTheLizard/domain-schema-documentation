@@ -45,6 +45,21 @@ allOf:
           required:
             - name
             - color
+      x-errors:
+        type: object
+        properties:
+          text:
+            type: string
+          type:
+            type: string
+            enum:
+              - NOT_IN_DOMAIN_MODEL
+              - MISSING_IN_IMPLEMENTATION
+              - WRONG
+              - OTHER
+        required:
+          - text
+          - type
     required:
     - $id
     - x-schema-type
