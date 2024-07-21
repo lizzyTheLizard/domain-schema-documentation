@@ -8,7 +8,6 @@ import { cleanName, getModuleId, getModuleName, getSchema, getSchemaName, resolv
  * Generates OpenApi-Specifications from module files
  * Removes stuff that is not compatible with OpenAPI, collect other schemas into one file
  * and writes the resulting file to the output folder
- * TODO: Validate the generated spec
  */
 export class OpenAPIGenerator {
   #currentModule!: ModuleWithOpenApi
@@ -90,7 +89,6 @@ export class OpenAPIGenerator {
     }
     let id: string
     if (input.$ref.startsWith('.')) {
-      // TODO: Those are IDs, not filenames
       id = resolveRelativeIdForModule(this.#currentModule, input.$ref)
     } else if (input.$ref.startsWith('/')) {
       id = input.$ref

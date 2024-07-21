@@ -15,8 +15,10 @@ export interface OpenApiPluginOptions {
  * A plugin that generates OpenAPI specifications and validate existing OpenAPI specifications.
  * TODO: Validate existing specs
  * TODO: Better integration tests?
- * TODO: Check full model
+ * TODO: Validate the generated spec
  * TODO: Update documentation
+ * TODO: Run test for real model
+ * TODO: Better integration into html link?
  * @param outputFolder The folder to write the output to. Should be the same as the output folder of the writer.
  * @param optionsOrUndefined The options for the plugin. If not provided, the default options will be used.
  * @returns The plugin
