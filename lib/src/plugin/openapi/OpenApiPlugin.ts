@@ -14,9 +14,8 @@ export interface OpenApiPluginOptions {
 /**
  * A plugin that generates OpenAPI specifications and validate existing OpenAPI specifications.
  * TODO: Validate existing specs
- * TODO: Better integration tests?
- * TODO: Validate the generated spec
  * TODO: Update documentation
+ * TODO: Validate the generated spec
  * TODO: Run test for real model
  * TODO: Better integration into html link?
  * @param outputFolder The folder to write the output to. Should be the same as the output folder of the writer.
