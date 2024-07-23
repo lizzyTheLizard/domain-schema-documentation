@@ -7,8 +7,6 @@ properties:
     type: string
   link:
     type: string
-  htmlLink:
-    type: string
 required:
 - text
 - link

@@ -9,8 +9,6 @@ export interface Link {
   text: string
   /** Link URL */
   link: string
-  /** Optional link for HTML clients */
-  htmlLink?: string
 }
 
 /** A tag for a schema */
