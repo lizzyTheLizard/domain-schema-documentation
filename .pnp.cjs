@@ -98,6 +98,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-jsdoc", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:48.5.0"],\
           ["eslint-plugin-n", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:16.6.2"],\
           ["eslint-plugin-promise", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:6.2.0"],\
+          ["fast-json-patch", "npm:3.1.1"],\
           ["handlebars", "npm:4.7.8"],\
           ["java-parser", "npm:2.2.0"],\
           ["minimist", "npm:1.2.8"],\
@@ -3655,6 +3656,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-jsdoc", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:48.5.0"],\
           ["eslint-plugin-n", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:16.6.2"],\
           ["eslint-plugin-promise", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:6.2.0"],\
+          ["fast-json-patch", "npm:3.1.1"],\
           ["handlebars", "npm:4.7.8"],\
           ["java-parser", "npm:2.2.0"],\
           ["minimist", "npm:1.2.8"],\
@@ -4502,6 +4504,15 @@ const RAW_RUNTIME_STATE =
           ["glob-parent", "npm:5.1.2"],\
           ["merge2", "npm:1.4.1"],\
           ["micromatch", "npm:4.0.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["fast-json-patch", [\
+      ["npm:3.1.1", {\
+        "packageLocation": "./.yarn/cache/fast-json-patch-npm-3.1.1-7e8bb70a45-8a0438b481.zip/node_modules/fast-json-patch/",\
+        "packageDependencies": [\
+          ["fast-json-patch", "npm:3.1.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6365,6 +6376,7 @@ const RAW_RUNTIME_STATE =
           ["ajv-formats", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:3.0.1"],\
           ["better-ajv-errors", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:1.2.0"],\
           ["cpy-cli", "npm:5.0.0"],\
+          ["fast-json-patch", "npm:3.1.1"],\
           ["handlebars", "npm:4.7.8"],\
           ["java-parser", "npm:2.2.0"],\
           ["jest", "virtual:3d0e1bfb8afd782ca3699443368ec9a5da7fe24a763052978c0ed16db2ac4212f8c53551dff2f37fe8d3d2ca6001e09b4ad64d8f483f9aeaab238b6e33d8081d#npm:29.7.0"],\

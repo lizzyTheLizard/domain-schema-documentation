@@ -15,7 +15,7 @@ describe('OpenAPIValidator', () => {
     options = { srcSpec: path.join(tmpDir.name, 'Module.openapi.yaml') }
   })
 
-  test('No openApi and no spec', async () => {
+  test('No spec', async () => {
     const module = testModule()
     await validate(module, undefined, options)
     expect(module.errors).toEqual([])
@@ -26,7 +26,7 @@ describe('OpenAPIValidator', () => {
     const module = testModule()
     await validate(module, undefined, options)
     expect(module.errors).toEqual([{
-      text: `'${options.srcSpec}' should not exist but is present in the implementation`,
+      text: `'${options.srcSpec}' should not exist as ${module.$id} has no openapi specification`,
       type: 'NOT_IN_DOMAIN_MODEL'
     }])
   })
@@ -35,7 +35,7 @@ describe('OpenAPIValidator', () => {
     const module = { ...testModule() }
     await validate(module, fullSpec(), options)
     expect(module.errors).toEqual([{
-      text: `'${options.srcSpec}' should exist but is missing in the implementation`,
+      text: `'${options.srcSpec}' should exist as ${module.$id} has an openapi specification`,
       type: 'MISSING_IN_IMPLEMENTATION'
     }])
   })
@@ -67,7 +67,7 @@ describe('OpenAPIValidator', () => {
     const module = { ...testModule() }
     await validate(module, expectedSpec, options)
     expect(module.errors).toEqual([{
-      text: `Path '/new' should not exist in '${options.srcSpec}' but is present`,
+      text: `Path '/new' must not exist in '${options.srcSpec}'`,
       type: 'NOT_IN_DOMAIN_MODEL'
     }])
   })
@@ -87,7 +87,7 @@ describe('OpenAPIValidator', () => {
     const module = { ...testModule() }
     await validate(module, expectedSpec, options)
     expect(module.errors).toEqual([{
-      text: `Path '/new' should exist in '${options.srcSpec}' but is missing`,
+      text: `Path '/new' must exist in '${options.srcSpec}'`,
       type: 'MISSING_IN_IMPLEMENTATION'
     }])
   })
@@ -107,10 +107,10 @@ describe('OpenAPIValidator', () => {
     const module = { ...testModule() }
     await validate(module, expectedSpec, options)
     expect(module.errors).toEqual([{
-      text: `Method 'PUT /new' should not exist in '${options.srcSpec}' but is present`,
+      text: `Method 'PUT /new' must not exist in '${options.srcSpec}'`,
       type: 'NOT_IN_DOMAIN_MODEL'
     }, {
-      text: `Method 'GET /new' should exist in '${options.srcSpec}' but is missing`,
+      text: `Method 'GET /new' must exist in '${options.srcSpec}'`,
       type: 'MISSING_IN_IMPLEMENTATION'
     }])
   })
@@ -130,10 +130,10 @@ describe('OpenAPIValidator', () => {
     const module = { ...testModule() }
     await validate(module, expectedSpec, options)
     expect(module.errors).toEqual([{
-      text: `Response '201' on method 'GET /new' should not exist in '${options.srcSpec}' but is present`,
+      text: `Response '201' on method 'GET /new' must not exist in '${options.srcSpec}'`,
       type: 'NOT_IN_DOMAIN_MODEL'
     }, {
-      text: `Response '200' on method 'GET /new' should exist in '${options.srcSpec}' but is missing`,
+      text: `Response '200' on method 'GET /new' must exist in '${options.srcSpec}'`,
       type: 'MISSING_IN_IMPLEMENTATION'
     }])
   })
@@ -174,7 +174,7 @@ describe('OpenAPIValidator', () => {
     const module = { ...testModule() }
     await validate(module, expectedSpec, options)
     expect(module.errors).toEqual([{
-      text: `Response '200' on method 'GET /new' differs in schema. Should be '${JSON.stringify(expectedSpec.components.schemas.C2)}' but is '${JSON.stringify(actualSpec.components.schemas.C1)}'`,
+      text: `/type is 'string' instead of 'number' in response body '200' on method 'GET /new' in '${options.srcSpec}'`,
       type: 'WRONG'
     }])
   })
@@ -196,7 +196,79 @@ describe('OpenAPIValidator', () => {
     const module = { ...testModule() }
     await validate(module, expectedSpec, options)
     expect(module.errors).toEqual([{
-      text: `Response '200' on method 'GET /new' differs in schema. Should be '${JSON.stringify(expectedSpec.components.schemas.C2)}' but is '${JSON.stringify(actualSpec.components.schemas.C1)}'`,
+      text: `/properties/key2 is missing in response body '200' on method 'GET /new' in '${options.srcSpec}'`,
+      type: 'MISSING_IN_IMPLEMENTATION'
+    }, {
+      text: `/properties/key should not exist in response body '200' on method 'GET /new' in '${options.srcSpec}'`,
+      type: 'NOT_IN_DOMAIN_MODEL'
+    }])
+  })
+
+  test('Wrong request property', async () => {
+    const actualSpec = {
+      openapi: '3.0.3',
+      info: { title: 'test', description: 'test2', version: '1' },
+      paths: { '/new': { put: { requestBody: { content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } }, responses: { 201: { description: 'Successful operation' } } } } },
+      components: { schemas: { C1: { type: 'object', properties: { key: { type: 'string' } } } } }
+    }
+    const expectedSpec = {
+      openapi: '3.0.3',
+      info: { title: 'test', description: 'test2', version: '1' },
+      paths: { '/new': { put: { requestBody: { content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } }, responses: { 201: { description: 'Successful operation' } } } } },
+      components: { schemas: { C1: { type: 'object', properties: { key2: { type: 'string' } } } } }
+    }
+    await fs.writeFile(options.srcSpec, yaml.stringify(actualSpec))
+    const module = { ...testModule() }
+    await validate(module, expectedSpec, options)
+    expect(module.errors).toEqual([{
+      text: `/properties/key2 is missing in request body on method 'PUT /new' in '${options.srcSpec}'`,
+      type: 'MISSING_IN_IMPLEMENTATION'
+    }, {
+      text: `/properties/key should not exist in request body on method 'PUT /new' in '${options.srcSpec}'`,
+      type: 'NOT_IN_DOMAIN_MODEL'
+    }])
+  })
+
+  test('Wrong response property (deep)', async () => {
+    const actualSpec = {
+      openapi: '3.0.3',
+      info: { title: 'test', description: 'test2', version: '1' },
+      paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
+      components: { schemas: { C1: { type: 'object', properties: { key: { $ref: '#/components/schemas/C2' } } }, C2: { type: 'object', properties: { key: { type: 'string' } } } } }
+    }
+    const expectedSpec = {
+      openapi: '3.0.3',
+      info: { title: 'test', description: 'test2', version: '1' },
+      paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
+      components: { schemas: { C1: { type: 'object', properties: { key: { $ref: '#/components/schemas/C2' } } }, C2: { type: 'object', properties: { key: { type: 'string' }, key2: { type: 'number' } } } } }
+    }
+    await fs.writeFile(options.srcSpec, yaml.stringify(actualSpec))
+    const module = { ...testModule() }
+    await validate(module, expectedSpec, options)
+    expect(module.errors).toEqual([{
+      text: `/properties/key/properties/key2 is missing in response body '200' on method 'GET /new' in '${options.srcSpec}'`,
+      type: 'MISSING_IN_IMPLEMENTATION'
+    }])
+  })
+
+  test('Wrong property type (deep)', async () => {
+    const actualSpec = {
+      openapi: '3.0.3',
+      info: { title: 'test', description: 'test2', version: '1' },
+      paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
+      components: { schemas: { C1: { type: 'object', properties: { key: { $ref: '#/components/schemas/C2' } } }, C2: { type: 'object', properties: { key: { type: 'string' } } } } }
+    }
+    const expectedSpec = {
+      openapi: '3.0.3',
+      info: { title: 'test', description: 'test2', version: '1' },
+      paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
+      components: { schemas: { C1: { type: 'object', properties: { key: { $ref: '#/components/schemas/C2' } } }, C2: { type: 'object', properties: { key: { type: 'number' } } } } }
+    }
+    await fs.writeFile(options.srcSpec, yaml.stringify(actualSpec))
+    const module = { ...testModule() }
+    await validate(module, expectedSpec, options)
+    expect(module.errors).toEqual([{
+      text: `/properties/key/properties/key/type is 'string' instead of 'number' in response body '200' on method 'GET /new' in '${options.srcSpec}'`,
       type: 'WRONG'
     }])
   })
