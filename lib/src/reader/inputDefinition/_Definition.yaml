@@ -1,0 +1,94 @@
+$id: _Definition.yaml
+$schema: http://json-schema.org/draft-07/schema#
+title: Definition
+type: object
+allOf:
+# Must be a valid JSON-Schema
+- $ref: http://json-schema.org/draft-07/schema#
+# Must be an reference object, array, enum or base property
+- type: object
+  oneOf:
+  - properties:
+      $ref:
+        type: 'string'
+    required:
+    - $ref
+  - properties:
+      type:
+        const: 'object'
+    anyOf:
+    - required:
+      - oneOf
+    - required:
+      - properties
+  - properties:
+      type:
+        const: 'array'
+      items:
+        $ref: '#'
+    required:
+    - items
+    - type
+  - properties:
+      type:
+        const: 'string'
+      x-enum-description:
+        type: object
+        additionalProperties:
+          type: string
+    required:
+      - enum
+  - properties:
+      type:
+        enum:
+        - string
+        - number
+        - integer
+        - boolean
+        - null
+      enum: false
+      format:
+        type: string
+      const: true
+      x-references:
+        oneOf:
+        - type: string
+        - type: array
+          items:
+            type: string
+    anyOf:
+    - required:
+      - const
+    - required:
+      - type
+# On some types we are stricter than the JSON-Schema
+- properties:
+    title:
+      type: string
+    definitions:
+      type: object
+      additionalProperties:
+        $ref: '#'
+    properties:
+      type: object
+      additionalProperties:
+        $ref: '#'
+    oneOf:
+      type: array
+      items:
+        $ref: '#'
+    items:
+      $ref: '#'
+    type:
+      type: string
+    enum:
+      type: array
+      items:
+        type: string
+    additionalItems: false
+    maxProperties: false
+    minProperties: false
+    patternProperties: false
+    propertyNames: false
+    allOf: false
+    anyOf: false

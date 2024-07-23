@@ -32,6 +32,9 @@ sed -i -e 's/kesslerUnitId: "10A"/kesslerUnitUId: "KU-10A"/g' model/Partner/Pers
 #Delete mkz
 sed -i '64d' model/Partner/Person.yml
 
+#Fix wrong type:string in $ref
+sed -i '114d' model/Vereinbarung/Praemienfluss.yml 
+
 #dtos not yet supported
 find model -type f -exec grep -q 'x-schema-type: dto' {} \; -delete
 # type dto is missing in this file...

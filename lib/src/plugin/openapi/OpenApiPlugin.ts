@@ -27,7 +27,7 @@ export function openApiPlugin (outputFolder: string, optionsOrUndefined?: Partia
     const generator = new OpenAPIGenerator(model, outputFolder)
     for (const module of model.modules) {
       const specDef = await generator.generate(module)
-      if (specDef !== undefined) module.links.push({ text: 'OpenApiSpec', href: `./${getOpenApiSpecFileName(module)}` })
+      if (specDef !== undefined) module.links.push({ text: 'OpenApiSpec', link: `./${getOpenApiSpecFileName(module)}` })
       await validate(module, specDef, options)
     }
   }

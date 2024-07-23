@@ -94,8 +94,12 @@ export class InputValidator {
   private setUpAjv (): Ajv {
     const ajv = new Ajv({ ...this.options.ajvOptions, discriminator: this.options.discriminator === 'AJV' })
       .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Application.yaml')))
+      .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Definition.yaml')))
+      .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Error.yaml')))
+      .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Link.yaml')))
       .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Module.yaml')))
       .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Schema.yaml')))
+      .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Tag.yaml')))
       .addKeyword('x-schema-type')
       .addKeyword('x-references')
       .addKeyword('x-enum-description')

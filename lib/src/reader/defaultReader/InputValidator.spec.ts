@@ -125,4 +125,11 @@ describe('InputValidator', () => {
     expect(() => { target.validateSchemaFile({ ...schema, properties: { key: { type: 'integer', const: 2 } } }, 'file.yaml') }).not.toThrow()
     expect(() => { target.validateSchemaFile({ ...schema, properties: { key: { type: 'number', const: 3 } } }, 'file.yaml') }).not.toThrow()
   })
+
+  test('validate ref property', () => {
+    const schema: Schema = testSchema()
+    expect(() => { target.validateSchemaFile({ ...schema, properties: { key: { $ref: '#' } } }, 'file.yaml') }).not.toThrow()
+    expect(() => { target.validateSchemaFile({ ...schema, properties: { key: { type: 'object', $ref: '#' } } }, 'file.yaml') }).not.toThrow()
+    expect(() => { target.validateSchemaFile({ ...schema, properties: { key: { type: 'string', $ref: '#' } } }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
+  })
 })

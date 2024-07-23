@@ -3,139 +3,53 @@ $schema: http://json-schema.org/draft-07/schema#
 title: Schema Definition
 type: object
 allOf:
-  - $ref: "#/definitions/Schema"
-  # On top level, we want to enforce additional properties
-  - type: object
-    properties:
-      x-schema-type:
+# A schema must be a definition and have some additional top level properties
+- $ref: './_Definition.yaml'
+- properties:
+    schema:
+      type: string
+      const: 'http://json-schema.org/draft-07/schema#'
+    x-schema-type:
+      type: string
+      enum:
+      - Aggregate
+      - Entity
+      - ValueObject
+      - ReferenceData
+      - Other
+    x-todos:
+      type: array
+      items:
         type: string
-        enum:
-          - Aggregate
-          - Entity
-          - ValueObject
-          - ReferenceData
-          - Other
-      x-todos:
-        type: array
-        items:
-          type: string
-      x-links:
-        type: array
-        items:
-          type: object
-          properties:
-            text:
-              type: string
-            href:
-              type: string
-          required:
-            - text
-            - href
-      x-tags:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-            value:
-              type: string
-            color:
-              type: string
-          required:
-            - name
-            - color
-      x-errors:
-        type: array
-        items:    
-          type: object
-          properties:
-            text:
-              type: string
-            type:
-              type: string
-              enum:
-                - NOT_IN_DOMAIN_MODEL
-                - MISSING_IN_IMPLEMENTATION
-                - WRONG
-                - OTHER
-          required:
-            - text
-            - type
+    x-links:
+      type: array
+      items:
+        $ref: './_Link.yaml'
+    x-tags:
+      type: array
+      items:
+        $ref: './_Tag.yaml'
+    x-errors:
+      type: array
+      items:    
+        $ref: './_Error.yaml'
+  required:
+  - $id
+  - x-schema-type
+  - title
+# Must be either an enum, object or interface
+- type: object
+  oneOf:
+  - properties:
+      type:
+        const: 'object'
+    anyOf:
+    - required:
+      - oneOf
+    - required:
+      - properties
+  - properties:
+      type:
+        const: 'string'
     required:
-    - $id
-    - x-schema-type
-    - title
-   # Must be either an enum, object or interface
-  - type: object
-    oneOf:
-      - type: object
-        properties:
-          type:
-            type: string
-            const: 'object'
-        anyOf:
-        - type: object
-          required:
-            - oneOf
-        - type: object
-          required:
-            - properties
-      - type: object
-        properties:
-          type:
-            type: string
-            const: 'string'
-        required:
-          - enum
-definitions:
-  Schema:
-    type: object
-    allOf:
-      # The Schema must be a valid JSON-Schema
-      - $ref: http://json-schema.org/draft-07/schema#
-      # We want to enforce the type of additional properties
-      - type: object
-        properties:
-          x-enum-description:
-            type: object
-            additionalProperties:
-              type: string
-          x-references:
-            oneOf:
-              - type: string
-              - type: array
-                items:
-                  type: string
-      # On some types we are stricter than the JSON-Schema
-      - type: object
-        properties:
-          title:
-            type: string
-          definitions:
-            type: object
-            additionalProperties:
-              $ref: '#/definitions/Schema'
-          properties:
-            type: object
-            additionalProperties:
-              $ref: '#/definitions/Schema'
-          oneOf:
-            type: array
-            items:
-              $ref: '#/definitions/Schema'
-          items:
-            $ref: '#/definitions/Schema'
-          additionalItems: false
-          maxProperties: false
-          minProperties: false
-          patternProperties: false
-          propertyNames: false
-          allOf: false
-          anyOf: false
-          type:
-            type: string
-          enum:
-            type: array
-            items:
-              type: string
+      - enum

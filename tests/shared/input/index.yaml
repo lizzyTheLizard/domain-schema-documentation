@@ -10,9 +10,9 @@ todos:
    -  A Todo
 links:
   - text: Link
-    href: 'http://www.google.com'
+    link: 'http://www.google.com'
   - text: Local-Link
-    href: './Module/index.yaml'
+    link: './Module/index.yaml'
 errors:
   - text: "An error"
     type: "WRONG"

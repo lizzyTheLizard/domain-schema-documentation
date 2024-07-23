@@ -8,7 +8,9 @@ export interface Link {
   /** Link text */
   text: string
   /** Link URL */
-  href: string
+  link: string
+  /** Optional link for HTML clients */
+  htmlLink?: string
 }
 
 /** A tag for a schema */
@@ -25,6 +27,7 @@ export interface Tag {
 export interface ImplementationError {
   text: string
   type: ImplementationErrorType
+  details?: Link[]
 }
 
 /** Type of the verification error */
