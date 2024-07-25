@@ -30,7 +30,9 @@ export class OpenApiComperator {
       return
     }
     const implementedSpec = await this.#parser.dereference(srcFile, { dereference: { circular: 'ignore' } })
-    const expectedSpec = await this.#parser.dereference(expectedSpecInput, { dereference: { circular: 'ignore' } })
+    // This will change the spec in place but we do not want to change the original spec. So let's clone it first
+    const clone = structuredClone(expectedSpecInput)
+    const expectedSpec = await this.#parser.dereference(clone, { dereference: { circular: 'ignore' } })
     const errors = this.compareSpec(expectedSpec as OpenAPIV3.Document, implementedSpec as OpenAPIV3.Document)
       .map(e => ({ ...e, text: `${e.text} in '${srcFile}'` }))
     module.errors.push(...errors)
@@ -177,7 +179,8 @@ export class OpenApiComperator {
       }
       const expectedSchema = expectedContent[expectedMediaType].schema
       const implementedSchema = implementedContent[expectedMediaType].schema
-      result.push(...jsonSchemaDiff(expectedSchema, implementedSchema).map(e => ({ ...e, text: `${context} is wrong: ${e.text}` })))
+      const contextWithMT = expectedMediaTypes.length === 1 ? context : `${context} with media type '${expectedMediaType}'`
+      result.push(...jsonSchemaDiff(expectedSchema, implementedSchema).map(e => ({ ...e, text: `${contextWithMT} is wrong: ${e.text}` })))
     })
     implementedMediaTypes.forEach(implementedMediaType => {
       if (!expectedMediaTypes.includes(implementedMediaType)) {

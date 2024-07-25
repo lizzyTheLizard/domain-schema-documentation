@@ -97,7 +97,7 @@ components:
         kind:
           type: string
           enum:
-            - INSIDE2
+            - INSIDEX
         key:
           type: string
         value:
