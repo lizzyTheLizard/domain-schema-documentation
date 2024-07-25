@@ -142,7 +142,5 @@ function constantValue (p: BasicProperty & { const: unknown }): string {
     case 'integer':
     case 'boolean':
       return JSON.stringify(p.const)
-    case 'null':
-      return 'null'
   }
 }

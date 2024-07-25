@@ -118,7 +118,7 @@ function normalizeProperty (property: NonNormalizedSubSchema, name: string): Nor
     const result: RefProperty = { $ref: `#/definitions/${name}` }
     return { result, definitions: { [name]: property } }
   }
-  if (property.type === undefined || (property.type !== 'boolean' && property.type !== 'integer' && property.type !== 'null' && property.type !== 'number' && property.type !== 'string')) {
+  if (property.type === undefined || (property.type !== 'boolean' && property.type !== 'integer' && property.type !== 'number' && property.type !== 'string')) {
     console.error(`Invalid type ${property.type} for property ${name}. Assuming string`)
     const result: BasicProperty = { ...property, type: 'string' }
     return ({ result, definitions: {} })
