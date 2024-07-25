@@ -8,7 +8,6 @@ import { OpenAPIV3 } from 'openapi-types'
 /**
  * Validates if the expected OpenAPI specification is equal to the implemented OpenAPI specification.
  * Errors will be added to the module.
- * TODO: Support enums values as those are not detected as changes in openapi-diff
  * @param module The current module
  * @param expectedSpec The expected OpenAPI specification
  * @param options The options for the OpenAPI plugin
