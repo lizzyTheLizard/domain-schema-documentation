@@ -1,5 +1,5 @@
 /* eslint-disable jsdoc/require-jsdoc */
-export function fullSpec (): any {
+export function fullSpec (): object {
   return {
     openapi: '3.0.3',
     info: { title: 'test', description: 'test2', version: '1' },
@@ -22,7 +22,7 @@ export function fullSpec (): any {
   }
 }
 
-export function refSpec (): any {
+export function refSpec (): object {
   return {
     paths: {
       '/pet': {
@@ -50,7 +50,7 @@ export function refSpec (): any {
   }
 }
 
-export function refSpecInterface (): any {
+export function refSpecInterface (): object {
   return {
     paths: {
       '/pet': {

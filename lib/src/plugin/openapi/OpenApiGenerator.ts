@@ -1,71 +1,52 @@
-import { type SchemaObject } from 'ajv'
-import Ajv from 'ajv-draft-04'
-import addFormats from 'ajv-formats'
-import { writeOutput } from '../../writer/WriterHelpers'
-import * as yaml from 'yaml'
-import path from 'path'
 import type { Schema, Model, Module, Definition, Property } from '../../reader/Reader'
-import { cleanName, getModuleId, getModuleName, getSchema, getSchemaName, resolveRelativeIdForModule } from '../../reader/helper/InputHelper'
-import fs from 'fs'
-import betterAjvErrors from 'better-ajv-errors'
+import { cleanName, getModuleId, getSchema, getSchemaName, resolveRelativeIdForModule } from '../../reader/helper/InputHelper'
 
 /**
  * Generates OpenApi-Specifications from module files
- * Removes stuff that is not compatible with OpenAPI, collect other schemas into one file
- * and writes the resulting file to the output folder
+ * - Removes stuff that is not compatible with OpenAPI
+ * - Collect other schemas into one file
  */
-export class OpenAPIGenerator {
-  readonly #ajv: Ajv
-  readonly #openApiSchema: SchemaObject
-  #currentModule!: Module
-  #currentSpec!: OpenApiSpec
-  #schemasToProcess!: string[]
-  #processedSchemas!: string[]
+export class OpenApiGenerator {
+  #schemasToProcess: string[] = []
+  #processedSchemas: string[] = []
+  #module!: Module
 
-  constructor (private readonly model: Model, private readonly outputFolder: string) {
-    this.#ajv = new Ajv({ allErrors: true, strict: false })
-    addFormats(this.#ajv)
-    this.#ajv.addFormat('media-range', true)
-    const schemaFile = path.join(__dirname, 'openapi_30.yaml')
-    this.#openApiSchema = yaml.parse(fs.readFileSync(schemaFile).toString())
+  constructor (private readonly model: Model) {
   }
 
-  public async generate (module: Module & { openApi?: unknown }): Promise<object | undefined> {
-    if (module.openApi === undefined || module.openApi === null) return undefined
-    this.#currentModule = module
+  public generate (module: Module, inputSpec: object): object {
+    this.#module = module
     this.#schemasToProcess = []
     this.#processedSchemas = []
-    this.#currentSpec = this.createInitialOpenApiSpec(module.openApi)
-    this.replaceRefs(this.#currentSpec)
+    const currentSpec = this.createInitialOpenApiSpec(inputSpec)
+    this.replaceRefs(currentSpec)
     let currentSchemaId: string | undefined
     while ((currentSchemaId = this.#schemasToProcess.pop()) !== undefined) {
       const s = getSchema(this.model, currentSchemaId)
-      const schemaCopy = cleanSchemaCopy(s)
+      const schemaCopy = OpenApiGenerator.cleanSchemaCopy(s)
       this.replaceRefs(schemaCopy, s.$id)
-      this.#currentSpec.components.schemas[getDefinitionName(s)] = schemaCopy
+      currentSpec.components.schemas[OpenApiGenerator.getDefinitionName(s)] = schemaCopy
       Object.entries(s.definitions).forEach(([definitionName, originalDefinition]) => {
-        const definitionCopy = cleanDefinitionCopy(originalDefinition)
+        const definitionCopy = OpenApiGenerator.cleanDefinitionCopy(originalDefinition)
         this.replaceRefs(definitionCopy, s.$id)
-        this.#currentSpec.components.schemas[getDefinitionName(s, definitionName)] = definitionCopy
+        currentSpec.components.schemas[OpenApiGenerator.getDefinitionName(s, definitionName)] = definitionCopy
       })
     }
-    await this.validate()
-    await this.write()
-    return this.#currentSpec
+    return currentSpec
   }
 
-  private createInitialOpenApiSpec (input: object): OpenApiSpec {
-    const openApiSpec: OpenApiSpec = {
+  private createInitialOpenApiSpec (inputSpec: object): any {
+    const openApiSpec = {
       openapi: '3.0.3',
       info: {
-        title: this.#currentModule.title,
-        description: this.#currentModule.description,
+        title: this.#module.title,
+        description: this.#module.description,
         version: new Date().toDateString()
       },
       servers: [],
       paths: {},
       components: { schemas: {}, securitySchemes: {} },
-      ...structuredClone(input)
+      ...structuredClone(inputSpec)
     }
     if (openApiSpec.components.schemas === undefined) { openApiSpec.components.schemas = {} }
     return openApiSpec
@@ -86,7 +67,7 @@ export class OpenAPIGenerator {
       if (schemaId === undefined) {
         throw new Error(`Unsupported reference ${input.$ref}. Cannot have '#' a reference in OpenApi. Do you mean '#/components?`)
       }
-      input.$ref = '#/components/schemas/' + getDefinitionName(schemaId)
+      input.$ref = '#/components/schemas/' + OpenApiGenerator.getDefinitionName(schemaId)
       return
     }
     if (input.$ref.startsWith('#/components/')) {
@@ -96,7 +77,7 @@ export class OpenAPIGenerator {
       if (schemaId === undefined) {
         throw new Error(`Unsupported reference ${input.$ref}. Cannot have '#/definitions' a reference in OpenApi. Do you mean '#/components?`)
       }
-      input.$ref = '#/components/schemas/' + getDefinitionName(schemaId, input.$ref.substring(14))
+      input.$ref = '#/components/schemas/' + OpenApiGenerator.getDefinitionName(schemaId, input.$ref.substring(14))
       return
     }
     if (input.$ref.startsWith('#')) {
@@ -104,7 +85,7 @@ export class OpenAPIGenerator {
     }
     let id: string
     if (input.$ref.startsWith('.')) {
-      id = resolveRelativeIdForModule(this.#currentModule, input.$ref)
+      id = resolveRelativeIdForModule(this.#module, input.$ref)
     } else if (input.$ref.startsWith('/')) {
       id = input.$ref
     } else {
@@ -114,97 +95,58 @@ export class OpenAPIGenerator {
       this.#processedSchemas.push(id)
       this.#schemasToProcess.push(id)
     }
-    input.$ref = '#/components/schemas/' + getDefinitionName(id)
+    input.$ref = '#/components/schemas/' + OpenApiGenerator.getDefinitionName(id)
   }
 
-  private async validate (): Promise<void> {
-    if (!this.#currentSpec.openapi.startsWith('3.0')) { throw new Error('Only OpenAPI 3.0.X is supported') }
-    try {
-      if (this.#ajv.validate(this.#openApiSchema, this.#currentSpec)) return
-    } catch (e: unknown) {
-      const error = e as Error
-      throw new Error(`Invalid OpenAPI-Spec in module ${this.#currentModule.$id}: ${error.message}`)
+  private static getDefinitionName (schemaOrschemaId: string | Schema, definitionName?: string): string {
+    const moduleId = cleanName(getModuleId(schemaOrschemaId))
+    const schemaName = cleanName(getSchemaName(schemaOrschemaId))
+    const result = moduleId + schemaName
+    if (definitionName === undefined) {
+      return result
     }
-    const errors = this.#ajv.errors
-    if (!errors) {
-      throw new Error(`Invalid OpenAPI-Spec in module ${this.#currentModule.$id}: ${this.#ajv.errorsText()}`)
+    return result + cleanName(definitionName)
+  }
+
+  private static cleanSchemaCopy (schema: Schema): unknown {
+    const copy: Partial<Schema & { example: unknown, properties: Record<string, unknown> }> = structuredClone(schema)
+    delete copy.$id
+    delete copy.definitions
+    delete copy.examples
+    delete copy.title
+    if (schema.examples !== undefined && schema.examples.length !== 0) {
+      copy.example = schema.examples[0]
     }
-    console.error(betterAjvErrors(this.#openApiSchema, this.#currentSpec, errors, { json: JSON.stringify(this.#currentSpec, null, ' ') }))
-    throw new Error(`Invalid OpenAPI-Spec in module ${this.#currentModule.$id}. See logs for details`)
+    if ('required' in copy && copy.required?.length === 0) {
+      delete copy.required
+    }
+    if ('properties' in schema && schema.properties !== undefined) {
+      const properites: Record<string, unknown> = {}
+      Object.entries(schema.properties).forEach(([n, v]) => { properites[n] = OpenApiGenerator.cleanPropertyCopy(v) })
+      copy.properties = properites
+    }
+    return copy
   }
 
-  private async write (): Promise<void> {
-    const yamlOutput = yaml.stringify(this.#currentSpec)
-    const relativeFilename = path.join(this.#currentModule.$id, getFileName(this.#currentModule))
-    await writeOutput(yamlOutput, relativeFilename, this.outputFolder)
+  private static cleanDefinitionCopy (definition: Definition): unknown {
+    const copy: Partial<Definition & { properties: Record<string, unknown> }> = structuredClone(definition)
+    if ('properties' in definition && definition.properties !== undefined) {
+      const properites: Record<string, unknown> = {}
+      Object.entries(definition.properties).forEach(([n, v]) => { properites[n] = OpenApiGenerator.cleanPropertyCopy(v) })
+      copy.properties = properites
+    }
+    return copy
   }
-}
 
-/**
- * The filename of the generated OpenApi-Spec without path
- * @param module The module
- * @returns The filename
- */
-export function getFileName (module: Module): string {
-  return `${getModuleName(module)}.openapi.yaml`
-}
-
-function getDefinitionName (schemaOrschemaId: string | Schema, definitionName?: string): string {
-  const moduleId = cleanName(getModuleId(schemaOrschemaId))
-  const schemaName = cleanName(getSchemaName(schemaOrschemaId))
-  const result = moduleId + schemaName
-  if (definitionName === undefined) {
-    return result
+  private static cleanPropertyCopy (property: Property): unknown {
+    const copy: Partial<Property & { enum: unknown[], items: unknown }> = structuredClone(property)
+    if ('const' in copy) {
+      copy.enum = [copy.const]
+      delete copy.const
+    }
+    if ('items' in property) {
+      copy.items = OpenApiGenerator.cleanPropertyCopy(property.items)
+    }
+    return copy
   }
-  return result + cleanName(definitionName)
-}
-
-function cleanSchemaCopy (schema: Schema): unknown {
-  const copy: Partial<Schema & { example: unknown, properties: Record<string, unknown> }> = structuredClone(schema)
-  delete copy.$id
-  delete copy.definitions
-  delete copy.examples
-  delete copy.title
-  if (schema.examples !== undefined && schema.examples.length !== 0) {
-    copy.example = schema.examples[0]
-  }
-  if ('required' in copy && copy.required?.length === 0) {
-    delete copy.required
-  }
-  if ('properties' in schema && schema.properties !== undefined) {
-    const properites: Record<string, unknown> = {}
-    Object.entries(schema.properties).forEach(([n, v]) => { properites[n] = cleanPropertyCopy(v) })
-    copy.properties = properites
-  }
-  return copy
-}
-
-function cleanDefinitionCopy (definition: Definition): unknown {
-  const copy: Partial<Definition & { properties: Record<string, unknown> }> = structuredClone(definition)
-  if ('properties' in definition && definition.properties !== undefined) {
-    const properites: Record<string, unknown> = {}
-    Object.entries(definition.properties).forEach(([n, v]) => { properites[n] = cleanPropertyCopy(v) })
-    copy.properties = properites
-  }
-  return copy
-}
-
-function cleanPropertyCopy (property: Property): unknown {
-  const copy: Partial<Property & { enum: unknown[], items: unknown }> = structuredClone(property)
-  if ('const' in copy) {
-    copy.enum = [copy.const]
-    delete copy.const
-  }
-  if ('items' in property) {
-    copy.items = cleanPropertyCopy(property.items)
-  }
-  return copy
-}
-
-interface OpenApiSpec {
-  openapi: string
-  info: object
-  servers: Array<{ url: string }>
-  paths: object
-  components: { schemas: Record<string, unknown>, securitySchemes: Record<string, undefined> }
 }

@@ -48,7 +48,7 @@
       <div class="badges">
         <img alt="Static Badge" src="https://img.shields.io/badge/Color--Tag-Blue-blue">
         <img alt="Static Badge" src="https://img.shields.io/badge/Without%20Value-green">
-        <img alt="Static Badge" src="https://img.shields.io/badge/Validator%20Errors-3-red">
+        <img alt="Static Badge" src="https://img.shields.io/badge/Validator%20Errors-5-red">
       </div>
       
       <div class="alert alert-danger" role="alert">
@@ -147,7 +147,15 @@
             </tr>
             <tr>
               <td>NOT_IN_DOMAIN_MODEL</td>
-              <td>Method &#x27;GET /test&#x27; should not exist in &#x27;/home/grma/IdeaProjects/domain-schema-documentation/tests/openapi/src/Module.openapi.yaml&#x27; but is present</td>
+              <td>Method &#x27;GET /test&#x27; must not exist in &#x27;/home/grma/IdeaProjects/domain-schema-documentation/tests/openapi/src/Module.openapi.yaml&#x27;</td>
+            </tr>
+            <tr>
+              <td>WRONG</td>
+              <td>Type of &#x27;kind&#x27; must be &#x27;string&#x27; but is &#x27;number&#x27; in response body &#x27;200&#x27; on method &#x27;PUT /test&#x27; in &#x27;/home/grma/IdeaProjects/domain-schema-documentation/tests/openapi/src/Module.openapi.yaml&#x27;</td>
+            </tr>
+            <tr>
+              <td>NOT_IN_DOMAIN_MODEL</td>
+              <td>Property &#x27;wrong&#x27; must not exist in response body &#x27;200&#x27; on method &#x27;PUT /test&#x27; in &#x27;/home/grma/IdeaProjects/domain-schema-documentation/tests/openapi/src/Module.openapi.yaml&#x27;</td>
             </tr>
             <tr>
               <td>WRONG</td>

@@ -1,24 +1,17 @@
-import * as tmp from 'tmp'
-import { OpenAPIGenerator } from './OpenApiGenerator'
+import { OpenApiGenerator } from './OpenApiGenerator'
 import { testInterfaceSchema, testModel, testModule, testSchema } from '../../testData'
 import { fullSpec, refSpec, refSpecInterface } from './testData'
 
 describe('OpenAPIGenerator', () => {
-  let tmpDir: tmp.DirResult
-  let target: OpenAPIGenerator
+  const module = testModule()
+  let target: OpenApiGenerator
 
   beforeEach(() => {
-    tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    target = new OpenAPIGenerator(testModel(), tmpDir.name)
-  })
-  test('reject invalid', async () => {
-    await expect(target.generate({ ...testModule(), openApi: { ...fullSpec(), wrong: 'value' } })).rejects.toThrow()
-    await expect(target.generate({ ...testModule(), openApi: fullSpec() })).resolves.not.toThrow()
+    target = new OpenApiGenerator(testModel())
   })
 
-  test('fill default values', async () => {
-    const module = { ...testModule(), openApi: {} }
-    const result = await target.generate(module)
+  test('fill default values', () => {
+    const result = target.generate(module, {})
     expect(result).toEqual({
       openapi: '3.0.3',
       info: { title: module.title, description: module.description, version: new Date().toDateString() },
@@ -28,20 +21,16 @@ describe('OpenAPIGenerator', () => {
     })
   })
 
-  test('overwrite defaults if given', async () => {
+  test('overwrite defaults if given', () => {
     const openApi = fullSpec()
-    const module = { ...testModule(), openApi }
-    const result = await target.generate(module)
-    expect(result).toEqual({
-      ...openApi
-    })
+    const result = target.generate(module, openApi)
+    expect(result).toEqual(openApi)
   })
 
-  test('$ref in original', async () => {
+  test('$ref in original', () => {
     const openApi = refSpec()
-    const module = { ...testModule(), openApi }
-    const result = await target.generate(module) as any
-    expect(result.paths).toEqual(openApi.paths)
+    const result = target.generate(module, openApi) as any
+    expect(result.paths).toEqual((openApi as any).paths)
     expect(result.components.schemas).toEqual({
       Test: {
         type: 'object',
@@ -67,9 +56,8 @@ describe('OpenAPIGenerator', () => {
     const openApi = refSpecInterface()
     const schema = testInterfaceSchema()
     const model = { ...testModel(), schemas: [testSchema(), schema] }
-    const module = { ...model.modules[0], openApi }
-    target = new OpenAPIGenerator(model, tmpDir.name)
-    const result = await target.generate(module) as any
+    target = new OpenApiGenerator(model)
+    const result = target.generate(model.modules[0], openApi) as any
     expect((result.paths)['/pet'].put.responses[200].content['application/json'].schema.$ref).toEqual('#/components/schemas/ModuleInterface')
     expect(result.components.schemas).toEqual({
       ModuleInterface: {
