@@ -1,5 +1,7 @@
 import type { Schema, Model, Module, Definition, Property } from '../../reader/Reader'
 import { cleanName, getModuleId, getSchema, getSchemaName, resolveRelativeIdForModule } from '../../reader/helper/InputHelper'
+import SwaggerParser from '@apidevtools/swagger-parser'
+import { type OpenAPIV3 } from 'openapi-types'
 
 /**
  * Generates OpenApi-Specifications from module files
@@ -7,6 +9,7 @@ import { cleanName, getModuleId, getSchema, getSchemaName, resolveRelativeIdForM
  * - Collect other schemas into one file
  */
 export class OpenApiGenerator {
+  readonly #parser = new SwaggerParser()
   #schemasToProcess: string[] = []
   #processedSchemas: string[] = []
   #module!: Module
@@ -14,7 +17,7 @@ export class OpenApiGenerator {
   constructor (private readonly model: Model) {
   }
 
-  public generate (module: Module, inputSpec: object): object {
+  public async generate (module: Module, inputSpec: object): Promise<OpenAPIV3.Document> {
     this.#module = module
     this.#schemasToProcess = []
     this.#processedSchemas = []
@@ -32,10 +35,11 @@ export class OpenApiGenerator {
         currentSpec.components.schemas[OpenApiGenerator.getDefinitionName(s, definitionName)] = definitionCopy
       })
     }
+    await this.validateGeneratedSpec(currentSpec)
     return currentSpec
   }
 
-  private createInitialOpenApiSpec (inputSpec: object): any {
+  private createInitialOpenApiSpec (inputSpec: object): OpenAPIV3.Document & { components: { schemas: object } } {
     const openApiSpec = {
       openapi: '3.0.3',
       info: {
@@ -108,45 +112,63 @@ export class OpenApiGenerator {
     return result + cleanName(definitionName)
   }
 
-  private static cleanSchemaCopy (schema: Schema): unknown {
-    const copy: Partial<Schema & { example: unknown, properties: Record<string, unknown> }> = structuredClone(schema)
-    delete copy.$id
-    delete copy.definitions
-    delete copy.examples
-    delete copy.title
+  private static cleanSchemaCopy (schema: Schema): OpenAPIV3.SchemaObject {
+    const copyWithStuff = structuredClone(schema) as Partial<Schema>
+    delete copyWithStuff.$id
+    delete copyWithStuff.definitions
+    delete copyWithStuff.examples
+    delete copyWithStuff.title
+    if ('required' in copyWithStuff && copyWithStuff.required?.length === 0) {
+      delete copyWithStuff.required
+    }
+    const copy = copyWithStuff as OpenAPIV3.SchemaObject
+
     if (schema.examples !== undefined && schema.examples.length !== 0) {
       copy.example = schema.examples[0]
     }
-    if ('required' in copy && copy.required?.length === 0) {
-      delete copy.required
-    }
     if ('properties' in schema && schema.properties !== undefined) {
-      const properites: Record<string, unknown> = {}
+      const properites: Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject> = {}
       Object.entries(schema.properties).forEach(([n, v]) => { properites[n] = OpenApiGenerator.cleanPropertyCopy(v) })
       copy.properties = properites
     }
     return copy
   }
 
-  private static cleanDefinitionCopy (definition: Definition): unknown {
-    const copy: Partial<Definition & { properties: Record<string, unknown> }> = structuredClone(definition)
+  private static cleanDefinitionCopy (definition: Definition): OpenAPIV3.SchemaObject {
+    const copy = structuredClone(definition) as OpenAPIV3.SchemaObject
     if ('properties' in definition && definition.properties !== undefined) {
-      const properites: Record<string, unknown> = {}
+      const properites: Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject> = {}
       Object.entries(definition.properties).forEach(([n, v]) => { properites[n] = OpenApiGenerator.cleanPropertyCopy(v) })
       copy.properties = properites
     }
     return copy
   }
 
-  private static cleanPropertyCopy (property: Property): unknown {
-    const copy: Partial<Property & { enum: unknown[], items: unknown }> = structuredClone(property)
-    if ('const' in copy) {
-      copy.enum = [copy.const]
-      delete copy.const
+  private static cleanPropertyCopy (property: Property): OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject {
+    if (!('type' in property)) {
+      return structuredClone(property)
     }
-    if ('items' in property) {
-      copy.items = OpenApiGenerator.cleanPropertyCopy(property.items)
+    if (property.type === 'array') {
+      return {
+        ...structuredClone(property),
+        items: OpenApiGenerator.cleanPropertyCopy(property.items)
+      }
     }
-    return copy
+    if ('const' in property) {
+      const copyWithStuff = structuredClone(property)
+      delete copyWithStuff.const
+      return {
+        ...copyWithStuff,
+        enum: [property.const]
+      }
+    }
+    return structuredClone(property)
+  }
+
+  private async validateGeneratedSpec (spec: OpenAPIV3.Document): Promise<void> {
+    const parserOptions: SwaggerParser.Options = { dereference: { circular: 'ignore' } }
+    // This will change the spec in place but we do not want to change the original spec. So let's clone it first
+    const clone = structuredClone(spec)
+    await this.#parser.validate(clone, parserOptions)
   }
 }

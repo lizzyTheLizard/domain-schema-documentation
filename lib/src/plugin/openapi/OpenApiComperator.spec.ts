@@ -5,6 +5,7 @@ import { fullSpec } from './testData'
 import path from 'path'
 import { promises as fs } from 'fs'
 import * as yaml from 'yaml'
+import { type OpenAPIV3 } from 'openapi-types'
 
 describe('OpenApiComperator', () => {
   let tmpDir: tmp.DirResult
@@ -75,6 +76,25 @@ describe('OpenApiComperator', () => {
     }])
   })
 
+  test('Different Path Property Name', async () => {
+    const actualSpec = {
+      openapi: '3.0.3',
+      info: { title: 'test', description: 'test2', version: '1' },
+      // eslint-disable-next-line no-template-curly-in-string
+      paths: { '/new/${id}': { get: { responses: { 200: { description: 'Successful operation' } } } } }
+    }
+    const expectedSpec = {
+      openapi: '3.0.3',
+      info: { title: 'test', description: 'test2', version: '1' },
+      // eslint-disable-next-line no-template-curly-in-string
+      paths: { '/new/${name}': { get: { responses: { 200: { description: 'Successful operation' } } } } }
+    }
+    await fs.writeFile(options.srcSpec, yaml.stringify(actualSpec))
+    const module = testModule()
+    await target.ensureEqual(module, expectedSpec)
+    expect(module.errors).toEqual([])
+  })
+
   test('Missing Path', async () => {
     const actualSpec = {
       openapi: '3.0.3',
@@ -110,11 +130,11 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Method 'PUT /new' must not exist in '${options.srcSpec}'`,
-      type: 'NOT_IN_DOMAIN_MODEL'
-    }, {
       text: `Method 'GET /new' must exist in '${options.srcSpec}'`,
       type: 'MISSING_IN_IMPLEMENTATION'
+    }, {
+      text: `Method 'PUT /new' must not exist in '${options.srcSpec}'`,
+      type: 'NOT_IN_DOMAIN_MODEL'
     }])
   })
 
@@ -133,11 +153,11 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Response '201' on method 'GET /new' must not exist in '${options.srcSpec}'`,
-      type: 'NOT_IN_DOMAIN_MODEL'
-    }, {
-      text: `Response '200' on method 'GET /new' must exist in '${options.srcSpec}'`,
+      text: `Response '200' in method 'GET /new' must exist in '${options.srcSpec}'`,
       type: 'MISSING_IN_IMPLEMENTATION'
+    }, {
+      text: `Response '201' in method 'GET /new' must not exist in '${options.srcSpec}'`,
+      type: 'NOT_IN_DOMAIN_MODEL'
     }])
   })
 
@@ -148,7 +168,7 @@ describe('OpenApiComperator', () => {
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
       components: { schemas: { C1: { type: 'string' } } }
     }
-    const expectedSpec = {
+    const expectedSpec: OpenAPIV3.Document = {
       openapi: '3.0.3',
       info: { title: 'test', description: 'test2', version: '1' },
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C2' } } } } } } } },
@@ -167,11 +187,11 @@ describe('OpenApiComperator', () => {
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
       components: { schemas: { C1: { type: 'string' } } }
     }
-    const expectedSpec = {
+    const expectedSpec: OpenAPIV3.Document = {
       openapi: '3.0.3',
       info: { title: 'test', description: 'test2', version: '1' },
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
-      components: { schemas: { C1: { type: 'string', 'x-header': 'Value' } } }
+      components: { schemas: { C1: { type: 'string', 'x-header': 'Value' } } } as any
     }
     await fs.writeFile(options.srcSpec, yaml.stringify(actualSpec))
     const module = testModule()
@@ -179,26 +199,28 @@ describe('OpenApiComperator', () => {
     expect(module.errors).toEqual([])
   })
 
-  // TODO: Fix test if enum-values are supported
-  /*  test('Enum-values', async () => {
+  test('Enum-values', async () => {
     const actualSpec = {
       openapi: '3.0.3',
       info: { title: 'test', description: 'test2', version: '1' },
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
       components: { schemas: { C1: { type: 'string', enum: ['A'] } } }
     }
-    const expectedSpec = {
+    const expectedSpec: OpenAPIV3.Document = {
       openapi: '3.0.3',
       info: { title: 'test', description: 'test2', version: '1' },
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
-      components: { schemas: { C1: { type: 'string', enum: ['A', 'B'], 'x-enum-description': { A: 'Test' } } } }
+      components: { schemas: { C1: { type: 'string', enum: ['A', 'B'] } } }
     }
     await fs.writeFile(options.srcSpec, yaml.stringify(actualSpec))
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
-    expect(module.errors).toEqual(['a'])
+    expect(module.errors).toEqual([{
+      text: `Response body '200' in method 'GET /new' is wrong: Enum must contain value "B" in '${options.srcSpec}'`,
+      type: 'MISSING_IN_IMPLEMENTATION'
+    }])
   })
-*/
+
   test('Wrong response type', async () => {
     const actualSpec = {
       openapi: '3.0.3',
@@ -206,7 +228,7 @@ describe('OpenApiComperator', () => {
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
       components: { schemas: { C1: { type: 'string' } } }
     }
-    const expectedSpec = {
+    const expectedSpec: OpenAPIV3.Document = {
       openapi: '3.0.3',
       info: { title: 'test', description: 'test2', version: '1' },
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C2' } } } } } } } },
@@ -216,7 +238,7 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Type must be 'number' but is 'string' in response body '200' on method 'GET /new' in '${options.srcSpec}'`,
+      text: `Response body '200' in method 'GET /new' is wrong: Type must be 'number' but is 'string' in '${options.srcSpec}'`,
       type: 'WRONG'
     }])
   })
@@ -228,7 +250,7 @@ describe('OpenApiComperator', () => {
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
       components: { schemas: { C1: { type: 'object', properties: { key: { type: 'string' } } } } }
     }
-    const expectedSpec = {
+    const expectedSpec: OpenAPIV3.Document = {
       openapi: '3.0.3',
       info: { title: 'test', description: 'test2', version: '1' },
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C2' } } } } } } } },
@@ -238,10 +260,10 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Property 'key2' must exist in response body '200' on method 'GET /new' in '${options.srcSpec}'`,
+      text: `Response body '200' in method 'GET /new' is wrong: Property 'key2' must exist in '${options.srcSpec}'`,
       type: 'MISSING_IN_IMPLEMENTATION'
     }, {
-      text: `Property 'key' must not exist in response body '200' on method 'GET /new' in '${options.srcSpec}'`,
+      text: `Response body '200' in method 'GET /new' is wrong: Property 'key' must not exist in '${options.srcSpec}'`,
       type: 'NOT_IN_DOMAIN_MODEL'
     }])
   })
@@ -253,7 +275,7 @@ describe('OpenApiComperator', () => {
       paths: { '/new': { put: { requestBody: { content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } }, responses: { 201: { description: 'Successful operation' } } } } },
       components: { schemas: { C1: { type: 'object', properties: { key: { type: 'string' } } } } }
     }
-    const expectedSpec = {
+    const expectedSpec: OpenAPIV3.Document = {
       openapi: '3.0.3',
       info: { title: 'test', description: 'test2', version: '1' },
       paths: { '/new': { put: { requestBody: { content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } }, responses: { 201: { description: 'Successful operation' } } } } },
@@ -263,10 +285,10 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Property 'key2' must exist in request body on method 'PUT /new' in '${options.srcSpec}'`,
+      text: `Request body in method 'PUT /new' is wrong: Property 'key2' must exist in '${options.srcSpec}'`,
       type: 'MISSING_IN_IMPLEMENTATION'
     }, {
-      text: `Property 'key' must not exist in request body on method 'PUT /new' in '${options.srcSpec}'`,
+      text: `Request body in method 'PUT /new' is wrong: Property 'key' must not exist in '${options.srcSpec}'`,
       type: 'NOT_IN_DOMAIN_MODEL'
     }])
   })
@@ -278,7 +300,7 @@ describe('OpenApiComperator', () => {
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
       components: { schemas: { C1: { type: 'object', properties: { key: { $ref: '#/components/schemas/C2' } } }, C2: { type: 'object', properties: { key: { type: 'string' } } } } }
     }
-    const expectedSpec = {
+    const expectedSpec: OpenAPIV3.Document = {
       openapi: '3.0.3',
       info: { title: 'test', description: 'test2', version: '1' },
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
@@ -288,7 +310,7 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Property 'key.key2' must exist in response body '200' on method 'GET /new' in '${options.srcSpec}'`,
+      text: `Response body '200' in method 'GET /new' is wrong: Property 'key.key2' must exist in '${options.srcSpec}'`,
       type: 'MISSING_IN_IMPLEMENTATION'
     }])
   })
@@ -300,7 +322,7 @@ describe('OpenApiComperator', () => {
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
       components: { schemas: { C1: { type: 'object', properties: { key: { $ref: '#/components/schemas/C2' } } }, C2: { type: 'object', properties: { key: { type: 'string' } } } } }
     }
-    const expectedSpec = {
+    const expectedSpec: OpenAPIV3.Document = {
       openapi: '3.0.3',
       info: { title: 'test', description: 'test2', version: '1' },
       paths: { '/new': { get: { responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/C1' } } } } } } } },
@@ -310,7 +332,7 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Type of 'key.key' must be 'number' but is 'string' in response body '200' on method 'GET /new' in '${options.srcSpec}'`,
+      text: `Response body '200' in method 'GET /new' is wrong: Type of 'key.key' must be 'number' but is 'string' in '${options.srcSpec}'`,
       type: 'WRONG'
     }])
   })

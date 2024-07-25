@@ -1,7 +1,6 @@
 import { type Plugin } from '../Plugin'
 import { type Module, type Model } from '../../reader/Reader'
 import { OpenApiGenerator } from './OpenApiGenerator'
-import { OpenApiValidator } from './OpenApiValidator'
 import { OpenApiComperator } from './OpenApiComperator'
 import { writeOutput } from '../../writer/WriterHelpers'
 import * as yaml from 'yaml'

@@ -1,5 +1,7 @@
+import { type OpenAPIV3 } from 'openapi-types'
+
 /* eslint-disable jsdoc/require-jsdoc */
-export function fullSpec (): object {
+export function fullSpec (): OpenAPIV3.Document {
   return {
     openapi: '3.0.3',
     info: { title: 'test', description: 'test2', version: '1' },

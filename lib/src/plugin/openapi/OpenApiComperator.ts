@@ -1,25 +1,25 @@
-import * as yaml from 'yaml'
 import { promises as fs } from 'fs'
 import { type ImplementationError, type Module } from '../../reader/Reader'
 import { type OpenApiPluginOptions } from './OpenApiPlugin'
-import { diffSpecs, type DiffResult } from 'openapi-diff'
-import { type Schema, jsonSchemaDiff } from './JsonSchemaDiff'
+import { jsonSchemaDiff } from './JsonSchemaDiff'
+import SwaggerParser from '@apidevtools/swagger-parser'
+import { OpenAPIV3 } from 'openapi-types'
 
 /**
  * Validates if the expected OpenAPI specification is equal to the implemented OpenAPI specification.
  * Errors will be added to the module.
  * TODO: Support enums values as those are not detected as changes in openapi-diff
- * TODO: Do not use this library any more as it does not recognize all differences
  * @param module The current module
  * @param expectedSpec The expected OpenAPI specification
  * @param options The options for the OpenAPI plugin
  * @returns A promise that resolves when the validation is done
  */
 export class OpenApiComperator {
+  readonly #parser = new SwaggerParser()
   constructor (private readonly options: OpenApiPluginOptions) {
   }
 
-  public async ensureEqual (module: Module, expectedSpec: unknown): Promise<void> {
+  public async ensureEqual (module: Module, expectedSpecInput: OpenAPIV3.Document): Promise<void> {
     const srcFile = this.getImplementedSpec(module)
     if (srcFile === undefined) return
     const exists = await this.existAndAccessible(srcFile)
@@ -30,22 +30,11 @@ export class OpenApiComperator {
       })
       return
     }
-
-    const contend = await fs.readFile(srcFile)
-    const implementedSpec = yaml.parse(contend.toString())
-    const specDifferences = await diffSpecs({
-      sourceSpec: { content: JSON.stringify(expectedSpec), location: 'generated', format: 'openapi3' },
-      destinationSpec: { content: JSON.stringify(implementedSpec), location: srcFile, format: 'openapi3' }
-    })
-    const errors: ImplementationError[] = []
-    errors.push(...specDifferences.nonBreakingDifferences.flatMap(d => this.convertToError(d)))
-    errors.push(...specDifferences.unclassifiedDifferences.flatMap(d => this.convertToError(d)))
-    if (specDifferences.breakingDifferencesFound) {
-      errors.push(...specDifferences.breakingDifferences.flatMap(d => this.convertToError(d)))
-    }
-    const uniqueErrors = this.unique(errors)
-    const errorsWithSrc = uniqueErrors.map(e => ({ ...e, text: `${e.text} in '${srcFile}'` }))
-    module.errors.push(...errorsWithSrc)
+    const implementedSpec = await this.#parser.dereference(srcFile, { dereference: { circular: 'ignore' } })
+    const expectedSpec = await this.#parser.dereference(expectedSpecInput, { dereference: { circular: 'ignore' } })
+    const errors = this.compareSpec(expectedSpec as OpenAPIV3.Document, implementedSpec as OpenAPIV3.Document)
+      .map(e => ({ ...e, text: `${e.text} in '${srcFile}'` }))
+    module.errors.push(...errors)
   }
 
   public async ensureNoSpec (module: Module): Promise<void> {
@@ -74,33 +63,140 @@ export class OpenApiComperator {
       .catch(() => false)
   }
 
-  private convertToError (diff: DiffResult<any>): ImplementationError[] {
-    const location = diff.action === 'add' ? diff.destinationSpecEntityDetails[0]?.location : diff.sourceSpecEntityDetails[0]?.location
-    const source = diff.sourceSpecEntityDetails[0]?.value as Schema
-    const target = diff.destinationSpecEntityDetails[0]?.value as Schema
-    const l = location.split('.')
-    const type = diff.action === 'add' ? 'NOT_IN_DOMAIN_MODEL' : 'MISSING_IN_IMPLEMENTATION'
-    const message = diff.action === 'add' ? 'must not exist' : 'must exist'
-    switch (diff.entity) {
-      case 'path':
-        return [{ text: `Path '${l[1]}' ${message}`, type }]
-      case 'method':
-        return [{ text: `Method '${l[2].toUpperCase()} ${l[1]}' ${message}`, type }]
-      case 'response.status-code':
-        return [{ text: `Response '${l[4]}' on method '${l[2].toUpperCase()} ${l[1]}' ${message}`, type }]
-      case 'request.body.scope':
-        return jsonSchemaDiff(source, target).map(e => ({ ...e, text: `${e.text} in request body on method '${l[2].toUpperCase()} ${l[1]}'` }))
-      case 'response.body.scope':
-        return jsonSchemaDiff(source, target).map(e => ({ ...e, text: `${e.text} in response body '${l[4]}' on method '${l[2].toUpperCase()} ${l[1]}'` }))
-      default:
-        // We do not care about other differences
-        return []
-    }
+  private compareSpec (expectedSpec: OpenAPIV3.Document, implementedSpec: OpenAPIV3.Document): ImplementationError[] {
+    const result: ImplementationError[] = []
+    const expectedPaths = Object.keys(expectedSpec.paths ?? {})
+    const implementedPaths = Object.keys(implementedSpec.paths ?? {})
+
+    expectedPaths.forEach(expectedPath => {
+      const implementedPath = implementedPaths.find(implementedPath => this.pathEquals(expectedPath, implementedPath))
+      if (implementedPath === undefined) {
+        result.push({ text: `Path '${expectedPath}' must exist`, type: 'MISSING_IN_IMPLEMENTATION' })
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        result.push(...this.comparePath(expectedPath, expectedSpec.paths[expectedPath]!, implementedSpec.paths[implementedPath]!))
+      }
+    })
+
+    implementedPaths.forEach(implementedPath => {
+      if (expectedPaths.find(expectedPath => this.pathEquals(expectedPath, implementedPath)) === undefined) {
+        result.push({ text: `Path '${implementedPath}' must not exist`, type: 'NOT_IN_DOMAIN_MODEL' })
+      }
+    })
+    return result
   }
 
-  private unique<T> (input: T[]): T[] {
-    const stringArray = input.map(i => JSON.stringify(i))
-    const uniqueStringArray = [...new Set(stringArray)]
-    return uniqueStringArray.map(i => JSON.parse(i))
+  private comparePath (path: string, expectedPath: OpenAPIV3.PathItemObject, implementedPath: OpenAPIV3.PathItemObject): ImplementationError[] {
+    const result: ImplementationError[] = []
+
+    for (const [,method] of Object.entries(OpenAPIV3.HttpMethods)) {
+      const methodStr = `${method.toUpperCase()} ${path}`
+      if (!(method in expectedPath) && !(method in implementedPath)) {
+        continue
+      }
+      if (method in expectedPath && !(method in implementedPath)) {
+        result.push({ text: `Method '${methodStr}' must exist`, type: 'MISSING_IN_IMPLEMENTATION' })
+        continue
+      }
+      if (!(method in expectedPath) && method in implementedPath) {
+        result.push({ text: `Method '${methodStr}' must not exist`, type: 'NOT_IN_DOMAIN_MODEL' })
+        continue
+      }
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const expectedMethod = expectedPath[method]!
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      const implementedMethod = implementedPath[method]!
+      result.push(...this.compareRequestBody(methodStr, expectedMethod, implementedMethod))
+      result.push(...this.compareResponseBodies(methodStr, expectedMethod, implementedMethod))
+    }
+    return result
   }
+
+  private compareRequestBody (method: string, expectedMethod: OpenAPIV3.OperationObject, implementedMethod: OpenAPIV3.OperationObject): ImplementationError[] {
+    const expectedRequestBody = 'requestBody' in expectedMethod ? expectedMethod.requestBody : undefined
+    const implementedRequestBody = 'requestBody' in implementedMethod ? implementedMethod.requestBody : undefined
+
+    if (expectedRequestBody === undefined && implementedRequestBody === undefined) {
+      return []
+    }
+    if (expectedRequestBody === undefined) {
+      return [{ text: `Request must not exist in method '${method}'`, type: 'NOT_IN_DOMAIN_MODEL' }]
+    }
+    if (implementedRequestBody === undefined) {
+      return [{ text: `Request must exist in method '${method}'`, type: 'MISSING_IN_IMPLEMENTATION' }]
+    }
+    const context = `Request body in method '${method}'`
+    return this.compareContentObject(context, expectedRequestBody, implementedRequestBody)
+  }
+
+  private compareResponseBodies (method: string, expectedMethod: OpenAPIV3.OperationObject, implementedMethod: OpenAPIV3.OperationObject): ImplementationError[] {
+    const result: ImplementationError[] = []
+    const expectedResponseStatusCodes = Object.keys(expectedMethod.responses ?? {})
+    const implementedResponseStatusCodes = Object.keys(implementedMethod.responses ?? {})
+
+    expectedResponseStatusCodes.forEach(expectedStatusCode => {
+      if (!implementedResponseStatusCodes.includes(expectedStatusCode)) {
+        result.push({ text: `Response '${expectedStatusCode}' in method '${method}' must exist`, type: 'MISSING_IN_IMPLEMENTATION' })
+        return
+      }
+      const expectedResponseBody = expectedMethod.responses[expectedStatusCode]
+      const implementedResponseBody = implementedMethod.responses[expectedStatusCode]
+      const context = `Response body '${expectedStatusCode}' in method '${method}'`
+      result.push(...this.compareContentObject(context, expectedResponseBody, implementedResponseBody))
+    })
+    implementedResponseStatusCodes.forEach(implementedStatusCode => {
+      if (!expectedResponseStatusCodes.includes(implementedStatusCode)) {
+        result.push({ text: `Response '${implementedStatusCode}' in method '${method}' must not exist`, type: 'NOT_IN_DOMAIN_MODEL' })
+      }
+    })
+    return result
+  }
+
+  private compareContentObject (context: string, expectedObject: ContentObject, implementedObject: ContentObject): ImplementationError[] {
+    if (expectedObject.$ref !== undefined || implementedObject.$ref !== undefined) {
+      throw Error('Do not expect $ref in content object as spec is already dereferenced')
+    }
+
+    const expectedContent = expectedObject.content
+    const implementedContent = implementedObject.content
+    if (expectedContent === undefined && implementedContent === undefined) {
+      return []
+    }
+    if (expectedContent === undefined) {
+      return [{ text: `${context} must exist`, type: 'MISSING_IN_IMPLEMENTATION' }]
+    }
+    if (implementedContent === undefined) {
+      return [{ text: `${context} must not exist`, type: 'NOT_IN_DOMAIN_MODEL' }]
+    }
+    const expectedMediaTypes = Object.keys(expectedContent)
+    const implementedMediaTypes = Object.keys(implementedContent)
+
+    const result: ImplementationError[] = []
+    expectedMediaTypes.forEach(expectedMediaType => {
+      if (!implementedMediaTypes.includes(expectedMediaType)) {
+        result.push({ text: `${context} must support media type '${expectedMediaType}'`, type: 'MISSING_IN_IMPLEMENTATION' })
+      }
+      const expectedSchema = expectedContent[expectedMediaType].schema
+      const implementedSchema = implementedContent[expectedMediaType].schema
+      result.push(...jsonSchemaDiff(expectedSchema, implementedSchema).map(e => ({ ...e, text: `${context} is wrong: ${e.text}` })))
+    })
+    implementedMediaTypes.forEach(implementedMediaType => {
+      if (!expectedMediaTypes.includes(implementedMediaType)) {
+        result.push({ text: `${context} must not support media type '${implementedMediaType}'`, type: 'NOT_IN_DOMAIN_MODEL' })
+      }
+    })
+    return result
+  }
+
+  private pathEquals (path1: string, path2: string): boolean {
+    // Remove path parameters as they are not part of the path to compare
+    const cleanedPath1 = path1.replaceAll(/\/\{[^}]*\}/g, '/{}')
+    const cleanedPath2 = path1.replaceAll(/\/\{[^}]*\}/g, '/{}')
+    return cleanedPath1 === cleanedPath2
+  }
+}
+
+interface ContentObject {
+  content?: Record<string, OpenAPIV3.MediaTypeObject>
+  $ref?: string
 }
