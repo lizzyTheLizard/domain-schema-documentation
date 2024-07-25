@@ -71,7 +71,7 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Path '/new' must not exist in '${options.srcSpec}'`,
+      text: 'Path \'/new\' must not exist',
       type: 'NOT_IN_DOMAIN_MODEL'
     }])
   })
@@ -110,7 +110,7 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Path '/new' must exist in '${options.srcSpec}'`,
+      text: 'Path \'/new\' must exist',
       type: 'MISSING_IN_IMPLEMENTATION'
     }])
   })
@@ -130,10 +130,10 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Method 'GET /new' must exist in '${options.srcSpec}'`,
+      text: 'Method \'GET /new\' must exist',
       type: 'MISSING_IN_IMPLEMENTATION'
     }, {
-      text: `Method 'PUT /new' must not exist in '${options.srcSpec}'`,
+      text: 'Method \'PUT /new\' must not exist',
       type: 'NOT_IN_DOMAIN_MODEL'
     }])
   })
@@ -153,10 +153,10 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Response '200' in method 'GET /new' must exist in '${options.srcSpec}'`,
+      text: 'Response \'200\' in method \'GET /new\' must exist',
       type: 'MISSING_IN_IMPLEMENTATION'
     }, {
-      text: `Response '201' in method 'GET /new' must not exist in '${options.srcSpec}'`,
+      text: 'Response \'201\' in method \'GET /new\' must not exist',
       type: 'NOT_IN_DOMAIN_MODEL'
     }])
   })
@@ -216,7 +216,7 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Response body '200' in method 'GET /new' is wrong: Enum must contain value "B" in '${options.srcSpec}'`,
+      text: 'Response body \'200\' in method \'GET /new\' is wrong: Enum must contain value "B"',
       type: 'MISSING_IN_IMPLEMENTATION'
     }])
   })
@@ -238,7 +238,7 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Response body '200' in method 'GET /new' is wrong: Type must be 'number' but is 'string' in '${options.srcSpec}'`,
+      text: 'Response body \'200\' in method \'GET /new\' is wrong: Type must be \'number\' but is \'string\'',
       type: 'WRONG'
     }])
   })
@@ -260,10 +260,10 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Response body '200' in method 'GET /new' is wrong: Property 'key2' must exist in '${options.srcSpec}'`,
+      text: 'Response body \'200\' in method \'GET /new\' is wrong: Property \'key2\' must exist',
       type: 'MISSING_IN_IMPLEMENTATION'
     }, {
-      text: `Response body '200' in method 'GET /new' is wrong: Property 'key' must not exist in '${options.srcSpec}'`,
+      text: 'Response body \'200\' in method \'GET /new\' is wrong: Property \'key\' must not exist',
       type: 'NOT_IN_DOMAIN_MODEL'
     }])
   })
@@ -285,10 +285,10 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Request body in method 'PUT /new' is wrong: Property 'key2' must exist in '${options.srcSpec}'`,
+      text: 'Request body in method \'PUT /new\' is wrong: Property \'key2\' must exist',
       type: 'MISSING_IN_IMPLEMENTATION'
     }, {
-      text: `Request body in method 'PUT /new' is wrong: Property 'key' must not exist in '${options.srcSpec}'`,
+      text: 'Request body in method \'PUT /new\' is wrong: Property \'key\' must not exist',
       type: 'NOT_IN_DOMAIN_MODEL'
     }])
   })
@@ -310,7 +310,7 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Response body '200' in method 'GET /new' is wrong: Property 'key.key2' must exist in '${options.srcSpec}'`,
+      text: 'Response body \'200\' in method \'GET /new\' is wrong: Property \'key.key2\' must exist',
       type: 'MISSING_IN_IMPLEMENTATION'
     }])
   })
@@ -332,7 +332,7 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: `Response body '200' in method 'GET /new' is wrong: Type of 'key.key' must be 'number' but is 'string' in '${options.srcSpec}'`,
+      text: 'Response body \'200\' in method \'GET /new\' is wrong: Type of \'key.key\' must be \'number\' but is \'string\'',
       type: 'WRONG'
     }])
   })

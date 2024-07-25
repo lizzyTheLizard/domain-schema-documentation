@@ -34,7 +34,7 @@ export class OpenApiComperator {
     const clone = structuredClone(expectedSpecInput)
     const expectedSpec = await this.#parser.dereference(clone, { dereference: { circular: 'ignore' } })
     const errors = this.compareSpec(expectedSpec as OpenAPIV3.Document, implementedSpec as OpenAPIV3.Document)
-      .map(e => ({ ...e, text: `${e.text} in '${srcFile}'` }))
+      .map(e => ({ ...e, text: `${e.text}` }))
     module.errors.push(...errors)
   }
 
