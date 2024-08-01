@@ -34,6 +34,26 @@ export function getModuleId (schemaOrSchemaId: string | Schema): string {
 }
 
 /**
+ * Get the basename (without file ending or path) for a schema
+ * @param schemaOrSchemaId The schema or schema id to get the basename for
+ * @returns The basename
+ */
+export function getSchemaName (schemaOrSchemaId: string | Schema): string {
+  const schemaId = typeof schemaOrSchemaId === 'string' ? schemaOrSchemaId : schemaOrSchemaId.$id
+  return path.basename(schemaId, path.extname(schemaId))
+}
+
+/**
+ * Get the basename (without file ending or path) for a module
+ * @param moduleOrModuleId The module or module id to get the basename for
+ * @returns The basename
+ */
+export function getModuleName (moduleOrModuleId: string | Module): string {
+  const moduleId = typeof moduleOrModuleId === 'string' ? moduleOrModuleId : moduleOrModuleId.$id
+  return path.basename(moduleId)
+}
+
+/**
  * Get the schema for a given schema id
  * @param model The model to search in
  * @param schemaId The schema id to search for
@@ -48,27 +68,35 @@ export function getSchema (model: Model, schemaId: string): Schema {
 
 /**
  * Resolve a relative id into an absolute id
- * @param from The schema or schema id to resolve from
+ * @param from The schema to resolve from
  * @param relativeId The relative id to resolve
  * @returns The resolved absolute id
  */
-export function resolveRelativeId (from: Schema | string, relativeId: string): string {
+export function resolveRelativeId (from: Schema, relativeId: string): string {
   const fromId = typeof from === 'string' ? from : from.$id
-  // TODO: Check this join for OS sep.
-  return path.join(path.dirname(fromId), relativeId)
+  return path.join(path.dirname(fromId), relativeId).replace(/\\/g, '/')
+}
+
+/**
+ * Resolve a relative id into an absolute id
+ * @param from The module to resolve from
+ * @param relativeId The relative id to resolve
+ * @returns The resolved absolute id
+ */
+export function resolveRelativeIdForModule (from: Module, relativeId: string): string {
+  const fromId = typeof from === 'string' ? from : from.$id
+  return path.join(fromId, relativeId).replace(/\\/g, '/')
 }
 
 /**
  * Get a relative link from one schema to another
- * @param fromSchemaOrId The schema or schema id to link from
+ * @param dirname The directory name of the schema to link from
  * @param toSchemaOrId The schema or schema id to link to
- * @returns The relative link from one schema to another
+ * @returns The relative link from that directery to another schema
  */
-export function relativeLink (fromSchemaOrId: Schema | string, toSchemaOrId: Schema | string): string {
-  const fromId = typeof fromSchemaOrId === 'string' ? fromSchemaOrId : fromSchemaOrId.$id
+export function relativeLink (dirname: string, toSchemaOrId: Schema | string): string {
   const toId = typeof toSchemaOrId === 'string' ? toSchemaOrId : toSchemaOrId.$id
-  // TODO: Check this for backslash
-  const relative = path.relative(fromId, toId)
+  const relative = path.relative(dirname, toId).replace(/\\/g, '/')
   return relative.startsWith('..') ? relative : './' + relative
 }
 

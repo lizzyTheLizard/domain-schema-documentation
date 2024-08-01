@@ -3,7 +3,7 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { type JavaType, getJavaPropertyType, getSimpleJavaClassName, getJavaPackageNameForModule, getFullJavaClassName, getJavaAdditionalPropertyType } from './JavaHelper'
-import { getSchemasForModule } from '../../reader/helper/InputHelper'
+import { getSchemaName, getSchemasForModule } from '../../reader/helper/InputHelper'
 import { parseClass, parseEnum, parseInterface } from './JavaParser'
 
 /**
@@ -52,7 +52,7 @@ class JavaValidator {
     for (const file of await fs.readdir(dir)) {
       // Ignore if it is not a java file
       if (path.extname(file) !== '.java') continue
-      const className = path.basename(file, path.extname(file))
+      const className = getSchemaName(file)
       if (expectedClasses.includes(className)) continue
       this.currentModule.errors.push({
         text: `File ${file} does not correspond to a domain model`,

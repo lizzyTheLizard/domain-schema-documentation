@@ -184,7 +184,7 @@ describe('JavaGenerator', () => {
     const schema: Schema = { ...testSchema(), definitions: { definition1: { type: 'object', properties: {}, required: [] } } }
     const model = { ...testModel(), schemas: [schema] }
     await javaGenerator(model, tmpDir.name, options)
-    expect(schema['x-links']).toEqual([{ text: 'Java-File', href: './java/Schema.java' }, { text: 'Java-File (definition1)', href: './java/SchemaDefinition1.java' }])
-    expect(model.modules[0].links).toEqual([{ text: 'Java-Files', href: './java' }])
+    expect(schema['x-links']).toEqual([{ text: 'Java-File', link: './java/Schema.java' }, { text: 'Java-File (definition1)', link: './java/SchemaDefinition1.java' }])
+    expect(model.modules[0].links).toEqual([{ text: 'Java-Files', link: './java' }])
   })
 })

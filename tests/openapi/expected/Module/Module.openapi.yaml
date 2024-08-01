@@ -1,0 +1,99 @@
+openapi: 3.0.3
+info:
+  title: Test API
+  version: 1.0.0
+  description: This is a test API
+servers:
+  - url: http:localhost:8080
+paths:
+  /test:
+    put:
+      tags:
+        - Test
+      summary: Test PUT operation
+      description: Some Description
+      operationId: testPut
+      requestBody:
+        description: Update something
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Request"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/Request"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/Request"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModuleInterface"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/ModuleInterface"
+        "400":
+          description: Invalid Request supplied
+        "404":
+          description: Not found
+      security:
+        - def_auth:
+            - write:test
+            - read:test
+components:
+  schemas:
+    Request:
+      type: string
+    ModuleInterface:
+      description: An interface
+      type: object
+      x-schema-type: Other
+      discriminator:
+        propertyName: kind
+      properties:
+        kind:
+          type: string
+      required:
+        - kind
+      oneOf:
+        - $ref: "#/components/schemas/ModuleInterfaceInterface1"
+        - $ref: "#/components/schemas/ModuleInterfaceInterface2"
+      x-links: []
+      x-tags: []
+      x-errors: []
+      x-todos: []
+    ModuleInterfaceInterface1:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+            - INSIDE1
+        name:
+          type: string
+      required:
+        - kind
+    ModuleInterfaceInterface2:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+            - INSIDE2
+        key:
+          type: string
+        value:
+          type: string
+      required:
+        - kind
+      additionalProperties:
+        type: integer
+  securitySchemes:
+    def_auth:
+      type: apiKey
+      name: api_key
+      in: header

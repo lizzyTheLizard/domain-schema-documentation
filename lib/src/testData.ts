@@ -1,9 +1,6 @@
+/* eslint-disable jsdoc/require-jsdoc */
 import type { EnumDefinition, Application, Module, SchemaCommon, ObjectDefinition, InterfaceDefinition, Model } from './reader/Reader'
 
-/**
- * Generate an application for unit testing
- * @returns An application
- */
 export function testApplication (): Application {
   return {
     title: 'Title',
@@ -15,10 +12,6 @@ export function testApplication (): Application {
   }
 }
 
-/**
- * Generate a module for unit testing
- * @returns A module
- */
 export function testModule (): Module {
   return {
     $id: '/Module',
@@ -31,10 +24,6 @@ export function testModule (): Module {
   }
 }
 
-/**
- * Generate a schema for unit testing
- * @returns A schema
- */
 export function testSchema (): ObjectDefinition & SchemaCommon {
   return {
     $id: '/Module/Schema.yaml',
@@ -51,10 +40,6 @@ export function testSchema (): ObjectDefinition & SchemaCommon {
   }
 }
 
-/**
- * Generate an interface schema for unit testing
- * @returns A schema
- */
 export function testInterfaceSchema (): InterfaceDefinition & SchemaCommon {
   return {
     $id: '/Module/Interface.yaml',
@@ -72,10 +57,6 @@ export function testInterfaceSchema (): InterfaceDefinition & SchemaCommon {
   }
 }
 
-/**
- * Generate an enum schema for unit testing
- * @returns A schema
- */
 export function testEnumSchema (): EnumDefinition & SchemaCommon {
   return {
     $id: '/Module/Enum.yaml',
@@ -91,10 +72,6 @@ export function testEnumSchema (): EnumDefinition & SchemaCommon {
   }
 }
 
-/**
- * Generate a model for unit testing
- * @returns A model
- */
 export function testModel (): Model {
   return {
     application: testApplication(),

@@ -14,29 +14,15 @@ properties:
   links:
     type: array
     items:
-      type: object
-      properties:
-        text:
-          type: string
-        href:
-          type: string
-      required:
-      - text
-      - href
+      $ref: './_Link.yaml'
   tags:
     type: array
     items:
-      type: object
-      properties:
-        name:
-          type: string
-        value:
-          type: string
-        color:
-          type: string
-      required:
-        - name
-        - color
+      $ref: './_Tag.yaml'
+  errors:
+    type: array
+    items:    
+      $ref: './_Error.yaml'
 required:
-    - title
-    - description
+- title
+- description

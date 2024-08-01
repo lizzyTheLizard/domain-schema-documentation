@@ -11,9 +11,64 @@ todos:
    -  A Todo
 links:
   - text: Link
-    href: 'http://www.google.com'
+    link: 'http://www.google.com'
   - text: Local-Link
-    href: './Module/index.yaml'
+    link: './Module/index.yaml'
 errors:
   - text: "An error"
     type: "WRONG"
+openApi:
+  info:
+    title: Test API
+    version: 1.0.0
+    description: This is a test API
+  servers:
+    - url: http:localhost:8080
+  paths:
+    /test:
+      put:
+        tags:
+          - Test
+        summary: Test PUT operation
+        description: Some Description
+        operationId: testPut
+        requestBody:
+          description: Update something
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Request'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Request'
+            application/x-www-form-urlencoded:
+              schema:
+                $ref: '#/components/schemas/Request'
+          required: true
+        responses:
+          '200':
+            description: Successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: './Interface.yml'          
+              application/xml:
+                schema:
+                  $ref: './Interface.yml'          
+          '400':
+            description: Invalid Request supplied
+          '404':
+            description: Not found
+        security:
+          - def_auth:
+              - write:test
+              - read:test
+  components:
+    schemas:
+      Request:
+        type: string
+    securitySchemes:
+      def_auth:
+        type: apiKey
+        name: api_key
+        in: header

@@ -6,7 +6,7 @@ const common: NonNormalizedSchema = { $id: '/Module/Schema.yaml', title: 'Schema
 
 describe('SchemaNormalizer', () => {
   test('keepLinks', () => {
-    const link = { href: 'test', text: 'text' }
+    const link = { link: 'test', text: 'text' }
     const schema = { ...common, 'x-links': [link], oneOf: [{ $ref: './Schema2.yaml' }] }
     const result = normalizeSchema(schema)
     expect(result).toEqual({

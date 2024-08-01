@@ -4,7 +4,7 @@ import path from 'path'
 import Handlebars from 'handlebars'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
 import { definitionKind, enhanceApplication, enhanceModule, enhanceSchema, loadTemplate, shieldIoBadgeUrl } from '../WriterHelpers'
-import { relativeLink } from '../../reader/helper/InputHelper'
+import { getModuleId, relativeLink } from '../../reader/helper/InputHelper'
 
 /** Options for the Markdown writer. */
 export interface MarkdownWriterOptions extends WriterBaseOptions {
@@ -72,7 +72,7 @@ function mdGetType (model: Model, schema: Schema, property: Property, options: M
 function mdGetTypeInternal (schema: Schema, type: PropertyType, options: MarkdownWriterOptions): string {
   switch (type.type) {
     case 'array': return `[${mdGetTypeInternal(schema, type.array, options)}]`
-    case 'reference': return `[${type.name}](${relativeLink(path.dirname(schema.$id), type.$id)}.md)`
+    case 'reference': return `[${type.name}](${relativeLink(getModuleId(schema), type.$id)}.md)`
     case 'self': return `[${type.name}](./)`
     case 'definition': return `[${type.name}](#${type.name})`
     case 'local':

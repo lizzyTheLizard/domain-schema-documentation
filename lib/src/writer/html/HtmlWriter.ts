@@ -3,7 +3,7 @@ import { type Tag, type Definition, type Model, type Property, type Schema } fro
 import path from 'path'
 import { definitionKind, enhanceApplication, enhanceModule, enhanceSchema, loadTemplate, shieldIoBadgeUrl } from '../WriterHelpers'
 import Handlebars from 'handlebars'
-import { relativeLink } from '../../reader/helper/InputHelper'
+import { getModuleId, relativeLink } from '../../reader/helper/InputHelper'
 import { getType, type PropertyType } from '../../reader/helper/GetType'
 
 /** Options for the HTML writer. */
@@ -70,7 +70,7 @@ function htmlGetType (model: Model, schema: Schema, property: Property, options:
 function htmlGetTypeInternal (schema: Schema, type: PropertyType, options: HtmlWriterOptions): string {
   switch (type.type) {
     case 'array': return `[${htmlGetTypeInternal(schema, type.array, options)}]`
-    case 'reference': return `<a href="${relativeLink(path.dirname(schema.$id), type.$id)}.html">${type.name}</a>`
+    case 'reference': return `<a href="${relativeLink(getModuleId(schema), type.$id)}.html">${type.name}</a>`
     case 'self': return `<a href="">${type.name}</a>`
     case 'definition': return `<a href="#${type.name}">${type.name}</a>`
     case 'local':

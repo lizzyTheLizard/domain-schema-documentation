@@ -27,17 +27,17 @@ export async function javaGenerator (model: Model, outputFolder: string, options
   Handlebars.registerHelper('javaConstantValue', (p: BasicProperty & { const: unknown }) => constantValue(p))
   Handlebars.registerHelper('javaCleanName', (name: string) => cleanName(name))
   for (const module of model.modules) {
-    module.links = [...module.links ?? [], { text: 'Java-Files', href: './java' }]
+    module.links = [...module.links ?? [], { text: 'Java-Files', link: './java' }]
   }
   for (const schema of model.schemas) {
     const output = await generate(schema, options)
     const filename = path.join('java', getSimpleJavaClassName(schema) + '.java')
     await writeOutput(output, path.join(getModuleId(schema), filename), outputFolder)
-    const links = [{ text: 'Java-File', href: './' + filename }]
+    const links = [{ text: 'Java-File', link: './' + filename }]
     for (const definitionName in schema.definitions) {
       const outputD = await generate(schema, options, definitionName)
       const filenameD = path.join('java', getSimpleJavaClassName(schema, definitionName) + '.java')
-      links.push({ text: 'Java-File (' + definitionName + ')', href: './' + filenameD })
+      links.push({ text: 'Java-File (' + definitionName + ')', link: './' + filenameD })
       await writeOutput(outputD, path.join(getModuleId(schema), filenameD), outputFolder)
     }
     schema['x-links'] = [...schema['x-links'] ?? [], ...links]
@@ -142,7 +142,5 @@ function constantValue (p: BasicProperty & { const: unknown }): string {
     case 'integer':
     case 'boolean':
       return JSON.stringify(p.const)
-    case 'null':
-      return 'null'
   }
 }

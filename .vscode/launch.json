@@ -31,11 +31,11 @@
         }, {
             "type": "node",
             "request": "launch",
-            "name": "Run Java Test",
+            "name": "Run OpenApi Test",
             "runtimeExecutable": "yarn",
             "runtimeArgs": [
                 "workspace",
-                "test-java",
+                "test-openapi",
                 "integration-tests"
             ],
             "cwd": "${workspaceRoot}",

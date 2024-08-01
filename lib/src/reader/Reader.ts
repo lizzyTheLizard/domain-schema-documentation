@@ -8,7 +8,7 @@ export interface Link {
   /** Link text */
   text: string
   /** Link URL */
-  href: string
+  link: string
 }
 
 /** A tag for a schema */
@@ -25,6 +25,7 @@ export interface Tag {
 export interface ImplementationError {
   text: string
   type: ImplementationErrorType
+  details?: Link[]
 }
 
 /** Type of the verification error */
@@ -50,7 +51,7 @@ export interface RefProperty {
 /** A basic property */
 export interface BasicProperty {
   /** The type of the property, as defined in JSON Schema */
-  type: 'boolean' | 'integer' | 'null' | 'number' | 'string'
+  type: 'boolean' | 'integer' | 'number' | 'string'
   /** The format of the property, as defined in JSON Schema */
   format?: string
   /** A reference to another schema, if the value of this property is an ID of this type. Used for documentation */

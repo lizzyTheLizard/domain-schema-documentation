@@ -1,5 +1,5 @@
 import Ajv, { type Format, type AnySchema, type Options, type Schema as AjvSchema } from 'ajv'
-import type { Module, Schema, Definition, SchemaType, ImplementationError, Link, Tag } from '../Reader'
+import type { Schema, Definition, SchemaType, ImplementationError, Link, Tag } from '../Reader'
 import { resolveRelativeId } from '../helper/InputHelper'
 import betterAjvErrors from 'better-ajv-errors'
 import * as fs from 'fs'
@@ -94,8 +94,12 @@ export class InputValidator {
   private setUpAjv (): Ajv {
     const ajv = new Ajv({ ...this.options.ajvOptions, discriminator: this.options.discriminator === 'AJV' })
       .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Application.yaml')))
+      .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Definition.yaml')))
+      .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Error.yaml')))
+      .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Link.yaml')))
       .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Module.yaml')))
       .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Schema.yaml')))
+      .addSchema(readYamlFile(path.join(__dirname, '../inputDefinition', '_Tag.yaml')))
       .addKeyword('x-schema-type')
       .addKeyword('x-references')
       .addKeyword('x-enum-description')
@@ -212,10 +216,10 @@ export class InputValidator {
     this.validateAjv(constValue, subSchema, `constant ${JSON.stringify(constValue)} in ${fileLocation}`)
   }
 
-  public validateReferences (root: Schema | Module, subSchema: unknown): void {
+  public validateReferences (schema: Schema, subSchema: unknown): void {
     if (subSchema == null || typeof subSchema !== 'object') return
     Object.entries(subSchema).forEach(([_, value]) => {
-      this.validateReferences(root, value)
+      this.validateReferences(schema, value)
     })
 
     const references: string[] = []
@@ -231,9 +235,9 @@ export class InputValidator {
     }
     references
       .filter(r => !r.startsWith('#'))
-      .filter((r: string) => !this.#ids.includes(resolveRelativeId(root.$id, r)))
+      .filter((r: string) => !this.#ids.includes(resolveRelativeId(schema, r)))
       .forEach((r: string) => {
-        throw new Error(`Invalid Reference '${r}' in Schema '${root.$id}'`)
+        throw new Error(`Invalid Reference '${r}' in Schema '${schema.$id}'`)
       })
   }
 }
