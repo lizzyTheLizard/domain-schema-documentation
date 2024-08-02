@@ -2,6 +2,6 @@
   "recommendations": [
     "arcanis.vscode-zipfs",
     "dbaeumer.vscode-eslint",
-    "jest-community.vscode-jest",
+    "orta.vscode-jest",
   ]
 }
