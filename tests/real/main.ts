@@ -10,7 +10,7 @@ const expected: string = path.join(__dirname, 'expected')
 const runOptions: RunOptions = {
   reader: defaultReader(input, {
     // It would be nicer to reqrite those as tags, but this would require a change in the model
-    allowedKeywords: ['x-misng-uidprefix', 'x-misng-alias'],
+    allowedKeywords: ['x-misng-uidprefix', 'x-misng-alias', 'x-field-extra-annotation'],
     allowedFormats: [...defaultFormats, { name: 'uid', avjFormat: (p: string) => uidVerifier(p) }],
     discriminator: 'ALLOW'
   }),
