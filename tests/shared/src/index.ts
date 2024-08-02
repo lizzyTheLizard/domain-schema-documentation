@@ -1,6 +1,6 @@
 import * as process from 'process'
 import * as path from 'path'
-import { compare } from 'dir-compare'
+import { compare, fileCompareHandlers } from 'dir-compare'
 import { promises as fs } from 'fs'
 import { createTwoFilesPatch } from 'diff'
 
@@ -21,7 +21,13 @@ export function handleError (error: unknown): void {
  */
 export async function compareOutput (outputFolder: string, expectedFolder?: string, excludeFilter?: string): Promise<void> {
   expectedFolder = expectedFolder ?? path.join(__dirname, '..', 'expected')
-  const result = await compare(outputFolder, expectedFolder, { compareContent: true, excludeFilter })
+  const result = await compare(outputFolder, expectedFolder, {
+    compareContent: true,
+    excludeFilter,
+    compareFileSync: fileCompareHandlers.lineBasedFileCompare.compareSync,
+    compareFileAsync: fileCompareHandlers.lineBasedFileCompare.compareAsync,
+    ignoreLineEnding: true // Ignore crlf/lf line ending differences
+  })
   if (result.same) {
     console.log('Directories are identical')
     process.exit(0)

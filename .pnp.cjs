@@ -2843,15 +2843,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["buffer-equal", [\
-      ["npm:1.0.0", {\
-        "packageLocation": "./.yarn/cache/buffer-equal-npm-1.0.0-f497e443d4-2459f0b6a5.zip/node_modules/buffer-equal/",\
-        "packageDependencies": [\
-          ["buffer-equal", "npm:1.0.0"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["buffer-from", [\
       ["npm:1.1.2", {\
         "packageLocation": "./.yarn/cache/buffer-from-npm-1.1.2-03d2f20d7e-124fff9d66.zip/node_modules/buffer-from/",\
@@ -3142,28 +3133,11 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["colors", [\
-      ["npm:1.0.3", {\
-        "packageLocation": "./.yarn/cache/colors-npm-1.0.3-6c5d583ab3-f9e40dd8b3.zip/node_modules/colors/",\
-        "packageDependencies": [\
-          ["colors", "npm:1.0.3"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["commander", [\
       ["npm:12.1.0", {\
         "packageLocation": "./.yarn/cache/commander-npm-12.1.0-65c868e907-6e1996680c.zip/node_modules/commander/",\
         "packageDependencies": [\
           ["commander", "npm:12.1.0"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
-      ["npm:2.9.0", {\
-        "packageLocation": "./.yarn/cache/commander-npm-2.9.0-dea41d1794-56bcda1e47.zip/node_modules/commander/",\
-        "packageDependencies": [\
-          ["commander", "npm:2.9.0"],\
-          ["graceful-readlink", "npm:1.0.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -3461,35 +3435,12 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["dir-compare", [\
-      ["npm:2.4.0", {\
-        "packageLocation": "./.yarn/cache/dir-compare-npm-2.4.0-52c615bfd0-f1bf30faee.zip/node_modules/dir-compare/",\
-        "packageDependencies": [\
-          ["dir-compare", "npm:2.4.0"],\
-          ["buffer-equal", "npm:1.0.0"],\
-          ["colors", "npm:1.0.3"],\
-          ["commander", "npm:2.9.0"],\
-          ["minimatch", "npm:3.0.4"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
       ["npm:5.0.0", {\
         "packageLocation": "./.yarn/cache/dir-compare-npm-5.0.0-da154d5bba-4ed7d55ae1.zip/node_modules/dir-compare/",\
         "packageDependencies": [\
           ["dir-compare", "npm:5.0.0"],\
           ["minimatch", "npm:3.1.2"],\
           ["p-limit", "npm:3.1.0"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["dir-compare-cli", [\
-      ["npm:1.0.1", {\
-        "packageLocation": "./.yarn/cache/dir-compare-cli-npm-1.0.1-d55460e99e-ef972c68dd.zip/node_modules/dir-compare-cli/",\
-        "packageDependencies": [\
-          ["dir-compare-cli", "npm:1.0.1"],\
-          ["colors", "npm:1.0.3"],\
-          ["commander", "npm:2.9.0"],\
-          ["dir-compare", "npm:2.4.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4790,15 +4741,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/graceful-fs-npm-4.2.11-24bb648a68-386d011a55.zip/node_modules/graceful-fs/",\
         "packageDependencies": [\
           ["graceful-fs", "npm:4.2.11"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["graceful-readlink", [\
-      ["npm:1.0.1", {\
-        "packageLocation": "./.yarn/cache/graceful-readlink-npm-1.0.1-6da4ca180d-c53e703257.zip/node_modules/graceful-readlink/",\
-        "packageDependencies": [\
-          ["graceful-readlink", "npm:1.0.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6394,14 +6336,6 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "HARD"\
       }],\
-      ["npm:3.0.4", {\
-        "packageLocation": "./.yarn/cache/minimatch-npm-3.0.4-6e76f51c23-d0a2bcd93e.zip/node_modules/minimatch/",\
-        "packageDependencies": [\
-          ["minimatch", "npm:3.0.4"],\
-          ["brace-expansion", "npm:1.1.11"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
       ["npm:3.1.2", {\
         "packageLocation": "./.yarn/cache/minimatch-npm-3.1.2-9405269906-0262810a8f.zip/node_modules/minimatch/",\
         "packageDependencies": [\
@@ -7819,8 +7753,10 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./tests/bin/",\
         "packageDependencies": [\
           ["test-bin", "workspace:tests/bin"],\
-          ["dir-compare-cli", "npm:1.0.1"],\
-          ["domain-schema-documentation", "workspace:."]\
+          ["@types/node", "npm:20.14.7"],\
+          ["domain-schema-documentation", "workspace:."],\
+          ["test-shared", "workspace:tests/shared"],\
+          ["tsx", "npm:4.15.7"]\
         ],\
         "linkType": "SOFT"\
       }]\
