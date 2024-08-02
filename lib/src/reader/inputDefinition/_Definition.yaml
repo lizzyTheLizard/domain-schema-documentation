@@ -16,11 +16,9 @@ allOf:
   - properties:
       type:
         const: 'object'
-    anyOf:
-    - required:
-      - oneOf
-    - required:
-      - properties
+      $ref: false
+    required:
+    - type
   - properties:
       type:
         const: 'array'
@@ -36,7 +34,9 @@ allOf:
         type: object
         additionalProperties:
           type: string
+      $ref: false
     required:
+      - type
       - enum
   - properties:
       type:
@@ -45,8 +45,8 @@ allOf:
         - number
         - integer
         - boolean
-        - null
       enum: false
+      $ref: false
       format:
         type: string
       const: true

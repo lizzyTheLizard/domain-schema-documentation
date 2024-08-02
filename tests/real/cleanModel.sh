@@ -1,13 +1,14 @@
 #!/bin/bash
 
 rm -rf model
-cp -r original model
+cp -r original/model model
 
 #Rename old staff
 sed -i -e 's/x-misng-kind: aggregate/x-schema-type: Aggregate/g' model/*/*.y*ml
 sed -i -e 's/x-misng-kind: entity/x-schema-type: Entity/g' model/*/*.y*ml
 sed -i -e 's/x-misng-kind: enum/x-schema-type: ValueObject/g' model/*/*.y*ml
 sed -i -e 's/x-misng-kind: metadata/x-schema-type: ReferenceData/g' model/*/*.y*ml
+sed -i -e 's/x-misng-kind: dto/x-schema-type: Other/g' model/*/*.y*ml
 sed -i -e 's/x-misng-kind/x-schema-type/g' model/*/*.y*ml
 sed -i -e 's/x-misng-references/x-references/g' model/*/*.y*ml
 sed -i -e 's/x-misng-enumdesc/x-enum-description/g' model/*/*.y*ml
@@ -35,10 +36,14 @@ sed -i '64d' model/Partner/Person.yml
 #Fix wrong type:string in $ref
 sed -i '114d' model/Vereinbarung/Praemienfluss.yml 
 
-#dtos not yet supported
-find model -type f -exec grep -q 'x-schema-type: dto' {} \; -delete
-# type dto is missing in this file...
-rm model/Search/PoliceSearchResponseFirma.yml
+#Fix missing type in PoliceSearchResponseFirma
+sed -i '6i x-schema-type: Other'  model/Search/PoliceSearchResponseFirma.yml
+
+#Fix example in HealthStatus
+sed -i '158i \ \ \ \ additionalProperties: true'  model/Client/HealthStatus.yml
+
+#Top-Level-Array not supported => This must be added to the openapi
+rm model/Search/SchnellsucheResponse.yml
 
 # Missing application file
 printf "title: Real wold example\ndescription: This is a real world example"> model/index.yml
