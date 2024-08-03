@@ -11,6 +11,8 @@ allOf:
   - properties:
       $ref:
         type: 'string'
+      type:
+        const: 'object'
     required:
     - $ref
   - properties:
@@ -24,6 +26,7 @@ allOf:
         const: 'array'
       items:
         $ref: '#'
+      $ref: false
     required:
     - items
     - type
