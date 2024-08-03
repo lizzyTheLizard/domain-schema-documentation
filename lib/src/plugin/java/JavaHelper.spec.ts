@@ -1,7 +1,8 @@
-import { type RefProperty, type Schema, type Module, type ArrayProperty, type BasicProperty, type Model } from '../../reader/Reader'
+import { type Schema, type Module, type Model } from '../../reader/Reader'
 import { getFullJavaClassName, getJavaPackageName, getJavaPropertyType, getSimpleJavaClassName } from './JavaHelper'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { testModule, testSchema, testModel } from '../../testData'
+import { type ArrayProperty, type RefProperty, type StringProperty } from '../../schemaNormalizer/NormalizedSchema'
 
 describe('JavaHelper', () => {
   test('getJavaPropertyType', () => {
@@ -23,7 +24,7 @@ describe('JavaHelper', () => {
     const arrayProperty: ArrayProperty = { type: 'array', items: refProperty }
     expect(getJavaPropertyType(model, schema, arrayProperty, options)).toEqual({ type: 'COLLECTION', items: { type: 'CLASS', fullName: 'module2.Schema2' } })
     expect(getJavaPropertyType(model, schema, arrayProperty, options2)).toEqual({ type: 'COLLECTION', items: { type: 'CLASS', fullName: 'com.example.module2.model.Schema2' } })
-    const basicProperty: BasicProperty = { type: 'string' }
+    const basicProperty: StringProperty = { type: 'string' }
     expect(getJavaPropertyType(model, schema, basicProperty, options)).toEqual({ type: 'CLASS', fullName: 'String' })
     expect(getJavaPropertyType(model, schema, basicProperty, options2)).toEqual({ type: 'CLASS', fullName: 'com.example.CustomString' })
   })

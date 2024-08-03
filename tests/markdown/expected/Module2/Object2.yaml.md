@@ -6,8 +6,8 @@ An Object in Module 2
 classDiagram
 namespace Module 2 {
   class _Module2_Object2_yaml["Object 2"]
-  class Type["Type"]
   class AdditionalProperties["AdditionalProperties"]
+  class Type["Type"]
 }
 namespace Module {
   class _Module_Object_yaml["Object"]
@@ -17,8 +17,8 @@ _Module2_Object2_yaml o-- _Module_Object_yaml :reference1
 _Module2_Object2_yaml ..> _Module_Object_yaml :reference2
 _Module2_Object2_yaml o--" N" AdditionalProperties 
 click _Module2_Object2_yaml href "./Object2.yaml.html" "Object 2"
-click Type href "./Object2.yaml.html" "Object 2"
 click AdditionalProperties href "./Object2.yaml.html" "Object 2"
+click Type href "./Object2.yaml.html" "Object 2"
 click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 ```
 
@@ -31,6 +31,7 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 | type | [Type](#Type) |  |
 | reference1 | [Object](../Module/Object.yaml.md) |  |
 | reference2 | References [Object](../Module/Object.yaml.md) |  |
+| (other) | [AdditionalProperties](#AdditionalProperties) | Additional Properties |
 
 ## Examples
 ```json
@@ -46,14 +47,6 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 
 
 ## Subschemas
-### Enum Type
-
-| Enum | Description |
-|------|-------------|
-| type1 | Description of type1 |
-| type2 | Description of type2 |
-
-
 ### Class AdditionalProperties
 
 
@@ -61,6 +54,14 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 |------|------|-------------|
 | key | String |  |
 | value | String |  |
+
+### Enum Type
+
+| Enum | Description |
+|------|-------------|
+| type1 | Description of type1 |
+| type2 | Description of type2 |
+
 
 
 

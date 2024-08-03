@@ -1,7 +1,8 @@
-import { type Model, type Module, type Property, type Schema } from '../../reader/Reader'
-import { cleanName, getModuleId, getSchemaName } from '../../reader/helper/InputHelper'
+import { type Model, type Module, type Schema } from '../../reader/Reader'
+import { cleanName, getModuleId, getSchemaName } from '../../reader/InputHelper'
 import { type JavaPluginOptions } from './JavaPlugin'
-import { getType, type PropertyType } from '../../reader/helper/GetType'
+import { getType, type PropertyType } from '../../reader/GetType'
+import { type Property } from '../../schemaNormalizer/NormalizedSchema'
 
 export type JavaType = JavaClassType | JavaCollectionType | JavaMapType
 interface JavaClassType { type: 'CLASS', fullName: string }

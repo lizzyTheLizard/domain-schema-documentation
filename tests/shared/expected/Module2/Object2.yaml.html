@@ -55,8 +55,8 @@
             classDiagram
       namespace Module 2 {
         class _Module2_Object2_yaml["Object 2"]
-        class Type["Type"]
         class AdditionalProperties["AdditionalProperties"]
+        class Type["Type"]
       }
       namespace Module {
         class _Module_Object_yaml["Object"]
@@ -66,8 +66,8 @@
       _Module2_Object2_yaml ..> _Module_Object_yaml :reference2
       _Module2_Object2_yaml o--" N" AdditionalProperties 
       click _Module2_Object2_yaml href "./Object2.yaml.html" "Object 2"
-      click Type href "./Object2.yaml.html" "Object 2"
       click AdditionalProperties href "./Object2.yaml.html" "Object 2"
+      click Type href "./Object2.yaml.html" "Object 2"
       click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
           </pre>
         </div>
@@ -106,6 +106,11 @@
               <td>References <a href="../Module/Object.yaml.html">Object</a></td>
               <td></td>
             </tr>
+            <tr>
+              <td>(other)</td>
+              <td><a href="#AdditionalProperties">AdditionalProperties</a></td>
+              <td>Additional Properties</td>
+            </tr>
           </tbody>
         </table>
       </section>
@@ -118,30 +123,6 @@
       </section>
       
       <h2>Subschemas</h2>
-      <a id="Type"></a><h3>Enum Type</h3>
-      
-      <section>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Enum</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>type1</td>
-              <td>Description of type1</td>
-            </tr>
-            <tr>
-              <td>type2</td>
-              <td>Description of type2</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-      
-      
       <a id="AdditionalProperties"></a><h3>Class AdditionalProperties</h3>
       
       
@@ -168,6 +149,30 @@
           </tbody>
         </table>
       </section>
+      
+      <a id="Type"></a><h3>Enum Type</h3>
+      
+      <section>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Enum</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>type1</td>
+              <td>Description of type1</td>
+            </tr>
+            <tr>
+              <td>type2</td>
+              <td>Description of type2</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      
       
       
       

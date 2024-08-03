@@ -1,11 +1,12 @@
-import { type ObjectDefinition, type EnumDefinition, type Schema, type Model, type Definition, type BasicProperty } from '../../reader/Reader'
+import { type Schema, type Model } from '../../reader/Reader'
 import { writeOutput } from '../../writer/WriterHelpers'
-import { getDependencies } from '../../reader/helper/GetDependencies'
+import { getDependencies } from '../../reader/GetDependencies'
 import Handlebars from 'handlebars'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { getFullJavaClassName, getSimpleJavaClassName, getJavaPackageName, getJavaPropertyType, type JavaType, getJavaAdditionalPropertyType } from './JavaHelper'
-import { cleanName, getModuleId } from '../../reader/helper/InputHelper'
+import { cleanName, getModuleId } from '../../reader/InputHelper'
 import path from 'path'
+import { type EnumDefinition, type ObjectDefinition, type Property, type Definition } from '../../schemaNormalizer/NormalizedSchema'
 
 type HandlebarsContext = Definition & { schema: Schema, definitionName?: string } & JavaPluginOptions
 
@@ -24,7 +25,7 @@ export async function javaGenerator (model: Model, outputFolder: string, options
   Handlebars.registerHelper('javaPropertyType', (ctx: HandlebarsContext, propertyName: string) => propertyType(model, ctx.schema, ctx as ObjectDefinition, propertyName, options))
   Handlebars.registerHelper('javaAdditionalPropertiesType', (ctx: HandlebarsContext) => additionalPropertiesType(model, ctx.schema, ctx as Definition, options))
   Handlebars.registerHelper('javaImports', (ctx: HandlebarsContext) => collectImports(model, ctx.schema, options, ctx.definitionName))
-  Handlebars.registerHelper('javaConstantValue', (p: BasicProperty & { const: unknown }) => constantValue(p))
+  Handlebars.registerHelper('javaConstantValue', (p: Property & { const: unknown, type: 'string' }) => constantValue(p))
   Handlebars.registerHelper('javaCleanName', (name: string) => cleanName(name))
   for (const module of model.modules) {
     module.links = [...module.links, { text: 'Java-Files', link: './java' }]
@@ -131,16 +132,18 @@ function comment (text: string, indentation: number): string {
   }
 }
 
-function enumDoc (schema: EnumDefinition, key: string): string {
+function enumDoc (schema: EnumDefinition & { 'x-enum-description'?: Record<string, string> }, key: string): string {
   return schema['x-enum-description']?.[key] ?? ''
 }
 
-function constantValue (p: BasicProperty & { const: unknown }): string {
+function constantValue (p: Property & { const: unknown, type: string }): string {
   switch (p.type) {
     case 'string':
     case 'number':
     case 'integer':
     case 'boolean':
       return JSON.stringify(p.const)
+    default:
+      return ''
   }
 }

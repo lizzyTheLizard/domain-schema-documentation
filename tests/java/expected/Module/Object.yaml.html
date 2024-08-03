@@ -55,11 +55,11 @@
             classDiagram
       namespace Module {
         class _Module_Object_yaml["Object"]
-        class SubObject["SubObject"]
-        class SubEnum["SubEnum"]
         class SubInterface["SubInterface"]
-        class SubInterface2["SubInterface2"]
-        class SubInterface3["SubInterface3"]
+        class SubInterfaceOneOf3["SubInterfaceOneOf3"]
+        class SubInterfaceOneOf2["SubInterfaceOneOf2"]
+        class SubEnum["SubEnum"]
+        class SubObject["SubObject"]
         class _Module_Interface_yml["Interface"]
       }
       namespace Module 2 {
@@ -71,16 +71,16 @@
       _Module_Object_yaml ..> SubEnum :subEnum
       _Module_Object_yaml o-- SubInterface :subInterface
       SubInterface <|-- _Module_Object_yaml 
-      SubInterface <|-- SubInterface2 
-      SubInterface <|-- SubInterface3 
-      SubInterface3 <|-- _Module_Object_yaml 
-      SubInterface3 <|-- _Module_Interface_yml 
+      SubInterface <|-- SubInterfaceOneOf2 
+      SubInterface <|-- SubInterfaceOneOf3 
+      SubInterfaceOneOf3 <|-- _Module_Object_yaml 
+      SubInterfaceOneOf3 <|-- _Module_Interface_yml 
       click _Module_Object_yaml href "./Object.yaml.html" "Object"
-      click SubObject href "./Object.yaml.html" "Object"
-      click SubEnum href "./Object.yaml.html" "Object"
       click SubInterface href "./Object.yaml.html" "Object"
-      click SubInterface2 href "./Object.yaml.html" "Object"
-      click SubInterface3 href "./Object.yaml.html" "Object"
+      click SubInterfaceOneOf3 href "./Object.yaml.html" "Object"
+      click SubInterfaceOneOf2 href "./Object.yaml.html" "Object"
+      click SubEnum href "./Object.yaml.html" "Object"
+      click SubObject href "./Object.yaml.html" "Object"
       click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
       click _Module_Interface_yml href "./Interface.yml.html" "Interface"
           </pre>
@@ -125,6 +125,11 @@
               <td><a href="#SubInterface">SubInterface</a></td>
               <td></td>
             </tr>
+            <tr>
+              <td>(other)</td>
+              <td>Integer</td>
+              <td>Additional Properties</td>
+            </tr>
           </tbody>
         </table>
       </section>
@@ -137,7 +142,53 @@
       </section>
       
       <h2>Subschemas</h2>
-      <a id="SubObject"></a><h3>Class SubObject</h3>
+      <a id="SubInterface"></a><h3>Interface SubInterface</h3>
+      
+      
+      <section>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>key</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>value</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      
+      <section>
+      Implemented by
+        <ul>
+          <li><a href="">Object</a></li>
+          <li><a href="#SubInterfaceOneOf2">SubInterfaceOneOf2</a></li>
+          <li><a href="#SubInterfaceOneOf3">SubInterfaceOneOf3</a></li>
+        </ul>
+      </section>
+      <a id="SubInterfaceOneOf3"></a><h3>Interface SubInterfaceOneOf3</h3>
+      
+      
+      
+      <section>
+      Implemented by
+        <ul>
+          <li><a href="">Object</a></li>
+          <li><a href="./Interface.yml.html">Interface</a></li>
+        </ul>
+      </section>
+      <a id="SubInterfaceOneOf2"></a><h3>Class SubInterfaceOneOf2</h3>
       
       
       <section>
@@ -188,7 +239,7 @@
       </section>
       
       
-      <a id="SubInterface"></a><h3>Interface SubInterface</h3>
+      <a id="SubObject"></a><h3>Class SubObject</h3>
       
       
       <section>
@@ -215,63 +266,17 @@
         </table>
       </section>
       
-      <section>
-      Implemented by
-        <ul>
-          <li><a href="">Object</a></li>
-          <li><a href="#SubInterface2">SubInterface2</a></li>
-          <li><a href="#SubInterface3">SubInterface3</a></li>
-        </ul>
-      </section>
-      <a id="SubInterface2"></a><h3>Class SubInterface2</h3>
-      
-      
-      <section>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Property</th>
-              <th>Type</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>key</td>
-              <td>String</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>value</td>
-              <td>String</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-      
-      <a id="SubInterface3"></a><h3>Interface SubInterface3</h3>
-      
-      
-      
-      <section>
-      Implemented by
-        <ul>
-          <li><a href="">Object</a></li>
-          <li><a href="./Interface.yml.html">Interface</a></li>
-        </ul>
-      </section>
       
       
       <section>
         <h2>Links</h2>
         <ul>
           <li><a href="./java/Object.java">Java-File</a></li>
-          <li><a href="./java/ObjectSubObject.java">Java-File (SubObject)</a></li>
-          <li><a href="./java/ObjectSubEnum.java">Java-File (SubEnum)</a></li>
           <li><a href="./java/ObjectSubInterface.java">Java-File (SubInterface)</a></li>
-          <li><a href="./java/ObjectSubInterface2.java">Java-File (SubInterface2)</a></li>
-          <li><a href="./java/ObjectSubInterface3.java">Java-File (SubInterface3)</a></li>
+          <li><a href="./java/ObjectSubInterfaceOneOf3.java">Java-File (SubInterfaceOneOf3)</a></li>
+          <li><a href="./java/ObjectSubInterfaceOneOf2.java">Java-File (SubInterfaceOneOf2)</a></li>
+          <li><a href="./java/ObjectSubEnum.java">Java-File (SubEnum)</a></li>
+          <li><a href="./java/ObjectSubObject.java">Java-File (SubObject)</a></li>
         </ul>
       </section>
       

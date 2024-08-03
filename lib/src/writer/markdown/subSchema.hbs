@@ -19,8 +19,8 @@
 {{/if}}
 | {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{{mdGetType ../schema this}}} | {{{mdMultiline description}}} |
 {{#if @last}}
-{{#if additionalProperties}}
-| (other) | {{mdAdditionalPropertyType ../schema .}} | Additional Properties |
+{{#if ../additionalProperties}}
+| (other) | {{mdAdditionalPropertyType ../schema ..}} | Additional Properties |
 {{/if}}
 {{/if}}
 {{/each}}

@@ -1,10 +1,11 @@
 import { type Writer, applyWriterOptionsDefaults, type WriterBaseOptions } from '../Writer'
-import { type Tag, type Definition, type Model, type Property, type Schema } from '../../reader/Reader'
+import { type Tag, type Model, type Schema } from '../../reader/Reader'
 import path from 'path'
 import Handlebars from 'handlebars'
-import { getType, type PropertyType } from '../../reader/helper/GetType'
+import { getType, type PropertyType } from '../../reader/GetType'
 import { definitionKind, enhanceApplication, enhanceModule, enhanceSchema, loadTemplate, shieldIoBadgeUrl } from '../WriterHelpers'
-import { getModuleId, relativeLink } from '../../reader/helper/InputHelper'
+import { getModuleId, relativeLink } from '../../reader/InputHelper'
+import { type Definition, type Property } from '../../schemaNormalizer/NormalizedSchema'
 
 /** Options for the Markdown writer. */
 export interface MarkdownWriterOptions extends WriterBaseOptions {
@@ -65,7 +66,7 @@ function mdMultiline (input: string): string {
 function mdGetType (model: Model, schema: Schema, property: Property, options: MarkdownWriterOptions): string {
   const type = getType(model, schema, property)
   const result = mdGetTypeInternal(schema, type, options)
-  if ('const' in property) return `${result}<br>${JSON.stringify(property.const)}`
+  if ('const' in property && property.const !== undefined) return `${result}<br>${JSON.stringify(property.const)}`
   return result
 }
 

@@ -4,8 +4,8 @@ import {
   getModuleId,
   getSchemasForModule,
   relativeLink
-} from '../reader/helper/InputHelper'
-import { type Dependency, type DependencyType, getDependencies } from '../reader/helper/GetDependencies'
+} from '../reader/InputHelper'
+import { type Dependency, type DependencyType, getDependencies } from '../reader/GetDependencies'
 
 /**
  * Generate a dependency diagram for the whole application

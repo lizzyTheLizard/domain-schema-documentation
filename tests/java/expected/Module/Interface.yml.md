@@ -7,22 +7,22 @@ An interface
 classDiagram
 namespace Module {
   class _Module_Interface_yml["Interface"]
-  class Interface1["Interface1"]
-  class Interface2["Interface2"]
-  class SubInterface3["SubInterface3"]
+  class OneOf2["OneOf2"]
+  class OneOf1["OneOf1"]
+  class SubInterfaceOneOf3["SubInterfaceOneOf3"]
 }
-SubInterface3 <|-- _Module_Interface_yml 
-_Module_Interface_yml <|-- Interface1 
-_Module_Interface_yml <|-- Interface2 
+SubInterfaceOneOf3 <|-- _Module_Interface_yml 
+_Module_Interface_yml <|-- OneOf1 
+_Module_Interface_yml <|-- OneOf2 
 click _Module_Interface_yml href "./Interface.yml.html" "Interface"
-click Interface1 href "./Interface.yml.html" "Interface"
-click Interface2 href "./Interface.yml.html" "Interface"
-click SubInterface3 href "./Object.yaml.html" "Object"
+click OneOf2 href "./Interface.yml.html" "Interface"
+click OneOf1 href "./Interface.yml.html" "Interface"
+click SubInterfaceOneOf3 href "./Object.yaml.html" "Object"
 ```
 
 ## One Of
-1. [Interface1](#Interface1)
-1. [Interface2](#Interface2)
+1. [OneOf1](#OneOf1)
+1. [OneOf2](#OneOf2)
 
 
 ## Properties
@@ -33,15 +33,7 @@ click SubInterface3 href "./Object.yaml.html" "Object"
 
 
 ## Subschemas
-### Class Interface1
-
-
-| Property | Type | Description |
-|------|------|-------------|
-| kind* | String<br>"INSIDE1" |  |
-| name | String |  |
-
-### Class Interface2
+### Class OneOf2
 
 
 | Property | Type | Description |
@@ -49,6 +41,15 @@ click SubInterface3 href "./Object.yaml.html" "Object"
 | kind* | String<br>"INSIDE2" |  |
 | key | String |  |
 | value | String |  |
+| (other) | Integer | Additional Properties |
+
+### Class OneOf1
+
+
+| Property | Type | Description |
+|------|------|-------------|
+| kind* | String<br>"INSIDE1" |  |
+| name | String |  |
 
 
 ## Verification Errors
@@ -58,5 +59,5 @@ click SubInterface3 href "./Object.yaml.html" "Object"
 
 ## Links
 1. [Java-File](./java/Interface.java)
-1. [Java-File (Interface1)](./java/InterfaceInterface1.java)
-1. [Java-File (Interface2)](./java/InterfaceInterface2.java)
+1. [Java-File (OneOf2)](./java/InterfaceOneOf2.java)
+1. [Java-File (OneOf1)](./java/InterfaceOneOf1.java)
