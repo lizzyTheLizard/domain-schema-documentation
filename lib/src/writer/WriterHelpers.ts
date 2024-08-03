@@ -1,9 +1,10 @@
-import { type Tag, type Application, type Model, type Module, type Schema, type Definition } from '../reader/Reader'
+import { type Tag, type Application, type Model, type Module, type Schema } from '../reader/Reader'
 import { applicationDiagram, moduleDiagram, schemaDiagramm } from './MermaidDiagramGenerator'
 import path from 'path'
 import fs from 'fs'
 import Handlebars from 'handlebars'
-import { getModuleForSchema, getSchemasForModule } from '../reader/helper/InputHelper'
+import { getModuleForSchema, getSchemasForModule } from '../reader/InputHelper'
+import { type Definition } from '../schemaNormalizer/NormalizedSchema'
 
 export type EnhancedSchema = Schema & {
   classDiagram: string

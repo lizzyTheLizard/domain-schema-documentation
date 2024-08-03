@@ -46,6 +46,7 @@ describe('OpenAPIGenerator', () => {
         }
       },
       ModuleSchema: {
+        title: 'Schema',
         type: 'object',
         properties: { key: { type: 'number' } },
         'x-schema-type': 'Aggregate',
@@ -66,6 +67,7 @@ describe('OpenAPIGenerator', () => {
     expect(result.paths['/pet'].put.responses[200].content['application/json'].schema.$ref).toEqual('#/components/schemas/ModuleInterface')
     expect(result.components.schemas).toEqual({
       ModuleInterface: {
+        title: 'Interface',
         type: 'object',
         oneOf: [{ $ref: '#/components/schemas/ModuleSchema' }],
         properties: { field1: { type: 'string' } },
@@ -76,6 +78,7 @@ describe('OpenAPIGenerator', () => {
         'x-tags': []
       },
       ModuleSchema: {
+        title: 'Schema',
         type: 'object',
         properties: { key: { type: 'number' } },
         'x-schema-type': 'Aggregate',

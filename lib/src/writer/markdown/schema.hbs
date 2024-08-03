@@ -37,8 +37,8 @@
 {{/if}}
 | {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{{mdGetType .. this}}} | {{{mdMultiline description}}} |
 {{#if @last}}
-{{#if additionalProperties}}
-| (other) | {{mdAdditionalPropertyType . .}} | Additional Properties |
+{{#if ../additionalProperties}}
+| (other) | {{mdAdditionalPropertyType .. ..}} | Additional Properties |
 {{/if}}
 {{/if}}
 {{/each}}

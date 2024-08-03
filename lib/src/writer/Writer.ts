@@ -1,5 +1,5 @@
 import { type Model } from '../reader/Reader'
-import { cleanName } from '../reader/helper/InputHelper'
+import { cleanName } from '../reader/InputHelper'
 import { writeOutput } from './WriterHelpers'
 import { htmlWriter } from './html/HtmlWriter'
 import { markdownWriter } from './markdown/MarkdownWriter'

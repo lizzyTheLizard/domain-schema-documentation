@@ -46,10 +46,10 @@
         <td>{{description}}</td>
       </tr>
 {{#if @last}}
-{{#if additionalProperties}}
+{{#if ../additionalProperties}}
       <tr>
         <td>(other)</td>
-        <td>{{{htmlAdditionalPropertyType ../schema .}}}</td>
+        <td>{{{htmlAdditionalPropertyType ../schema ..}}}</td>
         <td>Additional Properties</td>
       </tr>
 {{/if}}

@@ -58,17 +58,17 @@
             classDiagram
       namespace Module {
         class _Module_Interface_yml["Interface"]
-        class Interface1["Interface1"]
-        class Interface2["Interface2"]
-        class SubInterface3["SubInterface3"]
+        class OneOf2["OneOf2"]
+        class OneOf1["OneOf1"]
+        class SubInterfaceOneOf3["SubInterfaceOneOf3"]
       }
-      SubInterface3 <|-- _Module_Interface_yml 
-      _Module_Interface_yml <|-- Interface1 
-      _Module_Interface_yml <|-- Interface2 
+      SubInterfaceOneOf3 <|-- _Module_Interface_yml 
+      _Module_Interface_yml <|-- OneOf1 
+      _Module_Interface_yml <|-- OneOf2 
       click _Module_Interface_yml href "./Interface.yml.html" "Interface"
-      click Interface1 href "./Interface.yml.html" "Interface"
-      click Interface2 href "./Interface.yml.html" "Interface"
-      click SubInterface3 href "./Object.yaml.html" "Object"
+      click OneOf2 href "./Interface.yml.html" "Interface"
+      click OneOf1 href "./Interface.yml.html" "Interface"
+      click SubInterfaceOneOf3 href "./Object.yaml.html" "Object"
           </pre>
         </div>
       </section>
@@ -76,8 +76,8 @@
       <section>
         <h2>Implemented By</h2>
         <ul>
-          <li><a href="#Interface1">Interface1</a></li>
-          <li><a href="#Interface2">Interface2</a></li>
+          <li><a href="#OneOf1">OneOf1</a></li>
+          <li><a href="#OneOf2">OneOf2</a></li>
         </ul>
       </section>
       
@@ -104,34 +104,7 @@
       
       
       <h2>Subschemas</h2>
-      <a id="Interface1"></a><h3>Class Interface1</h3>
-      
-      
-      <section>
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Property</th>
-              <th>Type</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>kind*</td>
-              <td>String<br>"INSIDE1"</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>name</td>
-              <td>String</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-      
-      <a id="Interface2"></a><h3>Class Interface2</h3>
+      <a id="OneOf2"></a><h3>Class OneOf2</h3>
       
       
       <section>
@@ -156,6 +129,38 @@
             </tr>
             <tr>
               <td>value</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>(other)</td>
+              <td>Integer</td>
+              <td>Additional Properties</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      
+      <a id="OneOf1"></a><h3>Class OneOf1</h3>
+      
+      
+      <section>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>kind*</td>
+              <td>String<br>"INSIDE1"</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>name</td>
               <td>String</td>
               <td></td>
             </tr>
@@ -186,8 +191,8 @@
         <h2>Links</h2>
         <ul>
           <li><a href="./java/Interface.java">Java-File</a></li>
-          <li><a href="./java/InterfaceInterface1.java">Java-File (Interface1)</a></li>
-          <li><a href="./java/InterfaceInterface2.java">Java-File (Interface2)</a></li>
+          <li><a href="./java/InterfaceOneOf2.java">Java-File (OneOf2)</a></li>
+          <li><a href="./java/InterfaceOneOf1.java">Java-File (OneOf1)</a></li>
         </ul>
       </section>
       

@@ -1,9 +1,9 @@
 import { type Plugin } from './plugin/Plugin'
 import { type Writer } from './writer/Writer'
 import { type Model, type ImplementationError, type Reader, type Module, type Tag } from './reader/Reader'
-import { defaultReader } from './reader/defaultReader/DefaultReader'
+import { defaultReader } from './reader/DefaultReader'
 import { htmlWriter } from './writer/html/HtmlWriter'
-import { getSchemasForModule } from './reader/helper/InputHelper'
+import { getSchemasForModule } from './reader/InputHelper'
 
 /**
  * Options for the run function.

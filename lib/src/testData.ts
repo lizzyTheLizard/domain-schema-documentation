@@ -1,5 +1,6 @@
 /* eslint-disable jsdoc/require-jsdoc */
-import type { EnumDefinition, Application, Module, SchemaCommon, ObjectDefinition, InterfaceDefinition, Model } from './reader/Reader'
+import type { Application, Module, Model, Schema } from './reader/Reader'
+import type { EnumDefinition, InterfaceDefinition, ObjectDefinition } from './schemaNormalizer/NormalizedSchema'
 
 export function testApplication (): Application {
   return {
@@ -24,7 +25,7 @@ export function testModule (): Module {
   }
 }
 
-export function testSchema (): ObjectDefinition & SchemaCommon {
+export function testSchema (): ObjectDefinition & Schema {
   return {
     $id: '/Module/Schema.yaml',
     title: 'Schema',
@@ -40,7 +41,7 @@ export function testSchema (): ObjectDefinition & SchemaCommon {
   }
 }
 
-export function testInterfaceSchema (): InterfaceDefinition & SchemaCommon {
+export function testInterfaceSchema (): InterfaceDefinition & Schema {
   return {
     $id: '/Module/Interface.yaml',
     title: 'Interface',
@@ -57,7 +58,7 @@ export function testInterfaceSchema (): InterfaceDefinition & SchemaCommon {
   }
 }
 
-export function testEnumSchema (): EnumDefinition & SchemaCommon {
+export function testEnumSchema (): EnumDefinition & Schema {
   return {
     $id: '/Module/Enum.yaml',
     title: 'Schema',

@@ -1,7 +1,8 @@
-import type { Schema, Model, Module, Definition, Property } from '../../reader/Reader'
-import { cleanName, getModuleId, getSchema, getSchemaName, resolveRelativeIdForModule } from '../../reader/helper/InputHelper'
+import type { Schema, Model, Module } from '../../reader/Reader'
+import { cleanName, getModuleId, getSchema, getSchemaName, resolveRelativeIdForModule } from '../../reader/InputHelper'
 import SwaggerParser from '@apidevtools/swagger-parser'
 import { type OpenAPIV3 } from 'openapi-types'
+import { type Definition, type Property } from '../../schemaNormalizer/NormalizedSchema'
 
 /**
  * Generates OpenApi-Specifications from module files
@@ -17,6 +18,12 @@ export class OpenApiGenerator {
   constructor (private readonly model: Model) {
   }
 
+  /**
+   * Generates an OpenAPI specification from a module
+   * @param module The module to generate the OpenAPI specification for
+   * @param inputSpec The input specification
+   * @returns An OpenAPI specification
+   */
   public async generate (module: Module, inputSpec: object): Promise<OpenAPIV3.Document> {
     this.#module = module
     this.#schemasToProcess = []
@@ -26,13 +33,13 @@ export class OpenApiGenerator {
     let currentSchemaId: string | undefined
     while ((currentSchemaId = this.#schemasToProcess.pop()) !== undefined) {
       const s = getSchema(this.model, currentSchemaId)
-      const schemaCopy = OpenApiGenerator.cleanSchemaCopy(s)
+      const schemaCopy = this.cleanSchema(s)
       this.replaceRefs(schemaCopy, s.$id)
-      currentSpec.components.schemas[OpenApiGenerator.getDefinitionName(s)] = schemaCopy
+      currentSpec.components.schemas[this.getDefinitionName(s)] = schemaCopy
       Object.entries(s.definitions).forEach(([definitionName, originalDefinition]) => {
-        const definitionCopy = OpenApiGenerator.cleanDefinitionCopy(originalDefinition)
+        const definitionCopy = this.cleanDefinition(originalDefinition)
         this.replaceRefs(definitionCopy, s.$id)
-        currentSpec.components.schemas[OpenApiGenerator.getDefinitionName(s, definitionName)] = definitionCopy
+        currentSpec.components.schemas[this.getDefinitionName(s, definitionName)] = definitionCopy
       })
     }
     await this.validateGeneratedSpec(currentSpec)
@@ -71,7 +78,7 @@ export class OpenApiGenerator {
       if (schemaId === undefined) {
         throw new Error(`Unsupported reference ${input.$ref}. Cannot have '#' a reference in OpenApi. Do you mean '#/components?`)
       }
-      input.$ref = '#/components/schemas/' + OpenApiGenerator.getDefinitionName(schemaId)
+      input.$ref = '#/components/schemas/' + this.getDefinitionName(schemaId)
       return
     }
     if (input.$ref.startsWith('#/components/')) {
@@ -81,7 +88,7 @@ export class OpenApiGenerator {
       if (schemaId === undefined) {
         throw new Error(`Unsupported reference ${input.$ref}. Cannot have '#/definitions' a reference in OpenApi. Do you mean '#/components?`)
       }
-      input.$ref = '#/components/schemas/' + OpenApiGenerator.getDefinitionName(schemaId, input.$ref.substring(14))
+      input.$ref = '#/components/schemas/' + this.getDefinitionName(schemaId, input.$ref.substring(14))
       return
     }
     if (input.$ref.startsWith('#')) {
@@ -99,10 +106,10 @@ export class OpenApiGenerator {
       this.#processedSchemas.push(id)
       this.#schemasToProcess.push(id)
     }
-    input.$ref = '#/components/schemas/' + OpenApiGenerator.getDefinitionName(id)
+    input.$ref = '#/components/schemas/' + this.getDefinitionName(id)
   }
 
-  private static getDefinitionName (schemaOrschemaId: string | Schema, definitionName?: string): string {
+  private getDefinitionName (schemaOrschemaId: string | Schema, definitionName?: string): string {
     const moduleId = cleanName(getModuleId(schemaOrschemaId))
     const schemaName = cleanName(getSchemaName(schemaOrschemaId))
     const result = moduleId + schemaName
@@ -112,57 +119,118 @@ export class OpenApiGenerator {
     return result + cleanName(definitionName)
   }
 
-  private static cleanSchemaCopy (schema: Schema): OpenAPIV3.SchemaObject {
-    const copyWithStuff = structuredClone(schema) as Partial<Schema>
-    delete copyWithStuff.$id
-    delete copyWithStuff.definitions
-    delete copyWithStuff.examples
-    delete copyWithStuff.title
-    if ('required' in copyWithStuff && copyWithStuff.required?.length === 0) {
-      delete copyWithStuff.required
+  private cleanSchema (schema: Schema): OpenAPIV3.SchemaObject {
+    const result: OpenAPIV3.SchemaObject = {
+      ...this.cleanDefinition(schema),
+      title: schema.title
     }
-    const copy = copyWithStuff as OpenAPIV3.SchemaObject
-
     if (schema.examples !== undefined && schema.examples.length !== 0) {
-      copy.example = schema.examples[0]
+      result.example = schema.examples[0]
     }
-    if ('properties' in schema && schema.properties !== undefined) {
-      const properites: Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject> = {}
-      Object.entries(schema.properties).forEach(([n, v]) => { properites[n] = OpenApiGenerator.cleanPropertyCopy(v) })
-      copy.properties = properites
-    }
-    return copy
+    return result
   }
 
-  private static cleanDefinitionCopy (definition: Definition): OpenAPIV3.SchemaObject {
-    const copy = structuredClone(definition) as OpenAPIV3.SchemaObject
+  private cleanDefinition (definition: Definition): OpenAPIV3.SchemaObject {
+    const result: OpenAPIV3.SchemaObject = {
+      description: definition.description,
+      type: definition.type
+    }
+    if ('enum' in definition && definition.enum !== undefined) {
+      result.enum = definition.enum
+    }
     if ('properties' in definition && definition.properties !== undefined) {
       const properites: Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject> = {}
-      Object.entries(definition.properties).forEach(([n, v]) => { properites[n] = OpenApiGenerator.cleanPropertyCopy(v) })
-      copy.properties = properites
+      Object.entries(definition.properties).forEach(([n, v]) => { properites[n] = this.cleanProperty(v) })
+      result.properties = properites
+
+      if (definition.required.length > 0) {
+        result.required = definition.required
+      }
+
+      if (typeof definition.additionalProperties === 'boolean') {
+        result.additionalProperties = definition.additionalProperties
+      }
+      if (typeof definition.additionalProperties === 'object') {
+        result.additionalProperties = this.cleanProperty(definition.additionalProperties)
+      }
+
+      result.maxProperties = definition.maxProperties
+      result.minProperties = definition.minProperties
     }
-    return copy
+    if ('oneOf' in definition && definition.oneOf !== undefined) {
+      result.oneOf = definition.oneOf.map((s) => this.cleanProperty(s))
+    }
+    if ('discriminator' in definition && definition.discriminator !== undefined) {
+      result.discriminator = definition.discriminator as OpenAPIV3.DiscriminatorObject
+    }
+    this.copyExtensions(definition, result)
+    return result
   }
 
-  private static cleanPropertyCopy (property: Property): OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject {
+  private cleanProperty (property: Property): OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject {
+    let result: OpenAPIV3.SchemaObject
     if (!('type' in property)) {
-      return structuredClone(property)
-    }
-    if (property.type === 'array') {
-      return {
-        ...structuredClone(property),
-        items: OpenApiGenerator.cleanPropertyCopy(property.items)
+      const resultRef = { $ref: property.$ref }
+      this.copyExtensions(property, resultRef)
+      return resultRef
+    } else if (property.type === 'array') {
+      result = {
+        type: property.type,
+        items: this.cleanProperty(property.items),
+        maxItems: property.maxItems,
+        minItems: property.minItems,
+        uniqueItems: property.uniqueItems
       }
-    }
-    if ('const' in property) {
-      const copyWithStuff = structuredClone(property)
-      delete copyWithStuff.const
-      return {
-        ...copyWithStuff,
-        enum: [property.const]
+    } else if (property.type === 'object') {
+      result = { type: property.type }
+    } else if (property.type === 'boolean') {
+      result = {
+        type: property.type,
+        format: property.format,
+        default: property.default,
+        readOnly: property.readOnly,
+        writeOnly: property.writeOnly
       }
+    } else if (property.type === 'string') {
+      result = {
+        type: property.type,
+        format: property.format,
+        default: property.default,
+        maxLength: property.maxLength,
+        minLength: property.minLength,
+        pattern: property.pattern,
+        readOnly: property.readOnly,
+        writeOnly: property.writeOnly
+      }
+    } else if (property.type === 'number' || property.type === 'integer') {
+      result = {
+        type: property.type,
+        format: property.format,
+        default: property.default,
+        multipleOf: property.multipleOf,
+        maximum: property.maximum,
+        minimum: property.minimum,
+        readOnly: property.readOnly,
+        writeOnly: property.writeOnly
+      }
+    } else {
+      throw new Error(`Unsupported property ${JSON.stringify(property)}`)
     }
-    return structuredClone(property)
+
+    this.copyExtensions(property, result)
+
+    if ('const' in property && property.const !== undefined) {
+      result.enum = [property.const]
+    }
+    return result
+  }
+
+  private copyExtensions (source: object, target: any): void {
+    Object.entries(source).forEach(([key, value]) => {
+      if (key.startsWith('x-')) {
+        target[key] = value
+      }
+    })
   }
 
   private async validateGeneratedSpec (spec: OpenAPIV3.Document): Promise<void> {

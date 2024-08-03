@@ -1,10 +1,11 @@
-import { type Module, type Schema, type Model, type Definition, type ObjectDefinition, type EnumDefinition } from '../../reader/Reader'
+import { type Module, type Schema, type Model } from '../../reader/Reader'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { type JavaType, getJavaPropertyType, getSimpleJavaClassName, getJavaPackageNameForModule, getFullJavaClassName, getJavaAdditionalPropertyType } from './JavaHelper'
-import { getSchemaName, getSchemasForModule } from '../../reader/helper/InputHelper'
+import { getSchemaName, getSchemasForModule } from '../../reader/InputHelper'
 import { parseClass, parseEnum, parseInterface } from './JavaParser'
+import { type Definition, type ObjectDefinition, type EnumDefinition } from '../../schemaNormalizer/NormalizedSchema'
 
 /**
  * Validator for Java files

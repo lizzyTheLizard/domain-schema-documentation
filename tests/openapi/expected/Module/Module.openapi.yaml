@@ -51,33 +51,23 @@ components:
     ModuleInterface:
       description: An interface
       type: object
-      x-schema-type: Other
-      discriminator:
-        propertyName: kind
       properties:
         kind:
           type: string
       required:
         - kind
       oneOf:
-        - $ref: "#/components/schemas/ModuleInterfaceInterface1"
-        - $ref: "#/components/schemas/ModuleInterfaceInterface2"
+        - $ref: "#/components/schemas/ModuleInterfaceOneOf1"
+        - $ref: "#/components/schemas/ModuleInterfaceOneOf2"
+      discriminator:
+        propertyName: kind
+      x-schema-type: Other
       x-links: []
       x-tags: []
       x-errors: []
       x-todos: []
-    ModuleInterfaceInterface1:
-      type: object
-      properties:
-        kind:
-          type: string
-          enum:
-            - INSIDE1
-        name:
-          type: string
-      required:
-        - kind
-    ModuleInterfaceInterface2:
+      title: Interface
+    ModuleInterfaceOneOf2:
       type: object
       properties:
         kind:
@@ -92,6 +82,17 @@ components:
         - kind
       additionalProperties:
         type: integer
+    ModuleInterfaceOneOf1:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+            - INSIDE1
+        name:
+          type: string
+      required:
+        - kind
   securitySchemes:
     def_auth:
       type: apiKey

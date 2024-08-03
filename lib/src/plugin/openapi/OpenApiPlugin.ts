@@ -5,7 +5,7 @@ import { OpenApiComperator } from './OpenApiComperator'
 import { writeOutput } from '../../writer/WriterHelpers'
 import * as yaml from 'yaml'
 import path from 'path'
-import { getModuleName } from '../../reader/helper/InputHelper'
+import { getModuleName } from '../../reader/InputHelper'
 
 export interface OpenApiPluginOptions {
   /**
