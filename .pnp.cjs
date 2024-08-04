@@ -88,6 +88,7 @@ const RAW_RUNTIME_STATE =
           ["@types/eslint", "npm:9.6.0"],\
           ["@types/jest", "npm:29.5.12"],\
           ["@types/node", "npm:22.1.0"],\
+          ["@types/semver", "npm:7.5.8"],\
           ["ajv", "npm:8.17.1"],\
           ["ajv-formats", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:3.0.1"],\
           ["better-ajv-errors", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:1.2.0"],\
@@ -95,9 +96,11 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-jsdoc", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:48.11.0"],\
           ["globals", "npm:15.9.0"],\
           ["handlebars", "npm:4.7.8"],\
+          ["husky", "npm:9.1.4"],\
           ["java-parser", "npm:2.2.0"],\
           ["minimist", "npm:1.2.8"],\
           ["openapi-types", "npm:12.1.3"],\
+          ["semver", "npm:7.6.3"],\
           ["syncpack", "npm:12.4.0"],\
           ["typescript", "patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>::version=5.5.4&hash=379a07"],\
           ["typescript-eslint", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:8.0.0"],\
@@ -2033,6 +2036,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@types/semver", [\
+      ["npm:7.5.8", {\
+        "packageLocation": "./.yarn/cache/@types-semver-npm-7.5.8-26073743d7-8663ff9272.zip/node_modules/@types/semver/",\
+        "packageDependencies": [\
+          ["@types/semver", "npm:7.5.8"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@types/stack-utils", [\
       ["npm:2.0.3", {\
         "packageLocation": "./.yarn/cache/@types-stack-utils-npm-2.0.3-48a0a03262-1f4658385a.zip/node_modules/@types/stack-utils/",\
@@ -3304,6 +3316,7 @@ const RAW_RUNTIME_STATE =
           ["@types/eslint", "npm:9.6.0"],\
           ["@types/jest", "npm:29.5.12"],\
           ["@types/node", "npm:22.1.0"],\
+          ["@types/semver", "npm:7.5.8"],\
           ["ajv", "npm:8.17.1"],\
           ["ajv-formats", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:3.0.1"],\
           ["better-ajv-errors", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:1.2.0"],\
@@ -3311,9 +3324,11 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-jsdoc", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:48.11.0"],\
           ["globals", "npm:15.9.0"],\
           ["handlebars", "npm:4.7.8"],\
+          ["husky", "npm:9.1.4"],\
           ["java-parser", "npm:2.2.0"],\
           ["minimist", "npm:1.2.8"],\
           ["openapi-types", "npm:12.1.3"],\
+          ["semver", "npm:7.6.3"],\
           ["syncpack", "npm:12.4.0"],\
           ["typescript", "patch:typescript@npm%3A5.5.4#optional!builtin<compat/typescript>::version=5.5.4&hash=379a07"],\
           ["typescript-eslint", "virtual:747c7bce729d72224ec75c74d7a39e37a8bce78a6e05da01bd1a543f6cc173eef706ab54067120536f9d6f5c33dd90a744b4a490539a0e27cc00a2aaff824ba2#npm:8.0.0"],\
@@ -4228,6 +4243,15 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/human-signals-npm-2.1.0-f75815481d-695edb3edf.zip/node_modules/human-signals/",\
         "packageDependencies": [\
           ["human-signals", "npm:2.1.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["husky", [\
+      ["npm:9.1.4", {\
+        "packageLocation": "./.yarn/cache/husky-npm-9.1.4-45a26bd693-f5185003be.zip/node_modules/husky/",\
+        "packageDependencies": [\
+          ["husky", "npm:9.1.4"]\
         ],\
         "linkType": "HARD"\
       }]\

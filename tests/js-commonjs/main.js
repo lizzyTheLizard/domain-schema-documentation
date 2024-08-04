@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { run, defaultReader } = require('domain-schema-documentation')
 const { compareOutput, handleError } = require('test-shared')
 const { promises: fs } = require('fs')

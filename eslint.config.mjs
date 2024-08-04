@@ -34,9 +34,4 @@ export default [
     ...tseslint.configs.disableTypeChecked,
     languageOptions: { globals: globals.node, parserOptions: { project: null } },
   },
-  {
-    name: 'Special rule for common-js test',
-    files: ['tests/js-commonjs/*.js'],
-    rules: { '@typescript-eslint/no-require-imports': ['off'] },
-  },
 ]
