@@ -6,7 +6,7 @@ import {
   enhanceModule, enhanceSchema,
   loadTemplate,
   shieldIoBadgeUrl,
-  writeOutput
+  writeOutput,
 } from './WriterHelpers'
 import path from 'path'
 import { type Model } from '../reader/Reader'
@@ -49,7 +49,7 @@ describe('writerHelpers', () => {
     expect(written.toString()).toEqual('test-content')
   })
 
-  test('enhanceApplication', async () => {
+  test('enhanceApplication', () => {
     const model: Model = testModel()
 
     const result = enhanceApplication(model)
@@ -57,11 +57,11 @@ describe('writerHelpers', () => {
     expect(result).toEqual({
       ...model.application,
       classDiagram: result.classDiagram,
-      modules: [model.modules[0]]
+      modules: [model.modules[0]],
     })
   })
 
-  test('enhanceModule', async () => {
+  test('enhanceModule', () => {
     const model: Model = testModel()
 
     const result = enhanceModule(model, model.modules[0])
@@ -69,11 +69,11 @@ describe('writerHelpers', () => {
     expect(result).toEqual({
       ...model.modules[0],
       classDiagram: result.classDiagram,
-      schemas: [model.schemas[0]]
+      schemas: [model.schemas[0]],
     })
   })
 
-  test('enhanceSchema', async () => {
+  test('enhanceSchema', () => {
     const model: Model = testModel()
 
     const result = enhanceSchema(model, model.schemas[0])
@@ -81,7 +81,7 @@ describe('writerHelpers', () => {
     expect(result).toEqual({
       ...model.schemas[0],
       classDiagram: result.classDiagram,
-      module: model.modules[0]
+      module: model.modules[0],
     })
   })
 

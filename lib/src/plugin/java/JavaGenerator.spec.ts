@@ -17,7 +17,7 @@ describe('JavaGenerator', () => {
     classTemplate: loadTemplate(path.join(__dirname, 'class.hbs')),
     enumTemplate: loadTemplate(path.join(__dirname, 'enum.hbs')),
     interfaceTemplate: loadTemplate(path.join(__dirname, 'interface.hbs')),
-    ignoreAdditionalFiles: false
+    ignoreAdditionalFiles: false,
   }
 
   test('empty model', async () => {
@@ -170,7 +170,7 @@ describe('JavaGenerator', () => {
 
   test('Enum Descriptions', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const schema2 = { ...testEnumSchema(), description: 'Enum description', 'x-enum-description': { A: 'Description A' } }
+    const schema2 = { ...testEnumSchema(), 'description': 'Enum description', 'x-enum-description': { A: 'Description A' } }
     const model = { ...testModel(), schemas: [schema2] }
     await javaGenerator(model, tmpDir.name, options)
 

@@ -7,8 +7,8 @@
     "domain-schema-documentation": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^20.14.7",
+    "@types/node": "^22.1.0",
     "test-shared": "workspace:*",
-    "tsx": "^4.15.7"
+    "tsx": "^4.16.5"
   }
 }

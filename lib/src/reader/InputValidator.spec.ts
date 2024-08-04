@@ -7,7 +7,7 @@ const inputValidatorOptions: InputValidatorOptions = {
   allowAdditionalPropertiesInExamples: 'INTERFACE',
   discriminator: 'AJV',
   allowedFormats: [],
-  allowedKeywords: []
+  allowedKeywords: [],
 }
 
 describe('InputValidator', () => {
@@ -17,25 +17,25 @@ describe('InputValidator', () => {
     target = new InputValidator(inputValidatorOptions)
   })
 
-  test('validateApplicationFile', async () => {
+  test('validateApplicationFile', () => {
     const application = testApplication()
     expect(() => { target.validateApplicationFile({ wrong: 'field' }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
     expect(target.validateApplicationFile(application, 'file.yaml')).toBe(application)
   })
 
-  test('validateModuleFile', async () => {
+  test('validateModuleFile', () => {
     const module = testModule()
     expect(() => { target.validateModuleFile({ wrong: 'field' }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
     expect(target.validateModuleFile(module, 'file.yaml')).toBe(module)
   })
 
-  test('validateSchemaFile', async () => {
+  test('validateSchemaFile', () => {
     const schema = testSchema()
     expect(() => { target.validateSchemaFile({ wrong: 'field' }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
     expect(target.validateSchemaFile(schema, 'file.yaml')).toBe(schema)
   })
 
-  test('validateId', async () => {
+  test('validateId', () => {
     const module = testModule()
     const schema = testSchema()
     expect(() => { target.validateModuleFile(module, 'file.yaml', 'otherId') }).toThrow(new Error(`Invalid file file.yaml. Id must be the same as the file path 'otherId' but is '${module.$id}'`))
@@ -44,7 +44,7 @@ describe('InputValidator', () => {
     expect(() => { target.validateSchemaFile(schema, 'file.yaml', schema.$id) }).not.toThrow()
   })
 
-  test('validateEnum', async () => {
+  test('validateEnum', () => {
     const schema = testEnumSchema()
     expect(() => { target.validateSchemaFile({ ...schema, 'x-enum-description': { A: 'doc', B: 'doc' } }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. It has an enum description for \'B\' which is not part of the enum'))
     expect(() => { target.validateSchemaFile({ ...schema, 'x-enum-description': { } }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. It has an enum description but no description for value \'A\''))
@@ -62,14 +62,14 @@ describe('InputValidator', () => {
     expect(() => { target.validateSchemaFile({ ...schema, additionalProperties: 'string' }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
   })
 
-  test('validateRequired', async () => {
+  test('validateRequired', () => {
     const schema = testSchema()
     expect(() => { target.validateSchemaFile({ ...schema, required: ['other'] }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. It has a required property \'other\' that is not defined'))
     expect(() => { target.validateSchemaFile(schema, 'file.yaml') }).not.toThrow()
     expect(() => { target.validateSchemaFile({ ...schema, required: ['key'] }, 'file.yaml') }).not.toThrow()
   })
 
-  test('validateExamples', async () => {
+  test('validateExamples', () => {
     const schema = testSchema()
     target.addSchemaToAjv(schema)
     expect(() => { target.validateExamples({ ...schema, examples: [{ wrong: 1 }] }) }).toThrow(new Error('Invalid example 0 in Schema \'/Module/Schema.yaml\'. See logs for details'))
@@ -79,7 +79,7 @@ describe('InputValidator', () => {
     expect(() => { target.validateExamples({ ...schema, examples: [{ key: 1, additional: 'test' }] }) }).toThrow(new Error('Invalid example 0 in Schema \'/Module/Schema.yaml\'. See logs for details'))
   })
 
-  test('validateExamples additional Properties allowed', async () => {
+  test('validateExamples additional Properties allowed', () => {
     const schema = testSchema()
     target = new InputValidator({ ...inputValidatorOptions, allowAdditionalPropertiesInExamples: 'ALWAYS' })
     target.addSchemaToAjv(schema)
@@ -87,7 +87,7 @@ describe('InputValidator', () => {
     expect(() => { target.validateExamples({ ...schema, examples: [{ key: 1, additional: 'test' }] }) }).not.toThrow()
   })
 
-  test('validateReferences', async () => {
+  test('validateReferences', () => {
     const schema = testSchema()
     const schema2 = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { ref: { $ref: './Schema.yaml' } } }
     target.addSchemaToAjv(schema2)
@@ -97,7 +97,7 @@ describe('InputValidator', () => {
   })
 
   test('validate discriminator', () => {
-    const schema: Schema = { ...testSchema(), properties: { field1: { type: 'string', const: 'T1' }, field2: { type: 'string' } }, required: ['field1'] } as any
+    const schema: Schema = { ...testSchema(), properties: { field1: { type: 'string', const: 'T1' }, field2: { type: 'string' } }, required: ['field1'] } as unknown as Schema
     const schema2 = testInterfaceSchema()
     target.addSchemaToAjv(schema)
     expect(() => { target.addSchemaToAjv(schema2) }).not.toThrow()

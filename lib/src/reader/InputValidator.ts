@@ -38,7 +38,7 @@ export interface InputValidatorOptions {
    * Allowed formats. By default the formats of ajv-formats
    * @see {@link https://ajv.js.org/packages/ajv-formats.html}
    */
-  allowedFormats: Array<{ name: string, avjFormat: Format }>
+  allowedFormats: { name: string, avjFormat: Format }[]
   /** Allowed additional keywords. By default none */
   allowedKeywords: string[]
 }
@@ -50,23 +50,23 @@ export class InputValidator {
   readonly #ajv: Ajv
   readonly #ids: string[] = []
 
-  public constructor (private readonly options: InputValidatorOptions) {
+  public constructor(private readonly options: InputValidatorOptions) {
     this.#ajv = this.setUpAjv()
   }
 
-  public validateApplicationFile (parsed: unknown, fileLocation: string): NonNormalizedApplication {
+  public validateApplicationFile(parsed: unknown, fileLocation: string): NonNormalizedApplication {
     this.validateAjv(parsed, '_Application.yaml', `file ${fileLocation}`)
     return parsed as NonNormalizedApplication
   }
 
-  public validateModuleFile (parsed: unknown, fileLocation: string, expectedId?: string): NonNormalizedModule {
+  public validateModuleFile(parsed: unknown, fileLocation: string, expectedId?: string): NonNormalizedModule {
     this.validateAjv(parsed, '_Module.yaml', `file ${fileLocation}`)
     const nonNormalizedModule = parsed as { $id: string }
     this.validateId(nonNormalizedModule, fileLocation, expectedId)
     return parsed as NonNormalizedModule
   }
 
-  public validateSchemaFile (parsed: unknown, fileLocation: string, expectedId?: string): NonNormalizedSchema {
+  public validateSchemaFile(parsed: unknown, fileLocation: string, expectedId?: string): NonNormalizedSchema {
     this.validateAjv(parsed, '_Schema.yaml', `file ${fileLocation}`)
     const inputSchema = parsed as { $id: string }
     this.validateId(inputSchema, fileLocation, expectedId)
@@ -76,7 +76,7 @@ export class InputValidator {
     return parsed as NonNormalizedSchema
   }
 
-  public addSchemaToAjv (schema: Schema): void {
+  public addSchemaToAjv(schema: Schema): void {
     // Before we can add the schema to AJV, we need to set allowAdditionalProperties depending on the options
     // This needs to be done for each definition and the schema itself
     const definitions: Record<string, unknown> = {}
@@ -86,13 +86,13 @@ export class InputValidator {
     const schemaToAdd = {
       ...schema,
       definitions,
-      additionalProperties: this.allowAdditionalProperties(schema)
+      additionalProperties: this.allowAdditionalProperties(schema),
     }
     this.#ajv.addSchema(schemaToAdd, schema.$id)
     this.#ids.push(schema.$id)
   }
 
-  private setUpAjv (): Ajv {
+  private setUpAjv(): Ajv {
     const ajv = new Ajv(this.options.ajvOptions)
       .addSchema(readYamlFile(path.join(__dirname, './inputDefinition', '_Application.yaml')))
       .addSchema(readYamlFile(path.join(__dirname, './inputDefinition', '_Definition.yaml')))
@@ -115,21 +115,20 @@ export class InputValidator {
     return ajv
   }
 
-  private allowAdditionalProperties (d: Definition): unknown {
+  private allowAdditionalProperties(d: Definition): unknown {
     if ('additionalProperties' in d) {
       return d.additionalProperties
-    } if (d.type !== 'object') {
+    } else if (d.type !== 'object') {
       return undefined
-    } if (this.options.allowAdditionalPropertiesInExamples === 'NEVER') {
-      return false
-    } if (this.options.allowAdditionalPropertiesInExamples === 'INTERFACE') {
-      return 'oneOf' in d
-    } if (this.options.allowAdditionalPropertiesInExamples === 'ALWAYS') {
-      return true
+    }
+    switch (this.options.allowAdditionalPropertiesInExamples) {
+      case 'ALWAYS': return true
+      case 'NEVER': return false
+      case 'INTERFACE': return 'oneOf' in d
     }
   }
 
-  public validateExamples (s: Schema): void {
+  public validateExamples(s: Schema): void {
     const schemaType = 'x-schema-type' in s ? s['x-schema-type'] : 'Entity'
     if (!('examples' in s) || s.examples === undefined || s.examples.length === 0) {
       if (schemaType === 'Aggregate' || schemaType === 'ReferenceData') {
@@ -137,10 +136,12 @@ export class InputValidator {
       }
       return
     }
-    s.examples.forEach((e, i) => { this.validateAjv(e, s.$id, `example ${i} in Schema '${s.$id}'`) })
+    s.examples.forEach((e, i) => {
+      this.validateAjv(e, s.$id, `example ${i} in Schema '${s.$id}'`)
+    })
   }
 
-  private validateAjv (parsed: unknown, schemaOrSchemaId: string | AjvSchema, name: string): void {
+  private validateAjv(parsed: unknown, schemaOrSchemaId: string | AjvSchema, name: string): void {
     try {
       if (this.#ajv.validate(schemaOrSchemaId, parsed)) return
     } catch (e: unknown) {
@@ -156,13 +157,13 @@ export class InputValidator {
     throw new Error(`Invalid ${name}. See logs for details`)
   }
 
-  private validateId (parsed: { $id: string }, fileLocation: string, expectedId?: string): void {
+  private validateId(parsed: { $id: string }, fileLocation: string, expectedId?: string): void {
     if (expectedId === undefined) return
     if (parsed.$id === expectedId) return
     throw new Error(`Invalid file ${fileLocation}. Id must be the same as the file path '${expectedId}' but is '${parsed.$id}'`)
   }
 
-  private validateEnumDocumentation (fileLocation: string, subSchema: unknown): void {
+  private validateEnumDocumentation(fileLocation: string, subSchema: unknown): void {
     // As this is not normalized yet, enums could be anywhere, even e.g as part of a property => do this recursively on everything
     if (subSchema === null || typeof subSchema !== 'object') return
     Object.entries(subSchema).forEach(([_, value]) => {
@@ -181,15 +182,15 @@ export class InputValidator {
     const enumValues = subSchema.enum as string[]
     const enumDescriptions = subSchema['x-enum-description'] as Record<string, string>
     const documentedValues = Object.keys(enumDescriptions)
-    enumValues.filter(k => !documentedValues.includes(k)).forEach(k => {
+    enumValues.filter(k => !documentedValues.includes(k)).forEach((k) => {
       throw new Error(`Invalid file ${fileLocation}. It has an enum description but no description for value '${k}'`)
     })
-    documentedValues.filter(k => !enumValues.includes(k)).forEach(k => {
+    documentedValues.filter(k => !enumValues.includes(k)).forEach((k) => {
       throw new Error(`Invalid file ${fileLocation}. It has an enum description for '${k}' which is not part of the enum`)
     })
   }
 
-  private validateRequired (fileLocation: string, subSchema: unknown): void {
+  private validateRequired(fileLocation: string, subSchema: unknown): void {
     if (subSchema == null || typeof subSchema !== 'object') return
     Object.entries(subSchema).forEach(([_, value]) => {
       this.validateRequired(fileLocation, value)
@@ -200,12 +201,12 @@ export class InputValidator {
     const properties = 'properties' in subSchema ? Object.keys(subSchema.properties as Record<string, unknown>) : []
     required
       .filter(r => !properties.includes(r))
-      .forEach(r => {
+      .forEach((r) => {
         throw new Error(`Invalid file ${fileLocation}. It has a required property '${r}' that is not defined`)
       })
   }
 
-  private validateConsts (fileLocation: string, subSchema: unknown): void {
+  private validateConsts(fileLocation: string, subSchema: unknown): void {
     if (subSchema == null || typeof subSchema !== 'object') return
     Object.entries(subSchema).forEach(([_, value]) => {
       this.validateConsts(fileLocation, value)
@@ -218,7 +219,7 @@ export class InputValidator {
     this.validateAjv(constValue, subSchema, `constant ${JSON.stringify(constValue)} in ${fileLocation}`)
   }
 
-  public validateReferences (schema: Schema, subSchema: unknown): void {
+  public validateReferences(schema: Schema, subSchema: unknown): void {
     if (subSchema == null || typeof subSchema !== 'object') return
     Object.entries(subSchema).forEach(([_, value]) => {
       this.validateReferences(schema, value)
@@ -244,13 +245,13 @@ export class InputValidator {
   }
 }
 
-function readYamlFile (filePath: string): AnySchema {
-  return yaml.parse(fs.readFileSync(filePath).toString())
+function readYamlFile(filePath: string): AnySchema {
+  return yaml.parse(fs.readFileSync(filePath).toString()) as AnySchema
 }
 
 export type NonNormalizedSchema = JSONSchema7 & {
-  $id: string
-  title: string
+  '$id': string
+  'title': string
   'x-schema-type': SchemaType
   'x-todos'?: string[]
   'x-links'?: Link[]

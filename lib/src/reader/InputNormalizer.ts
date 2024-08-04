@@ -12,11 +12,13 @@ import { InputValidator, type InputValidatorOptions } from './InputValidator'
 export class InputNormalizer {
   readonly #applications: Application[] = []
   readonly #schemas: Schema[] = []
+
   readonly #modules: Module[] = []
   readonly #validator: InputValidator
   readonly #schemaNormalizer: SchemaNormalizer
 
-  public constructor (options: InputValidatorOptions & SchemaNormalizerOptions) {
+  public constructor(
+    options: InputValidatorOptions & SchemaNormalizerOptions) {
     this.#validator = new InputValidator(options)
     this.#schemaNormalizer = new SchemaNormalizer(options)
   }
@@ -26,14 +28,14 @@ export class InputNormalizer {
    * @param parsed The read object
    * @param fileLocation The location of the file, for debug infos only
    */
-  public addApplication (parsed: unknown, fileLocation: string): void {
+  public addApplication(parsed: unknown, fileLocation: string): void {
     const nonNormalizedApplication = this.#validator.validateApplicationFile(parsed, fileLocation)
     const application: Application = {
       ...nonNormalizedApplication,
       errors: nonNormalizedApplication.errors ?? [],
       todos: nonNormalizedApplication.todos ?? [],
       links: nonNormalizedApplication.links ?? [],
-      tags: nonNormalizedApplication.tags ?? []
+      tags: nonNormalizedApplication.tags ?? [],
     }
     this.#applications.push(application)
   }
@@ -44,14 +46,14 @@ export class InputNormalizer {
    * @param fileLocation The location of the file, for debug infos only
    * @param expectedId An expected ID that should be in this object (e.g. from filename) or none, if no ID is expected
    */
-  public addModule (parsed: unknown, fileLocation: string, expectedId?: string): void {
+  public addModule(parsed: unknown, fileLocation: string, expectedId?: string): void {
     const nonNormalizedModule = this.#validator.validateModuleFile(parsed, fileLocation, expectedId)
     const module: Module = {
       ...nonNormalizedModule,
       errors: nonNormalizedModule.errors ?? [],
       todos: nonNormalizedModule.todos ?? [],
       links: nonNormalizedModule.links ?? [],
-      tags: nonNormalizedModule.tags ?? []
+      tags: nonNormalizedModule.tags ?? [],
     }
     this.#modules.push(module)
   }
@@ -62,7 +64,7 @@ export class InputNormalizer {
    * @param fileLocation The location of the file, for debug infos only
    * @param expectedId The expected ID that should be in this object (e.g. from filename) or none, if no ID is expected
    */
-  public addSchema (parsed: unknown, fileLocation: string, expectedId?: string): void {
+  public addSchema(parsed: unknown, fileLocation: string, expectedId?: string): void {
     const nonNormalizedSchema = this.#validator.validateSchemaFile(parsed, fileLocation, expectedId)
     const normalizedSchema = this.#schemaNormalizer.normalize(nonNormalizedSchema)
     const errors = this.#schemaNormalizer.getErrors()
@@ -76,7 +78,7 @@ export class InputNormalizer {
       'x-links': (normalizedSchema as Partial<Schema>)['x-links'] ?? [],
       'x-tags': (normalizedSchema as Partial<Schema>)['x-tags'] ?? [],
       'x-errors': (normalizedSchema as Partial<Schema>)['x-errors'] ?? [],
-      'x-todos': (normalizedSchema as Partial<Schema>)['x-todos'] ?? []
+      'x-todos': (normalizedSchema as Partial<Schema>)['x-todos'] ?? [],
     }
 
     this.#validator.addSchemaToAjv(schema)
@@ -87,12 +89,12 @@ export class InputNormalizer {
    * Convert the read in object to a normalized model
    * @returns The normalized model
    */
-  public toModel (): Model {
+  public toModel(): Model {
     if (this.#applications.length === 0) throw new Error('No application file found')
-    this.#schemas.forEach(s => {
+    this.#schemas.forEach((s) => {
       this.#validator.validateReferences(s, s)
     })
-    this.#schemas.forEach(m => {
+    this.#schemas.forEach((m) => {
       this.#validator.validateExamples(m)
     })
     return { application: this.#applications[0], modules: this.#modules, schemas: this.#schemas }

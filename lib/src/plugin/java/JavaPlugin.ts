@@ -61,7 +61,7 @@ export interface JavaPluginOptions {
  * @param optionsOrUndefined The options for the plugin. If not provided, the default options will be used.
  * @returns The plugin
  */
-export function javaPlugin (outputFolder: string, optionsOrUndefined?: Partial<JavaPluginOptions>): Plugin {
+export function javaPlugin(outputFolder: string, optionsOrUndefined?: Partial<JavaPluginOptions>): Plugin {
   const options = applyDefaults(optionsOrUndefined)
   return async (model) => {
     await javaValidator(model, options)
@@ -69,7 +69,7 @@ export function javaPlugin (outputFolder: string, optionsOrUndefined?: Partial<J
   }
 }
 
-function applyDefaults (optionsOrUndefined?: Partial<JavaPluginOptions>): JavaPluginOptions {
+function applyDefaults(optionsOrUndefined?: Partial<JavaPluginOptions>): JavaPluginOptions {
   return {
     mainPackageName: optionsOrUndefined?.mainPackageName ?? 'com.example',
     modelPackageName: optionsOrUndefined?.modelPackageName ?? 'model',
@@ -79,7 +79,7 @@ function applyDefaults (optionsOrUndefined?: Partial<JavaPluginOptions>): JavaPl
     enumTemplate: optionsOrUndefined?.enumTemplate ?? loadTemplate(path.join(__dirname, 'enum.hbs')),
     interfaceTemplate: optionsOrUndefined?.interfaceTemplate ?? loadTemplate(path.join(__dirname, 'interface.hbs')),
     srcDir: optionsOrUndefined?.srcDir,
-    ignoreAdditionalFiles: optionsOrUndefined?.ignoreAdditionalFiles ?? true
+    ignoreAdditionalFiles: optionsOrUndefined?.ignoreAdditionalFiles ?? true,
   }
 }
 
@@ -91,37 +91,37 @@ export const defaultJavaBasicTypeMap = {
   integer: 'Integer',
   number: 'Double',
   boolean: 'Boolean',
-  null: 'Void'
+  null: 'Void',
 }
 
 /**
  * Mapping for all ajv-formats. As this is the default list of all formats, these should be included in the basicTypeMap
  */
 export const defaultJavaFormatMap: Record<FormatName, string> = {
-  date: 'java.time.LocalDate',
-  time: 'java.time.OffsetTime',
+  'date': 'java.time.LocalDate',
+  'time': 'java.time.OffsetTime',
   'date-time': 'java.time.OffsetDateTime',
   'iso-time': 'java.time.LocalTime',
   'iso-date-time': 'java.time.LocalDateTime',
-  duration: 'java.time.Duration',
-  uri: 'java.net.URI',
+  'duration': 'java.time.Duration',
+  'uri': 'java.net.URI',
   'uri-reference': 'String',
   'uri-template': 'String',
-  url: 'java.net.URL',
-  email: 'String',
-  hostname: 'String',
-  ipv4: 'java.net.Inet4Address',
-  ipv6: 'java.net.Inet6Address',
-  regex: 'String',
-  uuid: 'java.util.UUID',
+  'url': 'java.net.URL',
+  'email': 'String',
+  'hostname': 'String',
+  'ipv4': 'java.net.Inet4Address',
+  'ipv6': 'java.net.Inet6Address',
+  'regex': 'String',
+  'uuid': 'java.util.UUID',
   'json-pointer': 'String',
   'json-pointer-uri-fragment': 'String',
   'relative-json-pointer': 'String',
-  byte: 'Byte',
-  float: 'Float',
-  double: 'Double',
-  password: 'String',
-  binary: 'byte[]',
-  int32: 'Integer',
-  int64: 'Long'
+  'byte': 'Byte',
+  'float': 'Float',
+  'double': 'Double',
+  'password': 'String',
+  'binary': 'byte[]',
+  'int32': 'Integer',
+  'int64': 'Long',
 }

@@ -1,10 +1,13 @@
 {
   "name": "example",
   "scripts": {
-    "generate": "node main.js",
-    "generate:watch": "node --watch --watch-path=./input main.js"
+    "generate": "tsx main.ts"
   },
   "dependencies": {
     "domain-schema-documentation": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.1.0",
+    "tsx": "^4.16.5"
   }
 }

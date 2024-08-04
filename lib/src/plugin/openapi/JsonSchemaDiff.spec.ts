@@ -36,7 +36,7 @@ describe('JsonSchemaDiff', () => {
     const result = jsonSchemaDiff(source, dest)
     expect(result).toEqual([
       { text: 'Enum \'key\' must contain value "A"', type: 'MISSING_IN_IMPLEMENTATION' },
-      { text: 'Enum \'key\' must not contain value "B"', type: 'NOT_IN_DOMAIN_MODEL' }
+      { text: 'Enum \'key\' must not contain value "B"', type: 'NOT_IN_DOMAIN_MODEL' },
     ])
   })
 
@@ -55,7 +55,7 @@ describe('JsonSchemaDiff', () => {
   })
 
   test('Ignore additions', () => {
-    const source: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } }, 'x-SOMETHING': 'test' } as any
+    const source: OpenAPIV3.SchemaObject = { 'properties': { key: { type: 'string' } }, 'x-SOMETHING': 'test' } as unknown as OpenAPIV3.SchemaObject
     const dest: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } } }
     const result = jsonSchemaDiff(source, dest)
     expect(result).toEqual([])

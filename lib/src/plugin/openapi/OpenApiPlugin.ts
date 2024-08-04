@@ -25,7 +25,7 @@ export interface OpenApiPluginOptions {
  * @param optionsOrUndefined The options for the plugin. If not provided, the default options will be used.
  * @returns The plugin
  */
-export function openApiPlugin (outputFolder: string, optionsOrUndefined?: Partial<OpenApiPluginOptions>): Plugin {
+export function openApiPlugin(outputFolder: string, optionsOrUndefined?: Partial<OpenApiPluginOptions>): Plugin {
   return async (model: Model) => {
     const options = applyDefaults(optionsOrUndefined)
     const generator = new OpenApiGenerator(model)
@@ -52,12 +52,12 @@ export function openApiPlugin (outputFolder: string, optionsOrUndefined?: Partia
   }
 }
 
-function getFileName (module: Module): string {
+function getFileName(module: Module): string {
   return `${getModuleName(module)}.openapi.yaml`
 }
 
-function applyDefaults (optionsOrUndefined?: Partial<OpenApiPluginOptions>): OpenApiPluginOptions {
+function applyDefaults(optionsOrUndefined?: Partial<OpenApiPluginOptions>): OpenApiPluginOptions {
   return {
-    srcSpec: optionsOrUndefined?.srcSpec ?? undefined
+    srcSpec: optionsOrUndefined?.srcSpec ?? undefined,
   }
 }

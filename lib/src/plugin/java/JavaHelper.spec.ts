@@ -10,8 +10,8 @@ describe('JavaHelper', () => {
     const module2: Module = { ...testModule(), $id: '/Module2' }
     const schema2: Schema = { ...testSchema(), $id: '/Module2/Schema2.yaml' }
     const model: Model = { ...testModel(), modules: [testModule(), module2], schemas: [schema, schema2] }
-    const options = { mainPackageName: undefined, modelPackageName: undefined, basicTypeMap: { string: 'String' } } as any as JavaPluginOptions
-    const options2 = { mainPackageName: 'com.example', modelPackageName: 'model', basicTypeMap: { string: 'com.example.CustomString' } } as any as JavaPluginOptions
+    const options = { mainPackageName: undefined, modelPackageName: undefined, basicTypeMap: { string: 'String' } } as unknown as JavaPluginOptions
+    const options2 = { mainPackageName: 'com.example', modelPackageName: 'model', basicTypeMap: { string: 'com.example.CustomString' } } as unknown as JavaPluginOptions
     const refProperty: RefProperty = { $ref: '../Module2/Schema2.yaml' }
     expect(getJavaPropertyType(model, schema, refProperty, options)).toEqual({ type: 'CLASS', fullName: 'module2.Schema2' })
     expect(getJavaPropertyType(model, schema, refProperty, options2)).toEqual({ type: 'CLASS', fullName: 'com.example.module2.model.Schema2' })
@@ -31,20 +31,20 @@ describe('JavaHelper', () => {
 
   test('getJavaPackageName', () => {
     const schema = testSchema()
-    const options = { mainPackageName: undefined, modelPackageName: undefined } as any as JavaPluginOptions
+    const options = { mainPackageName: undefined, modelPackageName: undefined } as unknown as JavaPluginOptions
     expect(getJavaPackageName(schema, options)).toEqual('module')
     expect(getJavaPackageName(schema.$id, options)).toEqual('module')
-    const options2 = { mainPackageName: 'com.example', modelPackageName: 'model' } as any as JavaPluginOptions
+    const options2 = { mainPackageName: 'com.example', modelPackageName: 'model' } as unknown as JavaPluginOptions
     expect(getJavaPackageName(schema, options2)).toEqual('com.example.module.model')
     expect(getJavaPackageName(schema.$id, options2)).toEqual('com.example.module.model')
   })
 
   test('getFullJavaClassName', () => {
     const schema = testSchema()
-    const options = { mainPackageName: undefined, modelPackageName: undefined } as any as JavaPluginOptions
+    const options = { mainPackageName: undefined, modelPackageName: undefined } as unknown as JavaPluginOptions
     expect(getFullJavaClassName(schema, options)).toEqual('module.Schema')
     expect(getFullJavaClassName(schema.$id, options)).toEqual('module.Schema')
-    const options2 = { mainPackageName: 'com.example', modelPackageName: 'model' } as any as JavaPluginOptions
+    const options2 = { mainPackageName: 'com.example', modelPackageName: 'model' } as unknown as JavaPluginOptions
     expect(getFullJavaClassName(schema, options2)).toEqual('com.example.module.model.Schema')
     expect(getFullJavaClassName(schema.$id, options2)).toEqual('com.example.module.model.Schema')
   })

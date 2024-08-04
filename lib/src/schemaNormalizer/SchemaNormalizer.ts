@@ -6,16 +6,16 @@ import { type SchemaNormalizerOptions } from './SchemaNormalizerOptions'
 import { basename, extname } from 'path'
 
 export class SchemaNormalizer {
-  #definitionsToProcess: Array<{ name: string, path: string[], definition: JSONSchema7 }> = []
-  #title: string = ''
-  #id: string = ''
+  #definitionsToProcess: { name: string, path: string[], definition: JSONSchema7 }[] = []
+  #title = ''
+  #id = ''
   #errors: SchemaNormalizerError[] = []
   readonly #options: SchemaNormalizerOptions
 
-  constructor (options?: Partial<SchemaNormalizerOptions>) {
+  constructor(options?: Partial<SchemaNormalizerOptions>) {
     this.#options = {
       allowedKeywords: options?.allowedKeywords ?? [],
-      failOnNotSupportedProperties: options?.failOnNotSupportedProperties ?? true
+      failOnNotSupportedProperties: options?.failOnNotSupportedProperties ?? true,
     }
   }
 
@@ -25,7 +25,7 @@ export class SchemaNormalizer {
    * @param input The schema to normalize
    * @returns The normalized schema
    */
-  public normalize (input: JSONSchema7): NormalizedSchema {
+  public normalize(input: JSONSchema7): NormalizedSchema {
     this.#definitionsToProcess = []
     this.#id = input.$id ?? 'Schema'
     this.#title = input.title ?? basename(this.#id, extname(this.#id))
@@ -48,15 +48,15 @@ export class SchemaNormalizer {
       $id: this.#id,
       title: this.#title,
       examples: this.getExamples(input),
-      definitions: subDefinitions
+      definitions: subDefinitions,
     }
   }
 
-  public getErrors (): SchemaNormalizerError[] {
+  public getErrors(): SchemaNormalizerError[] {
     return [...this.#errors]
   }
 
-  private getExamples (input: JSONSchema7): unknown[] | undefined {
+  private getExamples(input: JSONSchema7): unknown[] | undefined {
     if (input.examples === undefined) {
       return undefined
     }
@@ -66,7 +66,7 @@ export class SchemaNormalizer {
     return [input.examples]
   }
 
-  private toDefinition (input: JSONSchema7, path: string[]): Definition {
+  private toDefinition(input: JSONSchema7, path: string[]): Definition {
     this.processDefinitions(input, path)
 
     if (input.type === 'string') {
@@ -78,13 +78,12 @@ export class SchemaNormalizer {
     return this.toObjectDefinition(input, path)
   }
 
-  private toEnumDefinition (input: JSONSchema7, path: string[]): EnumDefinition {
+  private toEnumDefinition(input: JSONSchema7, path: string[]): EnumDefinition {
     let enumD = input.enum
     if (enumD === undefined) {
       this.#errors.push({ path: [...path, 'enum'], type: 'MISSING_REQUIRED_PROPERTY', message: 'Top-level string must be an enum' })
       enumD = []
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const enumValues = enumD.flatMap((value, index) => {
       if (typeof value !== 'string') {
         this.#errors.push({ path: [...path, `enum[${index}]`], value, type: 'NOT_SUPPORTED_VALUE', message: 'Only string enum values are supported' })
@@ -97,11 +96,11 @@ export class SchemaNormalizer {
       type: 'string',
       enum: enumValues,
       $comment: input.$comment,
-      description: input.description
+      description: input.description,
     }
   }
 
-  private toInterfaceDefinition (input: JSONSchema7, path: string[]): InterfaceDefinition {
+  private toInterfaceDefinition(input: JSONSchema7, path: string[]): InterfaceDefinition {
     const properties: Record<string, Property> = {}
     Object.entries(input.properties ?? {}).forEach(([propertyName, property]) => {
       properties[propertyName] = this.toProperty(property, [...path, propertyName])
@@ -135,11 +134,11 @@ export class SchemaNormalizer {
       $comment: input.$comment,
       maxProperties: input.maxProperties,
       minProperties: input.minProperties,
-      description: input.description
+      description: input.description,
     }
   }
 
-  private toObjectDefinition (input: JSONSchema7, path: string[]): ObjectDefinition {
+  private toObjectDefinition(input: JSONSchema7, path: string[]): ObjectDefinition {
     const properties: Record<string, Property> = {}
     Object.entries(input.properties ?? {}).forEach(([propertyName, property]) => {
       properties[propertyName] = this.toProperty(property, [...path, propertyName])
@@ -156,11 +155,11 @@ export class SchemaNormalizer {
       $comment: input.$comment,
       maxProperties: input.maxProperties,
       minProperties: input.minProperties,
-      description: input.description
+      description: input.description,
     }
   }
 
-  private toProperty (input: JSONSchema7Definition, path: string[]): Property {
+  private toProperty(input: JSONSchema7Definition, path: string[]): Property {
     if (typeof input === 'boolean') {
       this.#errors.push({ path, value: input, type: 'NOT_SUPPORTED_VALUE', message: 'Only objects are supported' })
       return { type: 'object' }
@@ -183,23 +182,23 @@ export class SchemaNormalizer {
     return { ...this.keepProperties(input, 'property', path), type: 'object' }
   }
 
-  private toRefProperty (input: JSONSchema7, path: string[]): RefProperty {
+  private toRefProperty(input: JSONSchema7, path: string[]): RefProperty {
     return {
       ...this.keepProperties(input, 'ref', path),
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       $ref: input.$ref!,
       readOnly: input.readOnly,
-      writeOnly: input.writeOnly
+      writeOnly: input.writeOnly,
     }
   }
 
-  private toDefinitionRefProperty (input: JSONSchema7, path: string[]): RefProperty {
+  private toDefinitionRefProperty(input: JSONSchema7, path: string[]): RefProperty {
     const name = path.map(p => cleanName(p)).join('')
     this.#definitionsToProcess.push({ name, path, definition: input })
     return { $ref: `#/definitions/${name}` }
   }
 
-  private toArrayProperty (input: JSONSchema7, path: string[]): ArrayProperty {
+  private toArrayProperty(input: JSONSchema7, path: string[]): ArrayProperty {
     let items: Property
     if (input.items === undefined) {
       items = { type: 'object' }
@@ -217,11 +216,11 @@ export class SchemaNormalizer {
       writeOnly: input.writeOnly,
       maxItems: input.maxItems,
       minItems: input.minItems,
-      uniqueItems: input.uniqueItems
+      uniqueItems: input.uniqueItems,
     }
   }
 
-  private toStringProperty (input: JSONSchema7, path: string[]): StringProperty {
+  private toStringProperty(input: JSONSchema7, path: string[]): StringProperty {
     let constV = input.const
     let defaultV = input.default
     if (constV !== undefined && typeof constV !== 'string') {
@@ -244,11 +243,11 @@ export class SchemaNormalizer {
       contentMediaType: input.contentMediaType,
       pattern: input.pattern,
       readOnly: input.readOnly,
-      writeOnly: input.writeOnly
+      writeOnly: input.writeOnly,
     }
   }
 
-  private toBooleanProperty (input: JSONSchema7, path: string[]): BooleanProperty {
+  private toBooleanProperty(input: JSONSchema7, path: string[]): BooleanProperty {
     let constV = input.const
     let defaultV = input.default
     if (constV !== undefined && typeof constV !== 'boolean') {
@@ -266,11 +265,11 @@ export class SchemaNormalizer {
       default: defaultV,
       readOnly: input.readOnly,
       writeOnly: input.writeOnly,
-      format: input.format
+      format: input.format,
     }
   }
 
-  private toNumberProperty (input: JSONSchema7, path: string[]): NumberProperty {
+  private toNumberProperty(input: JSONSchema7, path: string[]): NumberProperty {
     let constV = input.const
     let defaultV = input.default
     if (constV !== undefined && typeof constV !== 'number') {
@@ -293,11 +292,11 @@ export class SchemaNormalizer {
       maximum: input.maximum,
       exclusiveMaximum: input.exclusiveMaximum,
       exclusiveMinimum: input.exclusiveMinimum,
-      multipleOf: input.multipleOf
+      multipleOf: input.multipleOf,
     }
   }
 
-  private toAdditionalProperties (input: JSONSchema7Definition, path: string[]): boolean | Property {
+  private toAdditionalProperties(input: JSONSchema7Definition, path: string[]): boolean | Property {
     if (typeof input === 'boolean') {
       return input
     }
@@ -308,7 +307,7 @@ export class SchemaNormalizer {
     return true
   }
 
-  private processDefinitions (input: JSONSchema7, path: string[]): void {
+  private processDefinitions(input: JSONSchema7, path: string[]): void {
     const definitions = input.definitions
     if (definitions === undefined) return
     Object.entries(definitions).forEach(([name, definition]) => {
@@ -321,7 +320,7 @@ export class SchemaNormalizer {
     })
   }
 
-  private keepProperties (input: JSONSchema7, type: KeepPropertiesTypes, path: string[]): Record<string, unknown> {
+  private keepProperties(input: JSONSchema7, type: KeepPropertiesTypes, path: string[]): Record<string, unknown> {
     const result: Record<string, unknown> = {}
     Object.entries(input).forEach(([key, value]) => {
       if (this.#options.allowedKeywords.includes(key)) {
@@ -368,5 +367,5 @@ const allowedProperties: Record<KeepPropertiesTypes, string[]> = {
   array: ['items', 'maxItems', 'minItems', 'uniqueItems'],
   string: ['default', 'const', 'maxLength', 'minLength', 'pattern', 'contentMediaType', 'contentEncoding', 'format'],
   number: ['default', 'const', 'multipleOf', 'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'format'],
-  boolean: ['default', 'const', 'format']
+  boolean: ['default', 'const', 'format'],
 }

@@ -9,7 +9,7 @@ import {
   relativeLink,
   resolveRelativeId,
   getModuleName,
-  resolveRelativeIdForModule
+  resolveRelativeIdForModule,
 } from './InputHelper'
 import { testModel, testModule, testSchema } from '../testData'
 

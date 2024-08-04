@@ -12,7 +12,7 @@ type Schema = OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject | undefined
  * @param path The current property path or undefined to start at the root
  * @returns The list of errors
  */
-export function jsonSchemaDiff (expected: Schema, implemented: Schema, path?: string): ImplementationError[] {
+export function jsonSchemaDiff(expected: Schema, implemented: Schema, path?: string): ImplementationError[] {
   const entity = path === undefined ? 'Type' : `Type of '${path}'`
   if (expected === undefined && implemented === undefined) return []
   if (expected === undefined) return [{ text: `${entity} must not be defined`, type: 'NOT_IN_DOMAIN_MODEL' }]
@@ -27,11 +27,11 @@ export function jsonSchemaDiff (expected: Schema, implemented: Schema, path?: st
     ...compareArray(expected, implemented, path),
     ...compareProperties(expected, implemented, path),
     ...compareOneOf(expected, implemented, path),
-    ...compareRequired(expected, implemented, path)
+    ...compareRequired(expected, implemented, path),
   ]
 }
 
-function compareRefs (expected: OpenAPIV3.ReferenceObject, implemented: OpenAPIV3.ReferenceObject, path?: string): ImplementationError[] {
+function compareRefs(expected: OpenAPIV3.ReferenceObject, implemented: OpenAPIV3.ReferenceObject, path?: string): ImplementationError[] {
   if (expected.$ref === implemented.$ref) {
     return []
   }
@@ -39,7 +39,7 @@ function compareRefs (expected: OpenAPIV3.ReferenceObject, implemented: OpenAPIV
   return [{ text: `${entity} must be '${expected.$ref}' but is '${implemented.$ref}'`, type: 'WRONG' }]
 }
 
-function compareType (expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
+function compareType(expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
   if (expected.type === implemented.type) {
     return []
   }
@@ -47,7 +47,7 @@ function compareType (expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.S
   return [{ text: `${entity} must be '${expected.type}' but is '${implemented.type}'`, type: 'WRONG' }]
 }
 
-function compareEnum (expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
+function compareEnum(expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
   if (expected.enum === undefined && implemented.enum === undefined) {
     return []
   }
@@ -55,12 +55,12 @@ function compareEnum (expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.S
   const destEnum = implemented.enum ?? []
   const entity = path === undefined ? 'Enum' : `Enum '${path}'`
   const results: ImplementationError[] = []
-  sourceEnum.forEach(value => {
+  sourceEnum.forEach((value) => {
     if (!(destEnum.includes(value))) {
       results.push({ text: `${entity} must contain value ${JSON.stringify(value)}`, type: 'MISSING_IN_IMPLEMENTATION' })
     }
   })
-  destEnum.forEach(value => {
+  destEnum.forEach((value) => {
     if (!(sourceEnum.includes(value))) {
       results.push({ text: `${entity} must not contain value ${JSON.stringify(value)}`, type: 'NOT_IN_DOMAIN_MODEL' })
     }
@@ -68,16 +68,16 @@ function compareEnum (expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.S
   return results
 }
 
-function compareArray (expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
+function compareArray(expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
   if (!('items' in expected || 'items' in implemented)) {
     return []
   }
-  const sourceItems = 'items' in expected ? expected.items ?? {} : {}
-  const destItems = 'items' in implemented ? implemented.items ?? {} : {}
+  const sourceItems = 'items' in expected ? expected.items : {}
+  const destItems = 'items' in implemented ? implemented.items : {}
   return jsonSchemaDiff(sourceItems, destItems, path === undefined ? undefined : path + '[]')
 }
 
-function compareProperties (expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
+function compareProperties(expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
   if (expected.properties === undefined && implemented.properties === undefined) {
     return []
   }
@@ -89,7 +89,7 @@ function compareProperties (expected: OpenAPIV3.SchemaObject, implemented: OpenA
     if (!(name in destProperties)) {
       results.push({ text: `Property '${subPath}' must exist`, type: 'MISSING_IN_IMPLEMENTATION' })
     } else {
-      results.push(...jsonSchemaDiff(sourceProperty, destProperties[name], `${subPath}`))
+      results.push(...jsonSchemaDiff(sourceProperty, destProperties[name], subPath))
     }
   })
   Object.entries(destProperties).forEach(([name]) => {
@@ -101,7 +101,7 @@ function compareProperties (expected: OpenAPIV3.SchemaObject, implemented: OpenA
   return results
 }
 
-function compareOneOf (expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
+function compareOneOf(expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
   if (expected.oneOf === undefined && implemented.oneOf !== undefined) {
     const entity = path === undefined ? 'Type' : `'${path}'`
     return [{ text: `${entity} must not be OneOf`, type: 'WRONG' }]
@@ -128,20 +128,20 @@ function compareOneOf (expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.
   return results
 }
 
-function compareRequired (expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
+function compareRequired(expected: OpenAPIV3.SchemaObject, implemented: OpenAPIV3.SchemaObject, path?: string): ImplementationError[] {
   if (expected.required === undefined && implemented.required === undefined) {
     return []
   }
   const sourceRequired = expected.required ?? []
   const destRequired = implemented.required ?? []
   const results: ImplementationError[] = []
-  sourceRequired.forEach(value => {
+  sourceRequired.forEach((value) => {
     const entity = path === undefined ? value : `${path}.${value}`
     if (!(destRequired.includes(value))) {
       results.push({ text: `Property '${entity}' must be required`, type: 'WRONG' })
     }
   })
-  destRequired.forEach(value => {
+  destRequired.forEach((value) => {
     const entity = path === undefined ? value : `${path}.${value}`
     if (!(sourceRequired.includes(value))) {
       results.push({ text: `Property '${entity}' must not be required`, type: 'WRONG' })

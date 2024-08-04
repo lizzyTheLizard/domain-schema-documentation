@@ -3,6 +3,7 @@ import { cleanName, getModuleId, getSchema, getSchemaName, resolveRelativeIdForM
 import SwaggerParser from '@apidevtools/swagger-parser'
 import { type OpenAPIV3 } from 'openapi-types'
 import { type Definition, type Property } from '../../schemaNormalizer/NormalizedSchema'
+import { SchemaObject } from 'ajv'
 
 /**
  * Generates OpenApi-Specifications from module files
@@ -15,7 +16,7 @@ export class OpenApiGenerator {
   #processedSchemas: string[] = []
   #module!: Module
 
-  constructor (private readonly model: Model) {
+  constructor(private readonly model: Model) {
   }
 
   /**
@@ -24,7 +25,7 @@ export class OpenApiGenerator {
    * @param inputSpec The input specification
    * @returns An OpenAPI specification
    */
-  public async generate (module: Module, inputSpec: object): Promise<OpenAPIV3.Document> {
+  public async generate(module: Module, inputSpec: object): Promise<OpenAPIV3.Document> {
     this.#module = module
     this.#schemasToProcess = []
     this.#processedSchemas = []
@@ -46,24 +47,23 @@ export class OpenApiGenerator {
     return currentSpec
   }
 
-  private createInitialOpenApiSpec (inputSpec: object): OpenAPIV3.Document & { components: { schemas: object } } {
+  private createInitialOpenApiSpec(inputSpec: object): OpenAPIV3.Document & { components: { schemas: object } } {
     const openApiSpec = {
       openapi: '3.0.3',
       info: {
         title: this.#module.title,
         description: this.#module.description,
-        version: new Date().toDateString()
+        version: new Date().toDateString(),
       },
       servers: [],
       paths: {},
       components: { schemas: {}, securitySchemes: {} },
-      ...structuredClone(inputSpec)
+      ...structuredClone(inputSpec),
     }
-    if (openApiSpec.components.schemas === undefined) { openApiSpec.components.schemas = {} }
     return openApiSpec
   }
 
-  private replaceRefs (input: unknown, schemaId?: string): void {
+  private replaceRefs(input: unknown, schemaId?: string): void {
     if (input == null || typeof input !== 'object') return
     Object.entries(input).forEach(([_, value]) => {
       this.replaceRefs(value, schemaId)
@@ -109,7 +109,7 @@ export class OpenApiGenerator {
     input.$ref = '#/components/schemas/' + this.getDefinitionName(id)
   }
 
-  private getDefinitionName (schemaOrschemaId: string | Schema, definitionName?: string): string {
+  private getDefinitionName(schemaOrschemaId: string | Schema, definitionName?: string): string {
     const moduleId = cleanName(getModuleId(schemaOrschemaId))
     const schemaName = cleanName(getSchemaName(schemaOrschemaId))
     const result = moduleId + schemaName
@@ -119,10 +119,10 @@ export class OpenApiGenerator {
     return result + cleanName(definitionName)
   }
 
-  private cleanSchema (schema: Schema): OpenAPIV3.SchemaObject {
+  private cleanSchema(schema: Schema): OpenAPIV3.SchemaObject {
     const result: OpenAPIV3.SchemaObject = {
       ...this.cleanDefinition(schema),
-      title: schema.title
+      title: schema.title,
     }
     if (schema.examples !== undefined && schema.examples.length !== 0) {
       result.example = schema.examples[0]
@@ -130,15 +130,15 @@ export class OpenApiGenerator {
     return result
   }
 
-  private cleanDefinition (definition: Definition): OpenAPIV3.SchemaObject {
+  private cleanDefinition(definition: Definition): OpenAPIV3.SchemaObject {
     const result: OpenAPIV3.SchemaObject = {
       description: definition.description,
-      type: definition.type
+      type: definition.type,
     }
-    if ('enum' in definition && definition.enum !== undefined) {
+    if ('enum' in definition) {
       result.enum = definition.enum
     }
-    if ('properties' in definition && definition.properties !== undefined) {
+    if ('properties' in definition) {
       const properites: Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject> = {}
       Object.entries(definition.properties).forEach(([n, v]) => { properites[n] = this.cleanProperty(v) })
       result.properties = properites
@@ -157,8 +157,8 @@ export class OpenApiGenerator {
       result.maxProperties = definition.maxProperties
       result.minProperties = definition.minProperties
     }
-    if ('oneOf' in definition && definition.oneOf !== undefined) {
-      result.oneOf = definition.oneOf.map((s) => this.cleanProperty(s))
+    if ('oneOf' in definition) {
+      result.oneOf = definition.oneOf.map(s => this.cleanProperty(s))
     }
     if ('discriminator' in definition && definition.discriminator !== undefined) {
       result.discriminator = definition.discriminator as OpenAPIV3.DiscriminatorObject
@@ -167,54 +167,60 @@ export class OpenApiGenerator {
     return result
   }
 
-  private cleanProperty (property: Property): OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject {
-    let result: OpenAPIV3.SchemaObject
+  private cleanProperty(property: Property): OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject {
     if (!('type' in property)) {
       const resultRef = { $ref: property.$ref }
       this.copyExtensions(property, resultRef)
       return resultRef
-    } else if (property.type === 'array') {
-      result = {
-        type: property.type,
-        items: this.cleanProperty(property.items),
-        maxItems: property.maxItems,
-        minItems: property.minItems,
-        uniqueItems: property.uniqueItems
-      }
-    } else if (property.type === 'object') {
-      result = { type: property.type }
-    } else if (property.type === 'boolean') {
-      result = {
-        type: property.type,
-        format: property.format,
-        default: property.default,
-        readOnly: property.readOnly,
-        writeOnly: property.writeOnly
-      }
-    } else if (property.type === 'string') {
-      result = {
-        type: property.type,
-        format: property.format,
-        default: property.default,
-        maxLength: property.maxLength,
-        minLength: property.minLength,
-        pattern: property.pattern,
-        readOnly: property.readOnly,
-        writeOnly: property.writeOnly
-      }
-    } else if (property.type === 'number' || property.type === 'integer') {
-      result = {
-        type: property.type,
-        format: property.format,
-        default: property.default,
-        multipleOf: property.multipleOf,
-        maximum: property.maximum,
-        minimum: property.minimum,
-        readOnly: property.readOnly,
-        writeOnly: property.writeOnly
-      }
-    } else {
-      throw new Error(`Unsupported property ${JSON.stringify(property)}`)
+    }
+    let result: OpenAPIV3.SchemaObject
+    switch (property.type) {
+      case 'array':
+        result = {
+          type: property.type,
+          items: this.cleanProperty(property.items),
+          maxItems: property.maxItems,
+          minItems: property.minItems,
+          uniqueItems: property.uniqueItems,
+        }
+        break
+      case 'object':
+        result = { type: property.type }
+        break
+      case 'boolean':
+        result = {
+          type: property.type,
+          format: property.format,
+          default: property.default,
+          readOnly: property.readOnly,
+          writeOnly: property.writeOnly,
+        }
+        break
+      case 'string':
+        result = {
+          type: property.type,
+          format: property.format,
+          default: property.default,
+          maxLength: property.maxLength,
+          minLength: property.minLength,
+          pattern: property.pattern,
+          readOnly: property.readOnly,
+          writeOnly: property.writeOnly,
+        }
+        break
+      case 'number':
+      case 'integer':
+        result = {
+          type: property.type,
+          format: property.format,
+          default: property.default,
+          multipleOf: property.multipleOf,
+          maximum: property.maximum,
+          minimum: property.minimum,
+          readOnly: property.readOnly,
+          writeOnly: property.writeOnly,
+        }
+        break
     }
 
     this.copyExtensions(property, result)
@@ -225,15 +231,16 @@ export class OpenApiGenerator {
     return result
   }
 
-  private copyExtensions (source: object, target: any): void {
+  private copyExtensions(source: object, target: SchemaObject): void {
     Object.entries(source).forEach(([key, value]) => {
       if (key.startsWith('x-')) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         target[key] = value
       }
     })
   }
 
-  private async validateGeneratedSpec (spec: OpenAPIV3.Document): Promise<void> {
+  private async validateGeneratedSpec(spec: OpenAPIV3.Document): Promise<void> {
     const parserOptions: SwaggerParser.Options = { dereference: { circular: 'ignore' } }
     // This will change the spec in place but we do not want to change the original spec. So let's clone it first
     const clone = structuredClone(spec)

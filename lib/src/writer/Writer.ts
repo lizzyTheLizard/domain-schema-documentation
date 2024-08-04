@@ -24,10 +24,10 @@ export interface WriterBaseOptions {
  * @param optionsOrUndefined The options given
  * @returns The options incl. defaults for values not defined
  */
-export function applyWriterOptionsDefaults (outputFolder: string, optionsOrUndefined?: Partial<WriterBaseOptions>): WriterBaseOptions {
+export function applyWriterOptionsDefaults(outputFolder: string, optionsOrUndefined?: Partial<WriterBaseOptions>): WriterBaseOptions {
   return {
     write: optionsOrUndefined?.write ?? (async (o, f) => { await writeOutput(o, f, outputFolder) }),
-    typeName: (formatOrType: string) => typeName(formatOrType)
+    typeName: (formatOrType: string) => typeName(formatOrType),
   }
 }
 
@@ -36,7 +36,7 @@ export function applyWriterOptionsDefaults (outputFolder: string, optionsOrUndef
  * @param formatOrType The input base type or format
  * @returns The human readable form
  */
-export function typeName (formatOrType: string): string {
+export function typeName(formatOrType: string): string {
   switch (formatOrType.toLowerCase()) {
     case 'ipv4':
     case 'ipv6':

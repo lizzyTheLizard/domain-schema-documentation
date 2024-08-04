@@ -25,11 +25,11 @@ describe('SchemaNormalizer', () => {
   })
 
   test('top-level additions', () => {
-    expect(target.normalize({ $id: 'Schema', extrakeyword: 'test' } as any as JSONSchema7)).toMatchObject({ extrakeyword: 'test' })
+    expect(target.normalize({ $id: 'Schema', extrakeyword: 'test' } as unknown as JSONSchema7)).toMatchObject({ extrakeyword: 'test' })
     expect(target.getErrors()).toEqual([])
-    expect(target.normalize({ $id: 'Schema', 'x-test': 'test' } as any as JSONSchema7)).toMatchObject({ 'x-test': 'test' })
+    expect(target.normalize({ '$id': 'Schema', 'x-test': 'test' } as unknown as JSONSchema7)).toMatchObject({ 'x-test': 'test' })
     expect(target.getErrors()).toEqual([])
-    expect(target.normalize({ $id: 'Schema', wrong: 'test' } as any as JSONSchema7)).not.toMatchObject({ wrong: 'test' })
+    expect(target.normalize({ $id: 'Schema', wrong: 'test' } as unknown as JSONSchema7)).not.toMatchObject({ wrong: 'test' })
     expect(target.getErrors()).toEqual([{ message: 'wrong is not supported for an schema of type object', path: ['wrong'], value: 'test', type: 'NOT_SUPPORTED_PROPERTY' }])
   })
 
@@ -51,7 +51,7 @@ describe('SchemaNormalizer', () => {
       required: [],
       additionalProperties: undefined,
       oneOf: [{ $ref: './Schema.yaml' }],
-      definitions: {}
+      definitions: {},
     })
     expect(target.getErrors()).toEqual([])
   })
@@ -62,7 +62,7 @@ describe('SchemaNormalizer', () => {
       required: [],
       additionalProperties: undefined,
       oneOf: [{ $ref: './Schema.yaml' }],
-      definitions: {}
+      definitions: {},
     })
     expect(target.getErrors()).toEqual([])
   })
@@ -73,12 +73,12 @@ describe('SchemaNormalizer', () => {
       required: [],
       additionalProperties: undefined,
       oneOf: [{ $ref: '#/definitions/OneOf1' }],
-      definitions: { OneOf1: { type: 'object', properties: { key: { type: 'string' } }, required: [] } }
+      definitions: { OneOf1: { type: 'object', properties: { key: { type: 'string' } }, required: [] } },
     })
     expect(target.getErrors()).toEqual([])
   })
 
-  test('top-level properties', async () => {
+  test('top-level properties', () => {
     expect(target.normalize({ $id: 'Schema', properties: { key: { type: 'string' } } })).toEqual({
       $id: 'Schema',
       title: 'Schema',
@@ -86,47 +86,47 @@ describe('SchemaNormalizer', () => {
       properties: { key: { type: 'string' } },
       required: [],
       additionalProperties: undefined,
-      definitions: {}
+      definitions: {},
     })
     expect(target.getErrors()).toEqual([])
   })
 
-  test('top-level properties with dependencies', async () => {
+  test('top-level properties with dependencies', () => {
     expect(target.normalize({ $id: 'Schema', properties: { deep: { type: 'object', properties: { key: { type: 'string' } } } } })).toMatchObject({
       definitions: { Deep: { type: 'object', properties: { key: { type: 'string' } } } },
-      properties: { deep: { $ref: '#/definitions/Deep' } }
+      properties: { deep: { $ref: '#/definitions/Deep' } },
     })
     expect(target.getErrors()).toEqual([])
   })
 
-  test('top-level properties with enum dependencies', async () => {
+  test('top-level properties with enum dependencies', () => {
     expect(target.normalize({ $id: 'Schema', properties: { deep: { type: 'string', enum: ['A'] } } })).toMatchObject({
       definitions: { Deep: { type: 'string', enum: ['A'] } },
-      properties: { deep: { $ref: '#/definitions/Deep' } }
+      properties: { deep: { $ref: '#/definitions/Deep' } },
     })
     expect(target.getErrors()).toEqual([])
   })
 
-  test('top-level properties with oneOf dependencies', async () => {
+  test('top-level properties with oneOf dependencies', () => {
     expect(target.normalize({ $id: 'Schema', properties: { deep: { type: 'object', oneOf: [{ $ref: './Schema2.yaml' }] } } })).toMatchObject({
       definitions: { Deep: { oneOf: [{ $ref: './Schema2.yaml' }] } },
-      properties: { deep: { $ref: '#/definitions/Deep' } }
+      properties: { deep: { $ref: '#/definitions/Deep' } },
     })
     expect(target.getErrors()).toEqual([])
   })
 
-  test('top-level enum', async () => {
+  test('top-level enum', () => {
     expect(target.normalize({ $id: 'Schema', type: 'string', enum: ['A'] })).toEqual({
       $id: 'Schema',
       title: 'Schema',
       type: 'string',
       definitions: { },
-      enum: ['A']
+      enum: ['A'],
     })
     expect(target.getErrors()).toEqual([])
   })
 
-  test('additionalProperties', async () => {
+  test('additionalProperties', () => {
     expect(target.normalize({ $id: 'Schema' })).toMatchObject({ additionalProperties: undefined })
     expect(target.getErrors()).toEqual([])
     expect(target.normalize({ $id: 'Schema', additionalProperties: false })).toMatchObject({ additionalProperties: false })
@@ -142,7 +142,7 @@ describe('SchemaNormalizer', () => {
       properties: {},
       required: [],
       additionalProperties: { $ref: '#/definitions/AdditionalProperties' },
-      definitions: { AdditionalProperties: { type: 'string', enum: ['A'] } }
+      definitions: { AdditionalProperties: { type: 'string', enum: ['A'] } },
     })
     expect(target.getErrors()).toEqual([])
   })

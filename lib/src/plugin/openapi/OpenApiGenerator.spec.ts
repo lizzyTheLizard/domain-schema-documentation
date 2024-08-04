@@ -22,7 +22,7 @@ describe('OpenAPIGenerator', () => {
       info: { title: module.title, description: module.description, version: new Date().toDateString() },
       servers: [],
       paths: {},
-      components: { schemas: {}, securitySchemes: {} }
+      components: { schemas: {}, securitySchemes: {} },
     })
   })
 
@@ -35,6 +35,7 @@ describe('OpenAPIGenerator', () => {
   test('$ref in original', async () => {
     const openApi = refSpec()
     const result = await target.generate(module, openApi)
+    // eslint-disable-next-line
     expect(result.paths).toEqual((openApi as any).paths)
     expect(result.components?.schemas).toEqual({
       Test: {
@@ -42,19 +43,19 @@ describe('OpenAPIGenerator', () => {
         properties: {
           TestP: { $ref: '#/components/schemas/ModuleSchema' },
           TestP2: { $ref: '#/components/schemas/ModuleSchema' },
-          TestP3: { $ref: '#/components/schemas/Test' }
-        }
+          TestP3: { $ref: '#/components/schemas/Test' },
+        },
       },
       ModuleSchema: {
-        title: 'Schema',
-        type: 'object',
-        properties: { key: { type: 'number' } },
+        'title': 'Schema',
+        'type': 'object',
+        'properties': { key: { type: 'number' } },
         'x-schema-type': 'Aggregate',
         'x-errors': [],
         'x-links': [],
         'x-todos': [],
-        'x-tags': []
-      }
+        'x-tags': [],
+      },
     })
   })
 
@@ -63,30 +64,33 @@ describe('OpenAPIGenerator', () => {
     const schema = testInterfaceSchema()
     const model = { ...testModel(), schemas: [testSchema(), schema] }
     target = new OpenApiGenerator(model)
+    // eslint-disable-next-line
     const result = await target.generate(model.modules[0], openApi) as any
+    // eslint-disable-next-line
     expect(result.paths['/pet'].put.responses[200].content['application/json'].schema.$ref).toEqual('#/components/schemas/ModuleInterface')
+    // eslint-disable-next-line
     expect(result.components.schemas).toEqual({
       ModuleInterface: {
-        title: 'Interface',
-        type: 'object',
-        oneOf: [{ $ref: '#/components/schemas/ModuleSchema' }],
-        properties: { field1: { type: 'string' } },
+        'title': 'Interface',
+        'type': 'object',
+        'oneOf': [{ $ref: '#/components/schemas/ModuleSchema' }],
+        'properties': { field1: { type: 'string' } },
         'x-schema-type': 'Aggregate',
         'x-errors': [],
         'x-links': [],
         'x-todos': [],
-        'x-tags': []
+        'x-tags': [],
       },
       ModuleSchema: {
-        title: 'Schema',
-        type: 'object',
-        properties: { key: { type: 'number' } },
+        'title': 'Schema',
+        'type': 'object',
+        'properties': { key: { type: 'number' } },
         'x-schema-type': 'Aggregate',
         'x-errors': [],
         'x-links': [],
         'x-todos': [],
-        'x-tags': []
-      }
+        'x-tags': [],
+      },
     })
   })
 })

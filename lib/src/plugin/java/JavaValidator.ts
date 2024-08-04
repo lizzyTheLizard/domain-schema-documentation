@@ -12,7 +12,7 @@ import { type Definition, type ObjectDefinition, type EnumDefinition } from '../
  * @param model The model to validate
  * @param options The java plugin options
  */
-export async function javaValidator (model: Model, options: JavaPluginOptions): Promise<void> {
+export async function javaValidator(model: Model, options: JavaPluginOptions): Promise<void> {
   // No source directory, no validation
   if (options.srcDir === undefined) return
   const validator = new JavaValidator(model, options)
@@ -24,10 +24,10 @@ export async function javaValidator (model: Model, options: JavaPluginOptions): 
 class JavaValidator {
   private currentModule!: Module
   private currentSchema!: Schema
-  constructor (private readonly model: Model, private readonly options: JavaPluginOptions) {
+  constructor(private readonly model: Model, private readonly options: JavaPluginOptions) {
   }
 
-  public async checkModule (module: Module): Promise<void> {
+  public async checkModule(module: Module): Promise<void> {
     this.currentModule = module
     await this.checkForAdditionalFiles()
     for (const schema of getSchemasForModule(this.model, this.currentModule)) {
@@ -35,7 +35,7 @@ class JavaValidator {
     }
   }
 
-  private async checkForAdditionalFiles (): Promise<void> {
+  private async checkForAdditionalFiles(): Promise<void> {
     // Check if the module directory exists and should be checked. Otherwise there is no error...
     if (this.options.ignoreAdditionalFiles) return
     const dir = this.getModuleDir()
@@ -57,19 +57,19 @@ class JavaValidator {
       if (expectedClasses.includes(className)) continue
       this.currentModule.errors.push({
         text: `File ${file} does not correspond to a domain model`,
-        type: 'NOT_IN_DOMAIN_MODEL'
+        type: 'NOT_IN_DOMAIN_MODEL',
       })
     }
   }
 
-  private getModuleDir (): string {
+  private getModuleDir(): string {
     const packageName = getJavaPackageNameForModule(this.currentModule, this.options)
     if (this.options.srcDir === undefined) throw new Error('This is not allowed here, scrDir must be set!')
     const baseDir = typeof this.options.srcDir === 'string' ? this.options.srcDir : this.options.srcDir(this.currentModule)
     return baseDir + (baseDir.endsWith('/') ? '' : '/') + packageName.replaceAll('.', '/')
   }
 
-  private async checkSchema (schema: Schema): Promise<void> {
+  private async checkSchema(schema: Schema): Promise<void> {
     this.currentSchema = schema
     await this.checkDefinition(schema, undefined)
     for (const definitionName of Object.keys(schema.definitions)) {
@@ -78,36 +78,34 @@ class JavaValidator {
     }
   }
 
-  private async checkDefinition (definition: Definition, definitionName: string | undefined): Promise<void> {
+  private async checkDefinition(definition: Definition, definitionName: string | undefined): Promise<void> {
     // File must exists, otherwise we cannot check anything anyway
     const filename = path.join(this.getModuleDir(), getSimpleJavaClassName(this.currentSchema, definitionName) + '.java')
     if (!await existAndAccessible(filename)) {
       this.currentSchema['x-errors'].push({
         text: `'${getFullJavaClassName(this.currentSchema, this.options, definitionName)}' should exist but is missing in the implementation`,
-        type: 'MISSING_IN_IMPLEMENTATION'
+        type: 'MISSING_IN_IMPLEMENTATION',
       })
       return
     }
     const fileContent = await fs.readFile(filename).then(b => b.toString())
-    if ('oneOf' in definition) {
-      await this.checkInterfaceDefinition(fileContent, definitionName)
-    } else if ('properties' in definition) {
-      await this.checkObjectDefinition(fileContent, definition, definitionName)
-    } else if (definition.type === 'string') {
-      await this.checkEnumDefinition(fileContent, definition, definitionName)
+    if ('enum' in definition) {
+      this.checkEnumDefinition(fileContent, definition, definitionName)
+    } else if ('oneOf' in definition) {
+      this.checkInterfaceDefinition(fileContent, definitionName)
     } else {
-      throw new Error('Unknown definition type')
+      this.checkObjectDefinition(fileContent, definition, definitionName)
     }
   }
 
-  private async checkObjectDefinition (fileContent: string, definition: ObjectDefinition, definitionName: string | undefined): Promise<void> {
+  private checkObjectDefinition(fileContent: string, definition: ObjectDefinition, definitionName: string | undefined): void {
     // Must be a class and have all the needed properties with the correct type
     // Do not check any further methods etc.
     const implementationProperties = parseClass(fileContent)
     if (typeof implementationProperties === 'string') {
       this.currentSchema['x-errors'].push({
         text: `Class '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}' is invalid: ${implementationProperties}`,
-        type: 'WRONG'
+        type: 'WRONG',
       })
       return
     }
@@ -117,7 +115,7 @@ class JavaValidator {
       if (!('additionalProperties' in implementationProperties)) {
         this.currentSchema['x-errors'].push({
           text: `Additional Properties are missing in class '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}'`,
-          type: 'MISSING_IN_IMPLEMENTATION'
+          type: 'MISSING_IN_IMPLEMENTATION',
         })
       } else {
         const domainType = getJavaAdditionalPropertyType(this.model, this.currentSchema, additionalProperties, this.options)
@@ -125,7 +123,7 @@ class JavaValidator {
         if (!typesEqual(domainType, implType)) {
           this.currentSchema['x-errors'].push({
             text: `Additional Properties have type '${printType(implType)}' in class '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}' but should have type '${printType(domainType)}'`,
-            type: 'WRONG'
+            type: 'WRONG',
           })
         }
       }
@@ -135,7 +133,7 @@ class JavaValidator {
       if (!(propertyName in implementationProperties)) {
         this.currentSchema['x-errors'].push({
           text: `Property '${propertyName}' is missing in class '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}'`,
-          type: 'MISSING_IN_IMPLEMENTATION'
+          type: 'MISSING_IN_IMPLEMENTATION',
         })
       }
     }
@@ -144,7 +142,7 @@ class JavaValidator {
         if (additionalProperties === false) {
           this.currentSchema['x-errors'].push({
             text: `Additional Properties should not exist in class '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}'`,
-            type: 'NOT_IN_DOMAIN_MODEL'
+            type: 'NOT_IN_DOMAIN_MODEL',
           })
         }
         continue
@@ -152,7 +150,7 @@ class JavaValidator {
       if (!(propertyName in definition.properties)) {
         this.currentSchema['x-errors'].push({
           text: `Property '${propertyName}' should not exist in class '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}'`,
-          type: 'NOT_IN_DOMAIN_MODEL'
+          type: 'NOT_IN_DOMAIN_MODEL',
         })
         continue
       }
@@ -161,36 +159,32 @@ class JavaValidator {
       if (!typesEqual(domainType, implType)) {
         this.currentSchema['x-errors'].push({
           text: `Property '${propertyName}' has type '${printType(implType)}' in class '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}' but should have type '${printType(domainType)}'`,
-          type: 'WRONG'
+          type: 'WRONG',
         })
       }
     }
   }
 
-  private additionalProperties (definition: ObjectDefinition): boolean {
-    return 'additionalProperties' in definition && definition.additionalProperties !== undefined && definition.additionalProperties !== false
-  }
-
-  private async checkInterfaceDefinition (fileContent: string, definitionName: string | undefined): Promise<void> {
+  private checkInterfaceDefinition(fileContent: string, definitionName: string | undefined): void {
     // Must be an interface
     // Do not check if methods for properties exist as they could be left out for a good reason
     const parseResult = parseInterface(fileContent)
     if (typeof parseResult === 'string') {
       this.currentSchema['x-errors'].push({
         text: `Interface '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}' is invalid: ${parseResult}`,
-        type: 'WRONG'
+        type: 'WRONG',
       })
     }
   }
 
-  private async checkEnumDefinition (fileContent: string, definition: EnumDefinition, definitionName: string | undefined): Promise<void> {
+  private checkEnumDefinition(fileContent: string, definition: EnumDefinition, definitionName: string | undefined): void {
     // Check that this is an enum and has the correct set of values
     // Do not check any further methods etc.
     const enumValues = parseEnum(fileContent)
     if (typeof enumValues === 'string') {
       this.currentSchema['x-errors'].push({
         text: `Enum '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}' is invalid: ${enumValues}`,
-        type: 'WRONG'
+        type: 'WRONG',
       })
       return
     }
@@ -199,7 +193,7 @@ class JavaValidator {
       if (!enumValues.includes(value)) {
         this.currentSchema['x-errors'].push({
           text: `Value '${value}' is missing in enum '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}'`,
-          type: 'MISSING_IN_IMPLEMENTATION'
+          type: 'MISSING_IN_IMPLEMENTATION',
         })
       }
     }
@@ -207,22 +201,22 @@ class JavaValidator {
       if (!expectedValues.includes(value)) {
         this.currentSchema['x-errors'].push({
           text: `Value '${value}' should not exist in enum '${getFullJavaClassName(this.currentSchema, this.options, definitionName)}'`,
-          type: 'NOT_IN_DOMAIN_MODEL'
+          type: 'NOT_IN_DOMAIN_MODEL',
         })
       }
     }
   }
 }
 
-async function existAndAccessible (file: string): Promise<boolean> {
-  const exists = await fs.stat(file).then(_ => true).catch(_ => false)
+async function existAndAccessible(file: string): Promise<boolean> {
+  const exists = await fs.stat(file).then(_ => true).catch((_: unknown) => false)
   if (!exists) return false
   return await fs.access(file, fs.constants.F_OK)
     .then(() => true)
     .catch(() => false)
 }
 
-function printType (type: JavaType): string {
+function printType(type: JavaType): string {
   switch (type.type) {
     case 'CLASS': return type.fullName
     case 'COLLECTION': return `Collection<${printType(type.items)}>`
@@ -230,7 +224,7 @@ function printType (type: JavaType): string {
   }
 }
 
-function typesEqual (type1: JavaType, type2: JavaType): boolean {
+function typesEqual(type1: JavaType, type2: JavaType): boolean {
   switch (type1.type) {
     case 'CLASS': return type2.type === 'CLASS' && type1.fullName === type2.fullName
     case 'COLLECTION': return type2.type === 'COLLECTION' && typesEqual(type1.items, type2.items)

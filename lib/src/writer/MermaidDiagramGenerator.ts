@@ -3,7 +3,7 @@ import {
   getModuleForSchema,
   getModuleId,
   getSchemasForModule,
-  relativeLink
+  relativeLink,
 } from '../reader/InputHelper'
 import { type Dependency, type DependencyType, getDependencies } from '../reader/GetDependencies'
 
@@ -12,7 +12,7 @@ import { type Dependency, type DependencyType, getDependencies } from '../reader
  * @param model The model to generate the diagram for
  * @returns The diagram for the whole application as mermaid code
  */
-export function applicationDiagram (model: Model): string {
+export function applicationDiagram(model: Model): string {
   const dependencies = model.schemas
     .flatMap(s => getDependencies(model, s))
     // Only interested in dependencies over module boundaries
@@ -24,7 +24,7 @@ export function applicationDiagram (model: Model): string {
     'classDiagram',
     ...model.modules.map(m => `class ${safeId(m)}["${m.title}"]`),
     ...unique(dependencies.map(d => `${d.fromId} ..> ${d.toId}`)),
-    ...model.modules.map(m => `click ${safeId(m)} href ".${m.$id}/index.html" "${m.title}"`)
+    ...model.modules.map(m => `click ${safeId(m)} href ".${m.$id}/index.html" "${m.title}"`),
   ]
   return lines.join('\n')
 }
@@ -35,7 +35,7 @@ export function applicationDiagram (model: Model): string {
  * @param module The module to generate the diagram for
  * @returns The diagram for the module as mermaid code
  */
-export function moduleDiagram (model: Model, module: Module): string {
+export function moduleDiagram(model: Model, module: Module): string {
   const dependenciesTo = model.schemas
     .filter(s => getModuleId(s) !== module.$id)
     .flatMap(s => getDependencies(model, s))
@@ -44,11 +44,11 @@ export function moduleDiagram (model: Model, module: Module): string {
     .flatMap(s => getDependencies(model, s))
   const dependencies = [
     ...dependenciesTo,
-    ...dependenciesFrom
+    ...dependenciesFrom,
   ].filter(d => shouldIncludeInDiagram(d))
   const endpoints = [
     ...getEndpointsFromSchemas(getSchemasForModule(model, module)),
-    ...getEndpointsFromDependencies(dependencies)
+    ...getEndpointsFromDependencies(dependencies),
   ].filter(e => shouldIncludeInDiagram(e))
   return toDiagram(dependencies, endpoints, model, module.$id)
 }
@@ -59,7 +59,7 @@ export function moduleDiagram (model: Model, module: Module): string {
  * @param schema The schema to generate the diagram for
  * @returns The diagram for the schema as mermaid code
  */
-export function schemaDiagramm (model: Model, schema: Schema): string {
+export function schemaDiagramm(model: Model, schema: Schema): string {
   const dependenciesTo = model.schemas
     .filter(s => s !== schema)
     .flatMap(s => getDependencies(model, s))
@@ -67,32 +67,32 @@ export function schemaDiagramm (model: Model, schema: Schema): string {
   const dependenciesFrom = getDependencies(model, schema)
   const dependencies = [
     ...dependenciesTo,
-    ...dependenciesFrom
+    ...dependenciesFrom,
   ].filter(d => shouldIncludeInDiagram(d, schema))
   const endpoints = [
     ...getEndpointsFromSchemas([schema]),
-    ...getEndpointsFromDependencies(dependencies)
+    ...getEndpointsFromDependencies(dependencies),
   ].filter(e => shouldIncludeInDiagram(e, schema))
   return toDiagram(dependencies, endpoints, model, getModuleId(schema))
 }
 
 interface Endpoint { schema: Schema, name?: string }
 
-function getEndpointsFromDependencies (dependencies: Dependency[]): Endpoint[] {
+function getEndpointsFromDependencies(dependencies: Dependency[]): Endpoint[] {
   return dependencies.flatMap(d => [
     { schema: d.fromSchema, name: d.fromDefinitionName },
-    { schema: d.toSchema, name: d.toDefinitionName }]
+    { schema: d.toSchema, name: d.toDefinitionName }],
   )
 }
 
-function getEndpointsFromSchemas (schemas: Schema[]): Endpoint[] {
+function getEndpointsFromSchemas(schemas: Schema[]): Endpoint[] {
   return schemas.flatMap(s => [
     { schema: s },
-    ...Object.keys(s.definitions).map(n => ({ schema: s, name: n }))
+    ...Object.keys(s.definitions).map(n => ({ schema: s, name: n })),
   ])
 }
 
-function shouldIncludeInDiagram (e: Endpoint | Dependency, schema?: Schema): boolean {
+function shouldIncludeInDiagram(e: Endpoint | Dependency, schema?: Schema): boolean {
   if ('fromSchema' in e) {
     if (e.type !== 'ENUM') {
       return true
@@ -107,16 +107,16 @@ function shouldIncludeInDiagram (e: Endpoint | Dependency, schema?: Schema): boo
   }
 }
 
-function safeId (obj: string | Schema | Module): string {
+function safeId(obj: string | Schema | Module): string {
   const id = typeof obj === 'string' ? obj : obj.$id
   return id.replace(/\//g, '_').replace(/\./g, '_')
 }
 
-function toDiagram (dependencies: Dependency[], endpoints: Endpoint[], model: Model, moduleId: string): string {
+function toDiagram(dependencies: Dependency[], endpoints: Endpoint[], model: Model, moduleId: string): string {
   const modules = unique(endpoints.map(s => getModuleForSchema(model, s.schema)))
-  const namespaceStrs = modules.map(module => {
+  const namespaceStrs = modules.map((module) => {
     const endpointsForModule = endpoints.filter(e => getModuleId(e.schema) === module.$id)
-    const classesStr = endpointsForModule.map(e => {
+    const classesStr = endpointsForModule.map((e) => {
       if (e.name !== undefined) {
         return `  class ${e.name}["${e.name}"]`
       } else {
@@ -125,12 +125,12 @@ function toDiagram (dependencies: Dependency[], endpoints: Endpoint[], model: Mo
     })
     return `namespace ${module.title} {\n${unique(classesStr).join('\n')}\n}`
   })
-  const dependenciesStr = dependencies.flatMap(d => {
+  const dependenciesStr = dependencies.flatMap((d) => {
     const from = d.fromDefinitionName ?? safeId(d.fromSchema)
     const to = d.toDefinitionName ?? safeId(d.toSchema)
     const arrow = toMermaidType(d.type)
     if (arrow === undefined) return []
-    return [`${from} ${toMermaidType(d.type)}${d.array ? '" N"' : ''} ${to} ${d.dependencyName !== undefined ? ':' + d.dependencyName : ''}`]
+    return [`${from} ${arrow}${d.array ? '" N"' : ''} ${to} ${d.dependencyName !== undefined ? ':' + d.dependencyName : ''}`]
   })
   const links = unique(endpoints.map((e: Endpoint) => {
     if (e.name === undefined) {
@@ -143,7 +143,7 @@ function toDiagram (dependencies: Dependency[], endpoints: Endpoint[], model: Mo
   return lines.join('\n')
 }
 
-function toMermaidType (type: DependencyType): string | undefined {
+function toMermaidType(type: DependencyType): string | undefined {
   switch (type) {
     case 'IS_IMPLEMENTED_BY': return '<|--'
     case 'CONTAINS': return 'o--'
@@ -151,6 +151,6 @@ function toMermaidType (type: DependencyType): string | undefined {
     case 'ENUM': return '..>'
   }
 }
-function unique<T> (arr: T[]): T[] {
+function unique<T>(arr: T[]): T[] {
   return Array.from(new Set(arr))
 }

@@ -17,11 +17,11 @@ export type EnhancedSchema = Schema & {
  * @param schema The schema to enhance
  * @returns The enhanced schema
  */
-export function enhanceSchema (model: Model, schema: Schema): EnhancedSchema {
+export function enhanceSchema(model: Model, schema: Schema): EnhancedSchema {
   return {
     ...schema,
     classDiagram: schemaDiagramm(model, schema),
-    module: getModuleForSchema(model, schema)
+    module: getModuleForSchema(model, schema),
   }
 }
 
@@ -36,11 +36,11 @@ export type EnhancedModule = Module & {
  * @param module The module to enhance
  * @returns The enhanced module
  */
-export function enhanceModule (model: Model, module: Module): EnhancedModule {
+export function enhanceModule(model: Model, module: Module): EnhancedModule {
   return {
     ...module,
     classDiagram: moduleDiagram(model, module),
-    schemas: getSchemasForModule(model, module)
+    schemas: getSchemasForModule(model, module),
   }
 }
 
@@ -54,12 +54,12 @@ export type EnhancedApplication = Application & {
  * @param model The model the application belongs to
  * @returns The enhanced application
  */
-export function enhanceApplication (model: Model): EnhancedApplication {
+export function enhanceApplication(model: Model): EnhancedApplication {
   const application = model.application
   return {
     ...application,
     classDiagram: applicationDiagram(model),
-    modules: model.modules
+    modules: model.modules,
   }
 }
 
@@ -69,7 +69,7 @@ export function enhanceApplication (model: Model): EnhancedApplication {
  * @param relativeFilename The filename to write to, relative to the output folder
  * @param outputFolder The output folder to write to
  */
-export async function writeOutput (output: string, relativeFilename: string, outputFolder: string): Promise<void> {
+export async function writeOutput(output: string, relativeFilename: string, outputFolder: string): Promise<void> {
   const outputFileName = path.join(outputFolder, relativeFilename)
   const outputDir = path.dirname(outputFileName)
   await fs.promises.mkdir(outputDir, { recursive: true })
@@ -81,7 +81,7 @@ export async function writeOutput (output: string, relativeFilename: string, out
  * @param path The path to the template file
  * @returns The loaded template
  */
-export function loadTemplate (path: string): Handlebars.TemplateDelegate {
+export function loadTemplate(path: string): Handlebars.TemplateDelegate {
   const templateString = fs.readFileSync(path).toString()
   return Handlebars.compile(templateString)
 }
@@ -92,7 +92,7 @@ export function loadTemplate (path: string): Handlebars.TemplateDelegate {
  * @returns The url
  * @see https://shields.io/badges
  */
-export function shieldIoBadgeUrl (tag: Tag): string {
+export function shieldIoBadgeUrl(tag: Tag): string {
   const name = encodeURIComponent(tag.name.replace('-', '--'))
   const value = tag.value !== undefined ? '-' + encodeURIComponent(tag.value.replace('-', '--')) : ''
   const color = '-' + encodeURIComponent(tag.color.replace('-', '--'))
@@ -104,7 +104,7 @@ export function shieldIoBadgeUrl (tag: Tag): string {
  * @param def The definition to check
  * @returns The kind of the definition
  */
-export function definitionKind (def: Definition): string {
+export function definitionKind(def: Definition): string {
   if ('oneOf' in def) {
     return 'Interface'
   }

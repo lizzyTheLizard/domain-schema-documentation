@@ -1,7 +1,7 @@
 import { type OpenAPIV3 } from 'openapi-types'
 
 /* eslint-disable jsdoc/require-jsdoc */
-export function fullSpec (): OpenAPIV3.Document {
+export function fullSpec(): OpenAPIV3.Document {
   return {
     openapi: '3.0.3',
     info: { title: 'test', description: 'test2', version: '1' },
@@ -13,18 +13,18 @@ export function fullSpec (): OpenAPIV3.Document {
           summary: 'Update an existing pet',
           description: 'Update an existing pet by Id',
           operationId: 'updatePet',
-          responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { type: 'object' } } } } }
-        }
-      }
+          responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { type: 'object' } } } } },
+        },
+      },
     },
     components: {
       schemas: { Test: { type: 'object' } },
-      securitySchemes: { api_key: { type: 'apiKey', name: 'api_key', in: 'header' } }
-    }
+      securitySchemes: { api_key: { type: 'apiKey', name: 'api_key', in: 'header' } },
+    },
   }
 }
 
-export function refSpec (): object {
+export function refSpec(): object {
   return {
     paths: {
       '/pet': {
@@ -33,9 +33,9 @@ export function refSpec (): object {
           summary: 'Update an existing pet',
           description: 'Update an existing pet by Id',
           operationId: 'updatePet',
-          responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/Test' } } } } }
-        }
-      }
+          responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '#/components/schemas/Test' } } } } },
+        },
+      },
     },
     components: {
       schemas: {
@@ -44,15 +44,15 @@ export function refSpec (): object {
           properties: {
             TestP: { $ref: './Schema.yaml' },
             TestP2: { $ref: '/Module/Schema.yaml' },
-            TestP3: { $ref: '#/components/schemas/Test' }
-          }
-        }
-      }
-    }
+            TestP3: { $ref: '#/components/schemas/Test' },
+          },
+        },
+      },
+    },
   }
 }
 
-export function refSpecInterface (): object {
+export function refSpecInterface(): object {
   return {
     paths: {
       '/pet': {
@@ -61,9 +61,9 @@ export function refSpecInterface (): object {
           summary: 'Update an existing pet',
           description: 'Update an existing pet by Id',
           operationId: 'updatePet',
-          responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '../Module/Interface.yaml' } } } } }
-        }
-      }
-    }
+          responses: { 200: { description: 'Successful operation', content: { 'application/json': { schema: { $ref: '../Module/Interface.yaml' } } } } },
+        },
+      },
+    },
   }
 }

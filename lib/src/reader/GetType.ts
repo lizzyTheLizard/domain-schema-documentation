@@ -14,14 +14,11 @@ export interface PropertyArrayType { type: 'array', array: PropertyType }
  * @param property The property to get the type for
  * @returns The type of the property
  */
-export function getType (model: Model, schema: Schema, property: Property & PropertyExtension): PropertyType {
+export function getType(model: Model, schema: Schema, property: Property & PropertyExtension): PropertyType {
   if ('type' in property && property.type === 'array') return { type: 'array', array: getType(model, schema, property.items) }
-  if ('$ref' in property && property.$ref !== undefined) return getReferenceType(model, schema, property.$ref)
+  if ('$ref' in property) return getReferenceType(model, schema, property.$ref)
 
   const localType = (('format' in property && property.format !== undefined) ? property.format : (property as { type: string }).type)
-  if (localType === undefined) {
-    throw new Error(`Invalid property ${JSON.stringify(property)} in ${schema.$id}, cannot determine type`)
-  }
   const result: PropertyLocalType = { type: 'local', name: localType }
   if ('x-references' in property) {
     const xref = property['x-references']
@@ -31,7 +28,7 @@ export function getType (model: Model, schema: Schema, property: Property & Prop
   return result
 }
 
-function getReferenceType (model: Model, schema: Schema, reference: string): PropertyReferenceType {
+function getReferenceType(model: Model, schema: Schema, reference: string): PropertyReferenceType {
   if (!reference.startsWith('#')) {
     const absoluteId = resolveRelativeId(schema, reference)
     const otherSchema = model.schemas.find(s => s.$id === absoluteId)

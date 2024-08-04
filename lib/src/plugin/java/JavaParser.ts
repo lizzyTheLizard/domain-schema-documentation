@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
   parse, BaseJavaCstVisitorWithDefaults,
   type FieldDeclarationCtx,
@@ -15,7 +14,7 @@ import {
   type RecordDeclarationCtx,
   type NormalClassDeclarationCtx,
   type EnumDeclarationCtx,
-  type EnumConstantCtx
+  type EnumConstantCtx,
 } from 'java-parser'
 import { type JavaType } from './JavaHelper'
 
@@ -29,7 +28,7 @@ import { type JavaType } from './JavaHelper'
  * @param fileContent The content to parse
  * @returns The parsed properties or an error message
  */
-export function parseClass (fileContent: string): Record<string, JavaType> | string {
+export function parseClass(fileContent: string): Record<string, JavaType> | string {
   const cst = parse(fileContent)
   const visitor = new JavaParser()
   visitor.visit(cst)
@@ -43,7 +42,7 @@ export function parseClass (fileContent: string): Record<string, JavaType> | str
  * @param fileContent The content to parse
  * @returns undefined if it is a proper interface or an error message
  */
-export function parseInterface (fileContent: string): undefined | string {
+export function parseInterface(fileContent: string): undefined | string {
   const cst = parse(fileContent)
   const visitor = new JavaParser()
   visitor.visit(cst)
@@ -56,7 +55,7 @@ export function parseInterface (fileContent: string): undefined | string {
  * @param fileContent The content to parse
  * @returns The enum values or an error message
  */
-export function parseEnum (fileContent: string): string[] | string {
+export function parseEnum(fileContent: string): string[] | string {
   const cst = parse(fileContent)
   const visitor = new JavaParser()
   visitor.visit(cst)
@@ -72,27 +71,27 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   public imports: Record<string, string> = {}
   public error: string | undefined
   public enumValues: string[] = []
-  public javaPackageName: string = ''
+  public javaPackageName = ''
 
-  constructor () {
+  constructor() {
     super()
     this.validateVisitor()
   }
 
-  public override recordComponentList (listCtx: RecordComponentListCtx, param?: any): any {
+  public override recordComponentList(listCtx: RecordComponentListCtx, _?: unknown): void {
     for (const nodes of listCtx.recordComponent) {
       const nodeCtx = nodes.children
       this.properties[this.getComponentName(nodeCtx)] = this.getType(nodeCtx)
     }
   }
 
-  public override fieldDeclaration (ctx: FieldDeclarationCtx): any {
+  public override fieldDeclaration(ctx: FieldDeclarationCtx): void {
     const names = this.getFieldNames(ctx)
     const type = this.getType(ctx)
-    names.forEach(name => { this.properties[name] = type })
+    names.forEach((name) => { this.properties[name] = type })
   }
 
-  public override importDeclaration (ctx: ImportDeclarationCtx, param?: any): any {
+  public override importDeclaration(ctx: ImportDeclarationCtx, _?: unknown): void {
     if (ctx.Static !== undefined) {
       // Ignore static imports
       return
@@ -106,11 +105,11 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
     this.imports[importName.split('.').pop()!] = importName
   }
 
-  public override packageDeclaration (ctx: PackageDeclarationCtx, param?: any): any {
+  public override packageDeclaration(ctx: PackageDeclarationCtx, _?: unknown): void {
     this.javaPackageName = ctx.Identifier.map(i => i.image).join('.')
   }
 
-  public override classDeclaration (ctx: ClassDeclarationCtx, param?: any): any {
+  public override classDeclaration(ctx: ClassDeclarationCtx, param?: unknown): void {
     if (this.name !== undefined) {
       console.error('Nested Classes are not supported', ctx)
       this.error = 'Class contains nested classes. This is not supported by the validator'
@@ -136,7 +135,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
     super.classDeclaration(ctx, param)
   }
 
-  public override interfaceDeclaration (ctx: InterfaceDeclarationCtx, param?: any): any {
+  public override interfaceDeclaration(ctx: InterfaceDeclarationCtx, param?: unknown): void {
     if (this.name !== undefined) {
       console.error('Nested Classes are not supported', ctx)
       this.error = 'Class contains nested classes. This is not supported by the validator'
@@ -149,19 +148,19 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
     super.interfaceDeclaration(ctx, param)
   }
 
-  public override enumConstant (ctx: EnumConstantCtx, param?: any): any {
+  public override enumConstant(ctx: EnumConstantCtx, param?: unknown): void {
     this.enumValues.push(getSub(ctx, 'Identifier').image)
     super.enumConstant(ctx, param)
   }
 
   // Getting the name of the component is staighforward, we just take the identifier
-  private getComponentName (ctx: RecordComponentCtx): string {
+  private getComponentName(ctx: RecordComponentCtx): string {
     return getSub(ctx, 'Identifier').image
   }
 
-  private getFieldNames (ctx: FieldDeclarationCtx): string[] {
+  private getFieldNames(ctx: FieldDeclarationCtx): string[] {
     const variableDeclaratorList = getSubChild(ctx, 'variableDeclaratorList')
-    return variableDeclaratorList.variableDeclarator.map(v => {
+    return variableDeclaratorList.variableDeclarator.map((v) => {
       const variableDeclarator = v.children
       const variableDeclaratorId = getSubChild(variableDeclarator, 'variableDeclaratorId')
       return getSub(variableDeclaratorId, 'Identifier').image
@@ -170,7 +169,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
 
   // Here it is getting tricky... The type can be primitive or reference, additionally it can be an array or not.
   // Let's check those cases and redirect to the correct function getPrimitiveType or getReferenceType
-  private getType (ctx: RecordComponentCtx | FieldDeclarationCtx): JavaType {
+  private getType(ctx: RecordComponentCtx | FieldDeclarationCtx): JavaType {
     const unannType = getSubChild(ctx, 'unannType')
     let isArray: boolean
     let itemType: JavaType
@@ -197,7 +196,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   }
 
   // Primitive types are easy, we just need to check if it is a boolean or a numeric type and which kind
-  private getPrimitiveType (ctx: UnannPrimitiveTypeCtx | PrimitiveTypeCtx): JavaType {
+  private getPrimitiveType(ctx: UnannPrimitiveTypeCtx | PrimitiveTypeCtx): JavaType {
     if (ctx.Boolean !== undefined) return { type: 'CLASS', fullName: 'Boolean' }
     if (ctx.numericType !== undefined) {
       const numericType = getSubChild(ctx, 'numericType')
@@ -231,7 +230,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
 
   // Reference types are harder... We need to check if its a collection type and if it is, we need to get the type of the items
   // Otherwise we need to get the full name of the class
-  private getReferenceType (ctx: UnannClassTypeCtx | ClassTypeCtx): JavaType {
+  private getReferenceType(ctx: UnannClassTypeCtx | ClassTypeCtx): JavaType {
     const className = this.getFullClassName(ctx)
     if (this.isCollectionType(className)) {
       const typeArgument = this.getTypeArgumentFromCollection(ctx, 0)
@@ -244,7 +243,7 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
     return { type: 'CLASS', fullName: className }
   }
 
-  private getFullClassName (ctx: UnannClassTypeCtx | ClassTypeCtx): string {
+  private getFullClassName(ctx: UnannClassTypeCtx | ClassTypeCtx): string {
     const classNameAsWritten = ctx.Identifier.map(i => i.image).join('.')
     // Check if this has already dots. Then it is a full class name
     if (classNameAsWritten.includes('.')) return classNameAsWritten
@@ -256,15 +255,15 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
     return this.javaPackageName + '.' + classNameAsWritten
   }
 
-  private isCollectionType (fullName: string): boolean {
+  private isCollectionType(fullName: string): boolean {
     return fullName === 'java.util.List' || fullName === 'java.util.Set' || fullName === 'java.util.Collection'
   }
 
-  private isMapType (fullName: string): boolean {
+  private isMapType(fullName: string): boolean {
     return fullName === 'java.util.Map'
   }
 
-  private getTypeArgumentFromCollection (ctx: UnannClassTypeCtx | ClassTypeCtx, argumentNumber: number): JavaType {
+  private getTypeArgumentFromCollection(ctx: UnannClassTypeCtx | ClassTypeCtx, argumentNumber: number): JavaType {
     const typeArguments = getSubChild(ctx, 'typeArguments')
     const typeArgument = getSubChild(typeArguments, 'typeArgumentList')
     const type = getSubChild(typeArgument, 'typeArgument', argumentNumber)
@@ -288,19 +287,19 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
 }
 
 function getSubChild<
-    ContextType extends Partial<Record<IdentifierType, Array<{ children: ReturnType }>>>,
-    IdentifierType extends keyof ContextType,
-    ReturnType = NonNullable<ContextType[IdentifierType]>[0]['children']
-  > (ctx: ContextType, identifier: IdentifierType, i?: number): ReturnType {
+  ContextType extends Partial<Record<IdentifierType, { children: ReturnType }[]>>,
+  IdentifierType extends keyof ContextType,
+  ReturnType = NonNullable<ContextType[IdentifierType]>[0]['children'],
+>(ctx: ContextType, identifier: IdentifierType, i?: number): ReturnType {
   const node = getSub(ctx, identifier, i)
   return node.children
 }
 
 function getSub<
-    ContextType extends Partial<Record<IdentifierType, ReturnType[]>>,
-    IdentifierType extends keyof ContextType,
-    ReturnType = NonNullable<ContextType[IdentifierType]>[0]
-  > (ctx: ContextType, identifier: IdentifierType, i?: number): ReturnType {
+  ContextType extends Partial<Record<IdentifierType, ReturnType[]>>,
+  IdentifierType extends keyof ContextType,
+  ReturnType = NonNullable<ContextType[IdentifierType]>[0],
+>(ctx: ContextType, identifier: IdentifierType, i?: number): ReturnType {
   const result = ctx[identifier]
   if (result === undefined) {
     console.error(`Context node does not have required attribute '${String(identifier)}'`, ctx)

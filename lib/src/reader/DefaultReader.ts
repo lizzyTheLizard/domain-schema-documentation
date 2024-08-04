@@ -25,7 +25,7 @@ type FileReader = (filePath: string) => Promise<unknown>
  * @param optionsOrUndefined Additional options for the reader (optional). If not provided, the default options will be used.
  * @returns Returns the reader function
  */
-export function defaultReader (inputFolder: string, optionsOrUndefined?: Partial<DefaultReaderOptions>): Reader {
+export function defaultReader(inputFolder: string, optionsOrUndefined?: Partial<DefaultReaderOptions>): Reader {
   return async function (): Promise<Model> {
     const options = applyDefaults(optionsOrUndefined)
     const inputNormalizer = new InputNormalizer(options)
@@ -34,7 +34,7 @@ export function defaultReader (inputFolder: string, optionsOrUndefined?: Partial
   }
 }
 
-function applyDefaults (options?: Partial<DefaultReaderOptions>): DefaultReaderOptions {
+function applyDefaults(options?: Partial<DefaultReaderOptions>): DefaultReaderOptions {
   const result = {
     fileReader: options?.fileReader ?? readYamlFile,
     allowAdditionalPropertiesInExamples: options?.allowAdditionalPropertiesInExamples ?? 'INTERFACE',
@@ -42,7 +42,7 @@ function applyDefaults (options?: Partial<DefaultReaderOptions>): DefaultReaderO
     allowedFormats: options?.allowedFormats ?? defaultFormats,
     allowedKeywords: options?.allowedKeywords ?? [],
     discriminator: options?.discriminator ?? 'AJV',
-    failOnNotSupportedProperties: true
+    failOnNotSupportedProperties: true,
   }
   if (result.discriminator !== 'DENY') {
     result.allowedKeywords.push('discriminator')
@@ -51,12 +51,12 @@ function applyDefaults (options?: Partial<DefaultReaderOptions>): DefaultReaderO
   return result
 }
 
-async function readYamlFile (filePath: string): Promise<unknown> {
+async function readYamlFile(filePath: string): Promise<unknown> {
   const contend = await fs.readFile(filePath)
-  return yaml.parse(contend.toString())
+  return yaml.parse(contend.toString()) as unknown
 }
 
-async function readFolderRecursive (baseFolder: string, folder: string, depth: number, options: DefaultReaderOptions, inputNormalizer: InputNormalizer): Promise<void> {
+async function readFolderRecursive(baseFolder: string, folder: string, depth: number, options: DefaultReaderOptions, inputNormalizer: InputNormalizer): Promise<void> {
   const files = await fs.readdir(folder)
   for (const file of files) {
     const filePath = path.join(folder, file)
@@ -80,19 +80,19 @@ async function readFolderRecursive (baseFolder: string, folder: string, depth: n
   }
 }
 
-function getExpectedId (baseFolder: string, filePath: string): string {
+function getExpectedId(baseFolder: string, filePath: string): string {
   const relativeId = path.relative(baseFolder, filePath)
   // Normalize slashes
   return '/' + relativeId.replaceAll('\\', '/')
 }
 
-function isIndexFile (filePath: string): boolean {
+function isIndexFile(filePath: string): boolean {
   const filename = path.basename(filePath).toLowerCase()
   return filename === 'index.yaml' || filename === 'index.yml'
 }
 
-function isYamlFile (filePath: string): boolean {
-  const ext = path.extname(filePath)?.toLowerCase()
+function isYamlFile(filePath: string): boolean {
+  const ext = path.extname(filePath).toLowerCase()
   return ext === '.yaml' || ext === '.yml'
 }
 

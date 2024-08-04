@@ -31,7 +31,7 @@ export interface RunOptions {
  * @param optionsOrUndefined Options or default if not given
  * @returns Promise that resolves when the run is finished
  */
-export async function run (optionsOrUndefined?: Partial<RunOptions>): Promise<void> {
+export async function run(optionsOrUndefined?: Partial<RunOptions>): Promise<void> {
   const options = applyDefaults(optionsOrUndefined)
 
   // Read the input model
@@ -46,18 +46,18 @@ export async function run (optionsOrUndefined?: Partial<RunOptions>): Promise<vo
   finalize(model)
 
   // Write output, can be executed in parallel
-  await Promise.all(options.writers.map(async w => { await w(model) }))
+  await Promise.all(options.writers.map(async (w) => { await w(model) }))
 }
 
-function applyDefaults (options?: Partial<RunOptions>): RunOptions {
+function applyDefaults(options?: Partial<RunOptions>): RunOptions {
   return {
     reader: options?.reader ?? defaultReader('./input'),
     plugins: options?.plugins ?? [],
-    writers: options?.writers ?? [htmlWriter('./out')]
+    writers: options?.writers ?? [htmlWriter('./out')],
   }
 }
 
-function finalize (model: Model): void {
+function finalize(model: Model): void {
   model.schemas.forEach(s => s['x-tags'].push(...getErrorTags(s['x-errors'])))
   model.modules.forEach(m => m.errors.push(...getSchemaErrors(model, m)))
   model.modules.forEach(m => m.tags.push(...getErrorTags(m.errors)))
@@ -65,8 +65,8 @@ function finalize (model: Model): void {
   model.application.tags.push(...getErrorTags(model.application.errors))
 }
 
-function getModuleErrors (model: Model): ImplementationError[] {
-  return model.modules.flatMap(m => {
+function getModuleErrors(model: Model): ImplementationError[] {
+  return model.modules.flatMap((m) => {
     const count = m.errors.length
     if (count === 0) return []
     if (count === 1) {
@@ -76,8 +76,8 @@ function getModuleErrors (model: Model): ImplementationError[] {
   })
 }
 
-function getSchemaErrors (model: Model, module: Module): ImplementationError[] {
-  return getSchemasForModule(model, module).flatMap(s => {
+function getSchemaErrors(model: Model, module: Module): ImplementationError[] {
+  return getSchemasForModule(model, module).flatMap((s) => {
     const count = s['x-errors'].length
     if (count === 0) return []
     if (count === 1) {
@@ -87,7 +87,7 @@ function getSchemaErrors (model: Model, module: Module): ImplementationError[] {
   })
 }
 
-function getErrorTags (error: ImplementationError[]): Tag[] {
+function getErrorTags(error: ImplementationError[]): Tag[] {
   if (error.length === 0) return []
   return [{ name: 'Validator Errors', value: error.length.toString(), color: 'red' }]
 }

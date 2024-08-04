@@ -27,7 +27,7 @@ export interface HtmlWriterOptions extends WriterBaseOptions {
  * @param optionsOrUndefined Additional options for the writer (optional). If not provided, the default options will be used.
  * @returns The writer
  */
-export function htmlWriter (outputFolder: string, optionsOrUndefined?: Partial<HtmlWriterOptions>): Writer {
+export function htmlWriter(outputFolder: string, optionsOrUndefined?: Partial<HtmlWriterOptions>): Writer {
   return async function (model: Model): Promise<void> {
     const options = applyDefaults(outputFolder, optionsOrUndefined)
     registerHandlebarsHelpers(model, options)
@@ -37,21 +37,21 @@ export function htmlWriter (outputFolder: string, optionsOrUndefined?: Partial<H
   }
 }
 
-function applyDefaults (outputFolder: string, options?: Partial<HtmlWriterOptions>): HtmlWriterOptions {
+function applyDefaults(outputFolder: string, options?: Partial<HtmlWriterOptions>): HtmlWriterOptions {
   return {
     ...applyWriterOptionsDefaults(outputFolder, options),
     schemaTemplate: options?.schemaTemplate ?? loadTemplate(path.join(__dirname, 'schema.hbs')),
     moduleTemplate: options?.moduleTemplate ?? loadTemplate(path.join(__dirname, 'module.hbs')),
     applicationTemplate: options?.applicationTemplate ?? loadTemplate(path.join(__dirname, 'application.hbs')),
     subSchemaTemplate: options?.subSchemaTemplate ?? loadTemplate(path.join(__dirname, 'subSchema.hbs')),
-    basicTemplate: options?.basicTemplate ?? loadTemplate(path.join(__dirname, 'basic.hbs'))
+    basicTemplate: options?.basicTemplate ?? loadTemplate(path.join(__dirname, 'basic.hbs')),
   }
 }
 
-function registerHandlebarsHelpers (model: Model, options: HtmlWriterOptions): void {
+function registerHandlebarsHelpers(model: Model, options: HtmlWriterOptions): void {
   Handlebars.registerHelper('htmlRelativeLink', (fromId: string, toId: string) => relativeLink(fromId, toId))
-  Handlebars.registerHelper('htmlGetProperty', (obj: any | undefined, property: string) => obj?.[property])
-  Handlebars.registerHelper('htmlHasProperty', (obj: any[] | undefined, property: any) => obj?.includes(property))
+  Handlebars.registerHelper('htmlGetProperty', (obj: Record<string, unknown> | undefined, property: string) => obj?.[property])
+  Handlebars.registerHelper('htmlHasElement', <T> (obj: T[] | undefined, element: T) => obj?.includes(element))
   Handlebars.registerHelper('htmlJson', (input: unknown) => JSON.stringify(input))
   Handlebars.registerHelper('htmlGetType', (schema: Schema, property: Property) => htmlGetType(model, schema, property, options))
   Handlebars.registerHelper('htmlIntent', (input: string, intent: number) => input.split('\n').map(l => ' '.repeat(intent) + l).join('\n'))
@@ -61,14 +61,14 @@ function registerHandlebarsHelpers (model: Model, options: HtmlWriterOptions): v
   Handlebars.registerPartial('htmlSubSchema', options.subSchemaTemplate)
 }
 
-function htmlGetType (model: Model, schema: Schema, property: Property, options: HtmlWriterOptions): string {
+function htmlGetType(model: Model, schema: Schema, property: Property, options: HtmlWriterOptions): string {
   const type = getType(model, schema, property)
   const result = htmlGetTypeInternal(schema, type, options)
   if ('const' in property && property.const !== undefined) return `${result}<br>${JSON.stringify(property.const)}`
   return result
 }
 
-function htmlGetTypeInternal (schema: Schema, type: PropertyType, options: HtmlWriterOptions): string {
+function htmlGetTypeInternal(schema: Schema, type: PropertyType, options: HtmlWriterOptions): string {
   switch (type.type) {
     case 'array': return `[${htmlGetTypeInternal(schema, type.array, options)}]`
     case 'reference': return `<a href="${relativeLink(getModuleId(schema), type.$id)}.html">${type.name}</a>`
@@ -83,7 +83,7 @@ function htmlGetTypeInternal (schema: Schema, type: PropertyType, options: HtmlW
   }
 }
 
-function htmlAdditionalPropertyType (model: Model, schema: Schema, definition: Definition, options: HtmlWriterOptions): string {
+function htmlAdditionalPropertyType(model: Model, schema: Schema, definition: Definition, options: HtmlWriterOptions): string {
   const addionalProperties = 'additionalProperties' in definition ? definition.additionalProperties ?? false : false
   if (addionalProperties === false) throw new Error('Additional properties are not enabled')
   if (addionalProperties === true) return '*'
@@ -91,7 +91,7 @@ function htmlAdditionalPropertyType (model: Model, schema: Schema, definition: D
   return htmlGetTypeInternal(schema, propertyType, options)
 }
 
-async function writeSchemaFiles (model: Model, options: HtmlWriterOptions): Promise<void> {
+async function writeSchemaFiles(model: Model, options: HtmlWriterOptions): Promise<void> {
   await Promise.all(model.schemas.map(async (schema) => {
     const context = enhanceSchema(model, schema)
     const output1 = options.schemaTemplate(context)
@@ -100,7 +100,7 @@ async function writeSchemaFiles (model: Model, options: HtmlWriterOptions): Prom
   }))
 }
 
-async function writeModuleFiles (model: Model, options: HtmlWriterOptions): Promise<void> {
+async function writeModuleFiles(model: Model, options: HtmlWriterOptions): Promise<void> {
   await Promise.all(model.modules.map(async (module) => {
     const context = enhanceModule(model, module)
     const output1 = options.moduleTemplate(context)
@@ -109,7 +109,7 @@ async function writeModuleFiles (model: Model, options: HtmlWriterOptions): Prom
   }))
 }
 
-async function writeApplicationFile (model: Model, options: HtmlWriterOptions): Promise<void> {
+async function writeApplicationFile(model: Model, options: HtmlWriterOptions): Promise<void> {
   const context = enhanceApplication(model)
   const output1 = options.applicationTemplate(context)
   const output2 = options.basicTemplate({ content: output1, title: model.application.title })

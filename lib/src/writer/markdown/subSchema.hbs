@@ -17,7 +17,7 @@
 | Property | Type | Description |
 |------|------|-------------|
 {{/if}}
-| {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{{mdGetType ../schema this}}} | {{{mdMultiline description}}} |
+| {{@key}}{{#if (mdHasElement ../required @key)}}*{{/if}} | {{{mdGetType ../schema this}}} | {{{mdMultiline description}}} |
 {{#if @last}}
 {{#if ../additionalProperties}}
 | (other) | {{mdAdditionalPropertyType ../schema ..}} | Additional Properties |

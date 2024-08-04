@@ -8,7 +8,7 @@ import { createTwoFilesPatch } from 'diff'
  * Handle en error while running the tests. Print the error and exit the process with -2
  * @param error The error to handle
  */
-export function handleError (error: unknown): void {
+export function handleError(error: unknown): void {
   console.error(error)
   process.exit(-2)
 }
@@ -19,14 +19,14 @@ export function handleError (error: unknown): void {
  * @param expectedFolder The folder with the expected output
  * @param excludeFilter File/directory name exclude filter. Comma separated minimatch patterns. See [Glob patterns](https://github.com/gliviu/dir-compare#glob-patterns).
  */
-export async function compareOutput (outputFolder: string, expectedFolder?: string, excludeFilter?: string): Promise<void> {
+export async function compareOutput(outputFolder: string, expectedFolder?: string, excludeFilter?: string): Promise<void> {
   expectedFolder = expectedFolder ?? path.join(__dirname, '..', 'expected')
   const result = await compare(outputFolder, expectedFolder, {
     compareContent: true,
     excludeFilter,
     compareFileSync: fileCompareHandlers.lineBasedFileCompare.compareSync,
     compareFileAsync: fileCompareHandlers.lineBasedFileCompare.compareAsync,
-    ignoreLineEnding: true // Ignore crlf/lf line ending differences
+    ignoreLineEnding: true, // Ignore crlf/lf line ending differences
   })
   if (result.same) {
     console.log('Directories are identical')
@@ -36,7 +36,7 @@ export async function compareOutput (outputFolder: string, expectedFolder?: stri
     console.error('Directories are not identical but no differences found?')
     process.exit(-3)
   }
-  await Promise.all(result.diffSet.map(async dif => {
+  await Promise.all(result.diffSet.map(async (dif) => {
     const actualFile = path.join(outputFolder, dif.relativePath, dif.name1 ?? '')
     const expectedFile = path.join(expectedFolder, dif.relativePath, dif.name2 ?? '')
     switch (dif.state) {

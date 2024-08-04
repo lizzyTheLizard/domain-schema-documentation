@@ -30,25 +30,25 @@ export type DependencyType = 'IS_IMPLEMENTED_BY' | 'CONTAINS' | 'REFERENCES' | '
  * @param schema The schema to get the dependencies for
  * @returns All dependencies for the schema
  */
-export function getDependencies (model: Model, schema: Schema): Dependency[] {
+export function getDependencies(model: Model, schema: Schema): Dependency[] {
   const schemaDependencies = getDependenciesForDefinition(model, schema)
   const definitionDependencies = Object.keys(schema.definitions).flatMap(name => getDependenciesForDefinition(model, schema, name))
   return Array.from(new Set([...schemaDependencies, ...definitionDependencies]))
 }
 
-function getDependenciesForDefinition (model: Model, s: Schema, fromDefinitionName?: string): Dependency[] {
+function getDependenciesForDefinition(model: Model, s: Schema, fromDefinitionName?: string): Dependency[] {
   const d: Definition = fromDefinitionName !== undefined ? s.definitions[fromDefinitionName] : s
   const results: Dependency[] = []
   if ('oneOf' in d) {
     results.push(...(d as InterfaceDefinition).oneOf
       .flatMap(oneOf => getDependenciesForProperty(model, s, oneOf, fromDefinitionName))
-      .map(d => ({ ...d, type: 'IS_IMPLEMENTED_BY' } satisfies Dependency))
+      .map(d => ({ ...d, type: 'IS_IMPLEMENTED_BY' } satisfies Dependency)),
     )
   }
   if ('properties' in d) {
     results.push(...Object.entries(d.properties)
       .flatMap(([name, p]) => getDependenciesForProperty(model, s, p, fromDefinitionName)
-        .map(d => ({ ...d, dependencyName: name })))
+        .map(d => ({ ...d, dependencyName: name }))),
     )
   }
   if ('additionalProperties' in d && typeof d.additionalProperties !== 'boolean' && d.additionalProperties !== undefined) {
@@ -59,13 +59,13 @@ function getDependenciesForDefinition (model: Model, s: Schema, fromDefinitionNa
   return results
 }
 
-function getDependenciesForProperty (model: Model, fromSchema: Schema, p: Property & PropertyExtension, fromDefinitionName?: string): Dependency[] {
+function getDependenciesForProperty(model: Model, fromSchema: Schema, p: Property & PropertyExtension, fromDefinitionName?: string): Dependency[] {
   if ('items' in p) {
     return getDependenciesForProperty(model, fromSchema, p.items, fromDefinitionName).map(d => ({ ...d, array: true }))
   }
   if ('x-references' in p) {
     const references = (typeof p['x-references'] === 'string') ? [p['x-references']] : p['x-references'] ?? []
-    return references.map(r => {
+    return references.map((r) => {
       const { toSchema, toDefinitionName } = getTo(model, fromSchema, r)
       const dependency: Dependency = { toSchema, fromSchema, type: 'REFERENCES', array: false }
       if (toDefinitionName !== undefined) { dependency.toDefinitionName = toDefinitionName }
@@ -85,7 +85,7 @@ function getDependenciesForProperty (model: Model, fromSchema: Schema, p: Proper
   return []
 }
 
-function getTo (model: Model, schema: Schema, refOrReference: string): { toSchema: Schema, toDefinitionName?: string } {
+function getTo(model: Model, schema: Schema, refOrReference: string): { toSchema: Schema, toDefinitionName?: string } {
   if (refOrReference === '#') {
     return { toSchema: schema }
   }
@@ -98,7 +98,7 @@ function getTo (model: Model, schema: Schema, refOrReference: string): { toSchem
   return { toSchema }
 }
 
-function getDependencyType (fromSchema: Schema, toSchema: Schema, toDefinition: Definition): DependencyType {
+function getDependencyType(fromSchema: Schema, toSchema: Schema, toDefinition: Definition): DependencyType {
   // If this is to an enum, this is not a real reference but an enum reference
   if ('enum' in toDefinition) {
     return 'ENUM'

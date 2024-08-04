@@ -15,7 +15,7 @@ import { type Reader } from './reader/Reader'
 const options = {
   string: ['in', 'out'],
   boolean: ['html', 'md', 'java', 'openapi', 'help', 'h'],
-  unknown: (arg: string): boolean => { invalidArgument(arg); return false }
+  unknown: (arg: string): boolean => { invalidArgument(arg); return false },
 }
 const args = minimist(process.argv.slice(2), options)
 showHelpIfNeeded(args)
@@ -23,17 +23,19 @@ showHelpIfNeeded(args)
 const runOptions = {
   reader: getReader(args),
   writers: getWriters(args),
-  plugins: getPlugins(args)
+  plugins: getPlugins(args),
 }
 
-run(runOptions).then(() => { console.log('Done') }).catch((error) => { handleError(error) })
+run(runOptions)
+  .then(() => { console.log('Done') })
+  .catch((error: unknown) => { handleError(error) })
 
-function getReader (args: minimist.ParsedArgs): Reader {
+function getReader(args: minimist.ParsedArgs): Reader {
   const inputDir: string = args.in as string || './input'
   return defaultReader(inputDir)
 }
 
-function getWriters (args: minimist.ParsedArgs): Writer[] {
+function getWriters(args: minimist.ParsedArgs): Writer[] {
   const outputDir: string = args.out as string || './out'
   const writers: Writer[] = []
   if (args.html as boolean) {
@@ -45,7 +47,7 @@ function getWriters (args: minimist.ParsedArgs): Writer[] {
   return writers
 }
 
-function getPlugins (args: minimist.ParsedArgs): Plugin[] {
+function getPlugins(args: minimist.ParsedArgs): Plugin[] {
   const outputDir: string = args.out as string || './out'
   const plugins: Plugin[] = []
   if (args.java as boolean) {
@@ -57,20 +59,20 @@ function getPlugins (args: minimist.ParsedArgs): Plugin[] {
   return plugins
 }
 
-function invalidArgument (arg?: string): void {
+function invalidArgument(arg?: string): void {
   console.error(`Invalid argument: ${arg}`)
   showHelp()
   process.exit(2)
 }
 
-function showHelpIfNeeded (args: minimist.ParsedArgs): void {
+function showHelpIfNeeded(args: minimist.ParsedArgs): void {
   if (args.h as boolean || args.help as boolean) {
     showHelp()
     process.exit(0)
   }
 }
 
-function showHelp (): void {
+function showHelp(): void {
   console.log('Usage: openapi-generator [--in <input-dir>] [--out <output-dir>] [--html] [--md] [--java] [--openapi]')
   console.log('Options:')
   console.log('  --in <input-dir>   Input directory containing OpenAPI files (default: ./input)')
@@ -82,7 +84,7 @@ function showHelp (): void {
   console.log('  --help, -h         Show this help')
 }
 
-function handleError (error: unknown): void {
+function handleError(error: unknown): void {
   console.error(error)
   process.exit(1)
 }

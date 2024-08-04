@@ -7,7 +7,7 @@ import { type Schema, type SchemaType, type Module, type Model } from './Reader'
  * @param moduleOrModuleId The module or module id to search for
  * @returns The schemas for the given module
  */
-export function getSchemasForModule (model: Model, moduleOrModuleId: Module | string): Schema[] {
+export function getSchemasForModule(model: Model, moduleOrModuleId: Module | string): Schema[] {
   const moduleId = typeof moduleOrModuleId === 'string' ? moduleOrModuleId : moduleOrModuleId.$id
   return model.schemas.filter(schema => schema.$id.startsWith(moduleId + '/'))
 }
@@ -19,7 +19,7 @@ export function getSchemasForModule (model: Model, moduleOrModuleId: Module | st
  * @param typ The type to search for
  * @returns The schemas for the given module and type
  */
-export function getSchemasForModuleAndTyp (model: Model, moduleOrModuleId: Module | string, typ: SchemaType): Schema[] {
+export function getSchemasForModuleAndTyp(model: Model, moduleOrModuleId: Module | string, typ: SchemaType): Schema[] {
   return getSchemasForModule(model, moduleOrModuleId).filter(schema => schema['x-schema-type'] === typ)
 }
 
@@ -28,7 +28,7 @@ export function getSchemasForModuleAndTyp (model: Model, moduleOrModuleId: Modul
  * @param schemaOrSchemaId The schema or schema id to get the module id for
  * @returns The module id for the given schema
  */
-export function getModuleId (schemaOrSchemaId: string | Schema): string {
+export function getModuleId(schemaOrSchemaId: string | Schema): string {
   const schemaId = typeof schemaOrSchemaId === 'string' ? schemaOrSchemaId : schemaOrSchemaId.$id
   return path.dirname(schemaId)
 }
@@ -38,7 +38,7 @@ export function getModuleId (schemaOrSchemaId: string | Schema): string {
  * @param schemaOrSchemaId The schema or schema id to get the basename for
  * @returns The basename
  */
-export function getSchemaName (schemaOrSchemaId: string | Schema): string {
+export function getSchemaName(schemaOrSchemaId: string | Schema): string {
   const schemaId = typeof schemaOrSchemaId === 'string' ? schemaOrSchemaId : schemaOrSchemaId.$id
   return path.basename(schemaId, path.extname(schemaId))
 }
@@ -48,7 +48,7 @@ export function getSchemaName (schemaOrSchemaId: string | Schema): string {
  * @param moduleOrModuleId The module or module id to get the basename for
  * @returns The basename
  */
-export function getModuleName (moduleOrModuleId: string | Module): string {
+export function getModuleName(moduleOrModuleId: string | Module): string {
   const moduleId = typeof moduleOrModuleId === 'string' ? moduleOrModuleId : moduleOrModuleId.$id
   return path.basename(moduleId)
 }
@@ -60,7 +60,7 @@ export function getModuleName (moduleOrModuleId: string | Module): string {
  * @returns The schema for the given schema id
  * @throws If the schema id is not found
  */
-export function getSchema (model: Model, schemaId: string): Schema {
+export function getSchema(model: Model, schemaId: string): Schema {
   const schema = model.schemas.find(s => s.$id === schemaId)
   if (!schema) throw new Error(`Schema with id ${schemaId} not found`)
   return schema
@@ -72,7 +72,7 @@ export function getSchema (model: Model, schemaId: string): Schema {
  * @param relativeId The relative id to resolve
  * @returns The resolved absolute id
  */
-export function resolveRelativeId (from: Schema, relativeId: string): string {
+export function resolveRelativeId(from: Schema, relativeId: string): string {
   const fromId = typeof from === 'string' ? from : from.$id
   return path.join(path.dirname(fromId), relativeId).replace(/\\/g, '/')
 }
@@ -83,7 +83,7 @@ export function resolveRelativeId (from: Schema, relativeId: string): string {
  * @param relativeId The relative id to resolve
  * @returns The resolved absolute id
  */
-export function resolveRelativeIdForModule (from: Module, relativeId: string): string {
+export function resolveRelativeIdForModule(from: Module, relativeId: string): string {
   const fromId = typeof from === 'string' ? from : from.$id
   return path.join(fromId, relativeId).replace(/\\/g, '/')
 }
@@ -94,7 +94,7 @@ export function resolveRelativeIdForModule (from: Module, relativeId: string): s
  * @param toSchemaOrId The schema or schema id to link to
  * @returns The relative link from that directery to another schema
  */
-export function relativeLink (dirname: string, toSchemaOrId: Schema | string): string {
+export function relativeLink(dirname: string, toSchemaOrId: Schema | string): string {
   const toId = typeof toSchemaOrId === 'string' ? toSchemaOrId : toSchemaOrId.$id
   const relative = path.relative(dirname, toId).replace(/\\/g, '/')
   return relative.startsWith('..') ? relative : './' + relative
@@ -106,7 +106,7 @@ export function relativeLink (dirname: string, toSchemaOrId: Schema | string): s
  * @param schemaOrSchemaId The schema or schema id to get the module for
  * @returns The module for the given schema
  */
-export function getModuleForSchema (model: Model, schemaOrSchemaId: string | Schema): Module {
+export function getModuleForSchema(model: Model, schemaOrSchemaId: string | Schema): Module {
   const moduleId = getModuleId(schemaOrSchemaId)
   const module = model.modules.find(m => m.$id === moduleId)
   if (!module) {
@@ -121,7 +121,7 @@ export function getModuleForSchema (model: Model, schemaOrSchemaId: string | Sch
  * @param name The name to clean
  * @returns The cleaned name
  */
-export function cleanName (name: string): string {
+export function cleanName(name: string): string {
   name = name.replace(/[^a-zA-Z0-9]/g, '')
   return name.charAt(0).toUpperCase() + name.slice(1)
 }

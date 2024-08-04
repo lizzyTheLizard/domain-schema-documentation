@@ -11,61 +11,61 @@ describe('DefaultInputNormalizer', () => {
       failOnNotSupportedProperties: true,
       discriminator: 'AJV',
       allowedFormats: [],
-      allowedKeywords: []
+      allowedKeywords: [],
     })
   })
 
-  test('addApplication success', async () => {
+  test('addApplication success', () => {
     target.addApplication(testApplication(), 'file.yaml')
     target.toModel()
   })
 
-  test('addApplication does validation', async () => {
+  test('addApplication does validation', () => {
     expect(() => { target.addApplication({ wrong: 'field' }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
   })
 
-  test('addApplication does normalization', async () => {
+  test('addApplication does normalization', () => {
     target.addApplication(testApplication(), 'file.yaml')
     const model = target.toModel()
     expect(model.application.errors).toEqual([])
   })
 
-  test('addApplication must be called', async () => {
+  test('addApplication must be called', () => {
     expect(() => { target.toModel() }).toThrow(new Error('No application file found'))
   })
 
-  test('addModule success', async () => {
+  test('addModule success', () => {
     target.addApplication(testApplication(), 'file.yaml')
     target.addModule(testModule(), 'file.yaml')
     target.toModel()
   })
 
-  test('addModule does validation', async () => {
+  test('addModule does validation', () => {
     target.addApplication(testApplication(), 'file.yaml')
     expect(() => { target.addModule({ wrong: 'field' }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
   })
 
-  test('addModule does normalization', async () => {
+  test('addModule does normalization', () => {
     target.addApplication(testApplication(), 'file.yaml')
     target.addModule(testModule(), 'file.yaml')
     const model = target.toModel()
     expect(model.modules[0].errors).toEqual([])
   })
 
-  test('addSchema success', async () => {
+  test('addSchema success', () => {
     target.addApplication(testApplication(), 'file.yaml')
     target.addModule(testModule(), 'file.yaml')
     target.addSchema(testSchema(), 'file.yaml')
     target.toModel()
   })
 
-  test('addSchema does validation', async () => {
+  test('addSchema does validation', () => {
     target.addApplication(testApplication(), 'file.yaml')
     target.addModule(testModule(), 'file.yaml')
     expect(() => { target.addSchema({ wrong: 'field' }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
   })
 
-  test('addSchema does normalization', async () => {
+  test('addSchema does normalization', () => {
     target.addApplication(testApplication(), 'file.yaml')
     target.addModule(testModule(), 'file.yaml')
     target.addSchema(testSchema(), 'file.yaml')

@@ -13,8 +13,8 @@ fs.rm(output, { recursive: true, force: true })
     await run({
       reader: defaultReader(input),
       writers: [markdownWriter(output), htmlWriter(output)],
-      plugins: [javaPlugin(output, { srcDir: src, ignoreAdditionalFiles: false })]
+      plugins: [javaPlugin(output, { srcDir: src, ignoreAdditionalFiles: false })],
     })
   })
   .then(async () => { await compareOutput(output, expected) })
-  .catch(error => { handleError(error) })
+  .catch((error: unknown) => { handleError(error) })

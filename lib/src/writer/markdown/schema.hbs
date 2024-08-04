@@ -35,7 +35,7 @@
 | Property | Type | Description |
 |------|------|-------------|
 {{/if}}
-| {{@key}}{{#if (mdHasValue ../required @key)}}*{{/if}} | {{{mdGetType .. this}}} | {{{mdMultiline description}}} |
+| {{@key}}{{#if (mdHasElement ../required @key)}}*{{/if}} | {{{mdGetType .. this}}} | {{{mdMultiline description}}} |
 {{#if @last}}
 {{#if ../additionalProperties}}
 | (other) | {{mdAdditionalPropertyType .. ..}} | Additional Properties |

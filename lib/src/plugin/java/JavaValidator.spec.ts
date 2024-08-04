@@ -8,7 +8,7 @@ import { testModel, testSchema } from '../../testData'
 
 describe('JavaValidator', () => {
   test('No Src Dir Given', async () => {
-    const options = { srcDir: undefined } as any as JavaPluginOptions
+    const options = { srcDir: undefined } as unknown as JavaPluginOptions
     const model = testModel()
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
@@ -18,7 +18,7 @@ describe('JavaValidator', () => {
 
   test('Implementation is missing', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
+    const options = { srcDir: tmpDir.name } as unknown as JavaPluginOptions
     const model = testModel()
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
@@ -33,7 +33,7 @@ describe('JavaValidator', () => {
     await fs.mkdir(path.join(tmpDir.name, 'module'))
     await fs.writeFile(filename, 'package module; public class Schema {}')
     const model = { ...testModel(), schemas: [schema] }
-    const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
+    const options = { srcDir: tmpDir.name } as unknown as JavaPluginOptions
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
     expect(model.modules[0].errors).toEqual([])
@@ -47,7 +47,7 @@ describe('JavaValidator', () => {
     await fs.writeFile(filename, 'package module; public class Schema { private Schema test; }')
     const schema = { ...testSchema(), properties: { test: { $ref: '#' } } }
     const model = { ...testModel(), schemas: [schema] }
-    const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
+    const options = { srcDir: tmpDir.name } as unknown as JavaPluginOptions
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
     expect(model.modules[0].errors).toEqual([])
@@ -61,7 +61,7 @@ describe('JavaValidator', () => {
     await fs.writeFile(filename, 'package module; public class Schema { }')
     const schema2 = { ...testSchema(), properties: { test: { $ref: '#' } } }
     const model = { ...testModel(), schemas: [schema2] }
-    const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
+    const options = { srcDir: tmpDir.name } as unknown as JavaPluginOptions
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
     expect(model.modules[0].errors).toEqual([])
@@ -75,7 +75,7 @@ describe('JavaValidator', () => {
     await fs.writeFile(filename, 'package module; public class Schema {}')
     const schema: Schema = { ...testSchema(), additionalProperties: { type: 'string' }, properties: {} }
     const model = { ...testModel(), schemas: [schema] }
-    const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
+    const options = { srcDir: tmpDir.name } as unknown as JavaPluginOptions
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
     expect(model.modules[0].errors).toEqual([])
@@ -89,7 +89,7 @@ describe('JavaValidator', () => {
     await fs.writeFile(filename, 'package module; import java.util.Map; public class Schema { private Map<String, Integer> additionalProperties; }')
     const schema: Schema = { ...testSchema(), additionalProperties: { type: 'string' }, properties: {} }
     const model = { ...testModel(), schemas: [schema] }
-    const options = { srcDir: tmpDir.name, basicTypeMap: defaultJavaBasicTypeMap } as any as JavaPluginOptions
+    const options = { srcDir: tmpDir.name, basicTypeMap: defaultJavaBasicTypeMap } as unknown as JavaPluginOptions
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
     expect(model.modules[0].errors).toEqual([])
@@ -103,7 +103,7 @@ describe('JavaValidator', () => {
     await fs.writeFile(filename, 'package module; import java.util.Map; public class Schema { private Map<String, Integer> additionalProperties; }')
     const schema: Schema = { ...testSchema(), additionalProperties: false, properties: {} }
     const model = { ...testModel(), schemas: [schema] }
-    const options = { srcDir: tmpDir.name, basicTypeMap: defaultJavaBasicTypeMap } as any as JavaPluginOptions
+    const options = { srcDir: tmpDir.name, basicTypeMap: defaultJavaBasicTypeMap } as unknown as JavaPluginOptions
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
     expect(model.modules[0].errors).toEqual([])
@@ -117,7 +117,7 @@ describe('JavaValidator', () => {
     await fs.writeFile(filename, 'package module; public class Schema { private Schema test; }')
     const schema: Schema = { ...testSchema(), properties: {} }
     const model = { ...testModel(), schemas: [schema] }
-    const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
+    const options = { srcDir: tmpDir.name } as unknown as JavaPluginOptions
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
     expect(model.modules[0].errors).toEqual([])
@@ -131,7 +131,7 @@ describe('JavaValidator', () => {
     await fs.writeFile(filename, 'package module; public class Schema { private String test; }')
     const schema = { ...testSchema(), properties: { test: { $ref: '#' } } }
     const model = { ...testModel(), schemas: [schema] }
-    const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
+    const options = { srcDir: tmpDir.name } as unknown as JavaPluginOptions
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
     expect(model.modules[0].errors).toEqual([])
@@ -145,7 +145,7 @@ describe('JavaValidator', () => {
     await fs.writeFile(filename, 'package module; public class Schema { }')
     const schema: Schema = { ...testSchema(), properties: {}, definitions: { test: { type: 'object', required: [], properties: { p1: { $ref: '#' } } } } }
     const model = { ...testModel(), schemas: [schema] }
-    const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
+    const options = { srcDir: tmpDir.name } as unknown as JavaPluginOptions
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
     expect(model.modules[0].errors).toEqual([])
@@ -161,7 +161,7 @@ describe('JavaValidator', () => {
     await fs.writeFile(filename2, 'package module; public class SchemaTest { private Schema p1; }')
     const schema: Schema = { ...testSchema(), properties: {}, definitions: { test: { type: 'object', required: [], properties: { p1: { $ref: '#' } } } } }
     const model = { ...testModel(), schemas: [schema] }
-    const options = { srcDir: tmpDir.name } as any as JavaPluginOptions
+    const options = { srcDir: tmpDir.name } as unknown as JavaPluginOptions
     await javaValidator(model, options)
     expect(model.application.errors).toEqual([])
     expect(model.modules[0].errors).toEqual([])

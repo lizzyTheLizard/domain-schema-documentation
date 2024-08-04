@@ -87,7 +87,7 @@
     <tbody>
 {{/if}}
       <tr>
-        <td>{{@key}}{{#if (htmlHasProperty ../required @key)}}*{{/if}}</td>
+        <td>{{@key}}{{#if (htmlHasElement ../required @key)}}*{{/if}}</td>
         <td>{{{htmlGetType .. this}}}</td>
         <td>{{description}}</td>
       </tr>

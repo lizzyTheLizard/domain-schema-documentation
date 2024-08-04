@@ -25,7 +25,7 @@ export interface MarkdownWriterOptions extends WriterBaseOptions {
  * @param optionsOrUndefined Additional options for the writer (optional). If not provided, the default options will be used.
  * @returns The writer
  */
-export function markdownWriter (outputFolder: string, optionsOrUndefined?: Partial<MarkdownWriterOptions>): Writer {
+export function markdownWriter(outputFolder: string, optionsOrUndefined?: Partial<MarkdownWriterOptions>): Writer {
   return async function (model: Model): Promise<void> {
     const options = applyDefaults(outputFolder, optionsOrUndefined)
     registerHandlebarsHelpers(model, options)
@@ -35,22 +35,22 @@ export function markdownWriter (outputFolder: string, optionsOrUndefined?: Parti
   }
 }
 
-function applyDefaults (outputFolder: string, options?: Partial<MarkdownWriterOptions>): MarkdownWriterOptions {
+function applyDefaults(outputFolder: string, options?: Partial<MarkdownWriterOptions>): MarkdownWriterOptions {
   return {
     ...applyWriterOptionsDefaults(outputFolder, options),
     schemaTemplate: options?.schemaTemplate ?? loadTemplate(path.join(__dirname, 'schema.hbs')),
     moduleTemplate: options?.moduleTemplate ?? loadTemplate(path.join(__dirname, 'module.hbs')),
     applicationTemplate: options?.applicationTemplate ?? loadTemplate(path.join(__dirname, 'application.hbs')),
-    subSchemaTemplate: options?.subSchemaTemplate ?? loadTemplate(path.join(__dirname, 'subSchema.hbs'))
+    subSchemaTemplate: options?.subSchemaTemplate ?? loadTemplate(path.join(__dirname, 'subSchema.hbs')),
   }
 }
 
-function registerHandlebarsHelpers (model: Model, options: MarkdownWriterOptions): void {
+function registerHandlebarsHelpers(model: Model, options: MarkdownWriterOptions): void {
   Handlebars.registerHelper('mdMultiline', (input: string) => mdMultiline(input))
   Handlebars.registerHelper('mdRelativeLink', (fromId: string, toId: string) => relativeLink(fromId, toId))
   Handlebars.registerHelper('mdGetType', (schema: Schema, property: Property) => mdGetType(model, schema, property, options))
-  Handlebars.registerHelper('mdGetProperty', (obj: any | undefined, property: string) => obj?.[property])
-  Handlebars.registerHelper('mdHasValue', (obj: any[] | undefined, property: any) => obj?.includes(property))
+  Handlebars.registerHelper('mdGetProperty', (obj: Record<string, unknown> | undefined, property: string) => obj?.[property])
+  Handlebars.registerHelper('mdHasElement', <T> (obj: T[] | undefined, element: T) => obj?.includes(element))
   Handlebars.registerHelper('mdJson', (input: unknown) => JSON.stringify(input, null, 2))
   Handlebars.registerHelper('mdAdditionalPropertyType', (schema: Schema, definition: Definition) => mdAdditionalPropertyType(model, schema, definition, options))
   Handlebars.registerHelper('mdBadge', (input: Tag) => `![Static Badge](${shieldIoBadgeUrl(input)})`)
@@ -58,19 +58,19 @@ function registerHandlebarsHelpers (model: Model, options: MarkdownWriterOptions
   Handlebars.registerPartial('mdSubSchema', options.subSchemaTemplate)
 }
 
-function mdMultiline (input: string): string {
+function mdMultiline(input?: string): string {
   if (input === undefined) return ''
   return input.split('\n').map(l => l.trim()).join('<br>')
 }
 
-function mdGetType (model: Model, schema: Schema, property: Property, options: MarkdownWriterOptions): string {
+function mdGetType(model: Model, schema: Schema, property: Property, options: MarkdownWriterOptions): string {
   const type = getType(model, schema, property)
   const result = mdGetTypeInternal(schema, type, options)
   if ('const' in property && property.const !== undefined) return `${result}<br>${JSON.stringify(property.const)}`
   return result
 }
 
-function mdGetTypeInternal (schema: Schema, type: PropertyType, options: MarkdownWriterOptions): string {
+function mdGetTypeInternal(schema: Schema, type: PropertyType, options: MarkdownWriterOptions): string {
   switch (type.type) {
     case 'array': return `[${mdGetTypeInternal(schema, type.array, options)}]`
     case 'reference': return `[${type.name}](${relativeLink(getModuleId(schema), type.$id)}.md)`
@@ -85,7 +85,7 @@ function mdGetTypeInternal (schema: Schema, type: PropertyType, options: Markdow
   }
 }
 
-function mdAdditionalPropertyType (model: Model, schema: Schema, definition: Definition, options: MarkdownWriterOptions): string {
+function mdAdditionalPropertyType(model: Model, schema: Schema, definition: Definition, options: MarkdownWriterOptions): string {
   const additionalProperty = 'additionalProperties' in definition ? definition.additionalProperties ?? false : false
   if (additionalProperty === false) throw new Error('Additional properties are not enabled')
   if (additionalProperty === true) return '*'
@@ -93,7 +93,7 @@ function mdAdditionalPropertyType (model: Model, schema: Schema, definition: Def
   return mdGetTypeInternal(schema, propertyType, options)
 }
 
-async function writeSchemaFiles (model: Model, options: MarkdownWriterOptions): Promise<void> {
+async function writeSchemaFiles(model: Model, options: MarkdownWriterOptions): Promise<void> {
   await Promise.all(model.schemas.map(async (schema) => {
     const context = enhanceSchema(model, schema)
     const output = options.schemaTemplate(context)
@@ -101,7 +101,7 @@ async function writeSchemaFiles (model: Model, options: MarkdownWriterOptions): 
   }))
 }
 
-async function writeModuleFiles (model: Model, options: MarkdownWriterOptions): Promise<void> {
+async function writeModuleFiles(model: Model, options: MarkdownWriterOptions): Promise<void> {
   await Promise.all(model.modules.map(async (module) => {
     const context = enhanceModule(model, module)
     const output = options.moduleTemplate(context)
@@ -109,7 +109,7 @@ async function writeModuleFiles (model: Model, options: MarkdownWriterOptions): 
   }))
 }
 
-async function writeApplicationFile (model: Model, options: MarkdownWriterOptions): Promise<void> {
+async function writeApplicationFile(model: Model, options: MarkdownWriterOptions): Promise<void> {
   const context = enhanceApplication(model)
   const output = options.applicationTemplate(context)
   await options.write(output, 'README.md')

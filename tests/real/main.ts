@@ -12,35 +12,35 @@ const runOptions: RunOptions = {
     // It would be nicer to reqrite those as tags, but this would require a change in the model
     allowedKeywords: ['x-misng-uidprefix', 'x-misng-alias', 'x-field-extra-annotation'],
     allowedFormats: [...defaultFormats, { name: 'uid', avjFormat: (p: string) => uidVerifier(p) }],
-    discriminator: 'ALLOW'
+    discriminator: 'ALLOW',
   }),
   plugins: [createMisNgTags, javaPlugin(output, {
     mainPackageName: 'ch.kessler.misng',
     modelPackageName: 'model',
-    basicTypeMap: { ...defaultJavaBasicTypeMap, ...defaultJavaFormatMap, uid: 'ch.kessler.shared.uid' }
+    basicTypeMap: { ...defaultJavaBasicTypeMap, ...defaultJavaFormatMap, uid: 'ch.kessler.shared.uid' },
   })],
-  writers: [markdownWriter(output)]
+  writers: [markdownWriter(output)],
 }
 
 fs.rm(output, { recursive: true, force: true })
   .then(async () => { await run(runOptions) })
   .then(async () => { await compareOutput(output, expected, '/README.md,/.gitkeep') })
-  .catch(error => { handleError(error) })
+  .catch((error: unknown) => { handleError(error) })
 
-function uidVerifier (uid: string): boolean {
+function uidVerifier(uid: string): boolean {
   if (typeof uid !== 'string') return false
   const split = uid.split('-')
   const prefix = split[0]
   const suffix = split.splice(1).join('-')
-  if (!prefix.match('[a-zA-Z]*')) return false
-  if (!suffix.match('[a-zA-Z\\-0-9]+')) return false
+  if (!(/[a-zA-Z]*/.exec(prefix))) return false
+  if (!(/[a-zA-Z\-0-9]+/.exec(suffix))) return false
   return true
 }
 
-async function createMisNgTags (model: Model): Promise<void> {
-  model.schemas.forEach(s => {
+function createMisNgTags(model: Model): void {
+  model.schemas.forEach((s) => {
     if ('x-misng-alias' in s && typeof s['x-misng-alias'] === 'string') {
-      s['x-misng-alias'].split(',').forEach(alias => {
+      s['x-misng-alias'].split(',').forEach((alias) => {
         s['x-tags'].push({ name: 'Alias', value: alias.trim(), color: 'aqua' })
       })
     }
