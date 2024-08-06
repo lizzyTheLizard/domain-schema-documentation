@@ -110,7 +110,7 @@ class JavaValidator {
       return
     }
 
-    const additionalProperties = 'additionalProperties' in definition ? (definition.additionalProperties ?? false) : false
+    const additionalProperties = 'additionalProperties' in definition ? definition.additionalProperties : false
     if (additionalProperties !== false) {
       if (!('additionalProperties' in implementationProperties)) {
         this.currentSchema['x-errors'].push({

@@ -84,7 +84,7 @@ function htmlGetTypeInternal(schema: Schema, type: PropertyType, options: HtmlWr
 }
 
 function htmlAdditionalPropertyType(model: Model, schema: Schema, definition: Definition, options: HtmlWriterOptions): string {
-  const addionalProperties = 'additionalProperties' in definition ? definition.additionalProperties ?? false : false
+  const addionalProperties = 'additionalProperties' in definition ? definition.additionalProperties : false
   if (addionalProperties === false) throw new Error('Additional properties are not enabled')
   if (addionalProperties === true) return '*'
   const propertyType = getType(model, schema, addionalProperties)

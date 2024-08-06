@@ -86,7 +86,7 @@ function mdGetTypeInternal(schema: Schema, type: PropertyType, options: Markdown
 }
 
 function mdAdditionalPropertyType(model: Model, schema: Schema, definition: Definition, options: MarkdownWriterOptions): string {
-  const additionalProperty = 'additionalProperties' in definition ? definition.additionalProperties ?? false : false
+  const additionalProperty = 'additionalProperties' in definition ? definition.additionalProperties : false
   if (additionalProperty === false) throw new Error('Additional properties are not enabled')
   if (additionalProperty === true) return '*'
   const propertyType = getType(model, schema, additionalProperty)

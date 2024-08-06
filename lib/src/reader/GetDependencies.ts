@@ -51,7 +51,7 @@ function getDependenciesForDefinition(model: Model, s: Schema, fromDefinitionNam
         .map(d => ({ ...d, dependencyName: name }))),
     )
   }
-  if ('additionalProperties' in d && typeof d.additionalProperties !== 'boolean' && d.additionalProperties !== undefined) {
+  if ('additionalProperties' in d && typeof d.additionalProperties !== 'boolean') {
     const additionalPropertyDependencies = getDependenciesForProperty(model, s, d.additionalProperties, fromDefinitionName)
       .map(d => ({ ...d, array: true }))
     results.push(...additionalPropertyDependencies)

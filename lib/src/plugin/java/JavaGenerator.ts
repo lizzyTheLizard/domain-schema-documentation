@@ -74,7 +74,7 @@ function collectImports(model: Model, schema: Schema, options: JavaPluginOptions
       return collectImportsFromType(type)
     }).forEach(i => result.push(i))
   }
-  if ('additionalProperties' in definition && definition.additionalProperties !== undefined && definition.additionalProperties !== false) {
+  if ('additionalProperties' in definition && definition.additionalProperties !== false) {
     const type = getJavaAdditionalPropertyType(model, schema, definition.additionalProperties, options)
     collectImportsFromType(type).forEach(i => result.push(i))
   }
@@ -107,7 +107,7 @@ function propertyType(model: Model, schema: Schema, definition: ObjectDefinition
 }
 
 function additionalPropertiesType(model: Model, schema: Schema, definition: Definition, options: JavaPluginOptions): string {
-  const additionalProperties = 'additionalProperties' in definition ? definition.additionalProperties ?? false : false
+  const additionalProperties = 'additionalProperties' in definition ? definition.additionalProperties : false
   if (additionalProperties === false) { throw new Error('additionalPropertiesType called without additionalProperties set to true or a property.') }
   const javaType = getJavaAdditionalPropertyType(model, schema, additionalProperties, options)
   return getSimpleClassNameFromType(javaType)
