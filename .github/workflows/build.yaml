@@ -22,8 +22,8 @@ jobs:
 
       # Check and build project
       - run: yarn install
-      - run: yarn check
       - run: yarn build
+      - run: yarn check
       - run: yarn integration-tests
 
       - name: Store dist folder
