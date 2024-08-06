@@ -37,7 +37,6 @@ export function defaultReader(inputFolder: string, optionsOrUndefined?: Partial<
 function applyDefaults(options?: Partial<DefaultReaderOptions>): DefaultReaderOptions {
   const result = {
     fileReader: options?.fileReader ?? readYamlFile,
-    allowAdditionalPropertiesInExamples: options?.allowAdditionalPropertiesInExamples ?? 'INTERFACE',
     ajvOptions: options?.ajvOptions ?? { allErrors: true },
     allowedFormats: options?.allowedFormats ?? defaultFormats,
     allowedKeywords: options?.allowedKeywords ?? [],

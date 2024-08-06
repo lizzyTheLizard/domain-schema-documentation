@@ -4,8 +4,6 @@ import { type SchemaNormalizerOptions } from '../schemaNormalizer/SchemaNormaliz
 import { type Model, type Application, type Module, type Schema, type PropertyExtension } from './Reader'
 import { InputValidator, type InputValidatorOptions } from './InputValidator'
 
-// TODO: x-references and x-enum-descriptions
-
 /**
  * Normalizes the input, for a definition according to the inputDefinition to a {@link Model}
  */

@@ -105,9 +105,6 @@ export class SchemaNormalizer {
     Object.entries(input.properties ?? {}).forEach(([propertyName, property]) => {
       properties[propertyName] = this.toProperty(property, [...path, propertyName])
     })
-    const additionalProperties = input.additionalProperties !== undefined
-      ? this.toAdditionalProperties(input.additionalProperties, [...path, 'additionalProperties'])
-      : undefined
     const oneOf: RefProperty[] = []
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     input.oneOf!.forEach((o, index) => {
@@ -129,7 +126,7 @@ export class SchemaNormalizer {
       type: 'object',
       oneOf,
       properties,
-      additionalProperties,
+      additionalProperties: true,
       required: input.required ?? [],
       $comment: input.$comment,
       maxProperties: input.maxProperties,
@@ -143,9 +140,7 @@ export class SchemaNormalizer {
     Object.entries(input.properties ?? {}).forEach(([propertyName, property]) => {
       properties[propertyName] = this.toProperty(property, [...path, propertyName])
     })
-    const additionalProperties = input.additionalProperties !== undefined
-      ? this.toAdditionalProperties(input.additionalProperties, [...path, 'additionalProperties'])
-      : undefined
+    const additionalProperties = this.toAdditionalProperties(input.additionalProperties, [...path, 'additionalProperties'])
     return {
       ...this.keepProperties(input, 'object', path),
       type: 'object',
@@ -296,7 +291,11 @@ export class SchemaNormalizer {
     }
   }
 
-  private toAdditionalProperties(input: JSONSchema7Definition, path: string[]): boolean | Property {
+  private toAdditionalProperties(input: JSONSchema7Definition | undefined, path: string[]): boolean | Property {
+    if (input === undefined) {
+      // By default, additional properties are not allowed
+      return false
+    }
     if (typeof input === 'boolean') {
       return input
     }

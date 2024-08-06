@@ -49,7 +49,7 @@ export interface Module {
   tags: Tag[]
 }
 
-export interface PropertyExtension { 'x-references'?: string | string[] }
+export interface PropertyExtension { 'x-references'?: string | string[], 'x-enum-descriptions'?: Record<string, string> }
 
 export type Schema = NormalizedSchema<unknown, PropertyExtension> & {
   /** The type of the schema, used for documentation */

@@ -7,7 +7,6 @@ describe('DefaultInputNormalizer', () => {
   beforeEach(() => {
     target = new InputNormalizer({
       ajvOptions: {},
-      allowAdditionalPropertiesInExamples: 'INTERFACE',
       failOnNotSupportedProperties: true,
       discriminator: 'AJV',
       allowedFormats: [],

@@ -76,7 +76,7 @@ describe('GetDependencies', () => {
 
   test('oneOf', () => {
     const schema1 = testSchema()
-    const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', oneOf: [{ $ref: './Schema.yaml' }], properties: {} }
+    const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', additionalProperties: true, oneOf: [{ $ref: './Schema.yaml' }], properties: {} }
     const model: Model = { ...testModel(), schemas: [schema1, schema2] }
     expect(getDependencies(model, schema2)).toEqual([{
       fromSchema: schema2,
@@ -88,7 +88,7 @@ describe('GetDependencies', () => {
 
   test('dependency ref', () => {
     const schema1: Schema = { ...testSchema(), 'x-schema-type': 'Entity' }
-    const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { $ref: '#/definitions/Reference' } }, definitions: { Reference: { type: 'object', properties: { reference2: { $ref: './Schema.yaml' } }, required: [] } } }
+    const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { $ref: '#/definitions/Reference' } }, definitions: { Reference: { type: 'object', properties: { reference2: { $ref: './Schema.yaml' } }, additionalProperties: false, required: [] } } }
     const model: Model = { ...testModel(), schemas: [schema1, schema2] }
     expect(getDependencies(model, schema2)).toEqual([{
       fromSchema: schema2,
@@ -108,7 +108,7 @@ describe('GetDependencies', () => {
   })
 
   test('dependency ref to main', () => {
-    const schema: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { $ref: '#/definitions/Reference' } }, definitions: { Reference: { type: 'object', properties: { reference2: { $ref: '#' } }, required: [] } } }
+    const schema: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { $ref: '#/definitions/Reference' } }, definitions: { Reference: { type: 'object', properties: { reference2: { $ref: '#' } }, additionalProperties: false, required: [] } } }
     const model: Model = { ...testModel(), schemas: [schema] }
     expect(getDependencies(model, schema)).toEqual([{
       fromSchema: schema,

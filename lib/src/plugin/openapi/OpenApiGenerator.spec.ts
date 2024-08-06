@@ -50,6 +50,7 @@ describe('OpenAPIGenerator', () => {
         'title': 'Schema',
         'type': 'object',
         'properties': { key: { type: 'number' } },
+        'additionalProperties': false,
         'x-schema-type': 'Aggregate',
         'x-errors': [],
         'x-links': [],
@@ -73,6 +74,7 @@ describe('OpenAPIGenerator', () => {
       ModuleInterface: {
         'title': 'Interface',
         'type': 'object',
+        'additionalProperties': true,
         'oneOf': [{ $ref: '#/components/schemas/ModuleSchema' }],
         'properties': { field1: { type: 'string' } },
         'x-schema-type': 'Aggregate',
@@ -85,6 +87,7 @@ describe('OpenAPIGenerator', () => {
         'title': 'Schema',
         'type': 'object',
         'properties': { key: { type: 'number' } },
+        'additionalProperties': false,
         'x-schema-type': 'Aggregate',
         'x-errors': [],
         'x-links': [],

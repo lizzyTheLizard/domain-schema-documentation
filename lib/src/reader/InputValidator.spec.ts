@@ -4,7 +4,6 @@ import { testSchema, testApplication, testModule, testEnumSchema, testInterfaceS
 
 const inputValidatorOptions: InputValidatorOptions = {
   ajvOptions: {},
-  allowAdditionalPropertiesInExamples: 'INTERFACE',
   discriminator: 'AJV',
   allowedFormats: [],
   allowedKeywords: [],
@@ -81,8 +80,8 @@ describe('InputValidator', () => {
 
   test('validateExamples additional Properties allowed', () => {
     const schema = testSchema()
-    target = new InputValidator({ ...inputValidatorOptions, allowAdditionalPropertiesInExamples: 'ALWAYS' })
-    target.addSchemaToAjv(schema)
+    target = new InputValidator({ ...inputValidatorOptions })
+    target.addSchemaToAjv({ ...schema, additionalProperties: true })
     expect(() => { target.validateExamples({ ...schema, examples: [{ key: 1 }] }) }).not.toThrow()
     expect(() => { target.validateExamples({ ...schema, examples: [{ key: 1, additional: 'test' }] }) }).not.toThrow()
   })

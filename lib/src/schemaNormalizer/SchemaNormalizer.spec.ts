@@ -49,7 +49,7 @@ describe('SchemaNormalizer', () => {
       type: 'object',
       properties: {},
       required: [],
-      additionalProperties: undefined,
+      additionalProperties: true,
       oneOf: [{ $ref: './Schema.yaml' }],
       definitions: {},
     })
@@ -60,7 +60,7 @@ describe('SchemaNormalizer', () => {
     expect(target.normalize({ $id: 'Schema', oneOf: [{ $ref: './Schema.yaml' }], properties: { key: { type: 'string' } } })).toMatchObject({
       properties: { key: { type: 'string' } },
       required: [],
-      additionalProperties: undefined,
+      additionalProperties: true,
       oneOf: [{ $ref: './Schema.yaml' }],
       definitions: {},
     })
@@ -71,7 +71,7 @@ describe('SchemaNormalizer', () => {
     expect(target.normalize({ $id: 'Schema', oneOf: [{ properties: { key: { type: 'string' } } }] })).toMatchObject({
       properties: { },
       required: [],
-      additionalProperties: undefined,
+      additionalProperties: true,
       oneOf: [{ $ref: '#/definitions/OneOf1' }],
       definitions: { OneOf1: { type: 'object', properties: { key: { type: 'string' } }, required: [] } },
     })
@@ -85,7 +85,7 @@ describe('SchemaNormalizer', () => {
       type: 'object',
       properties: { key: { type: 'string' } },
       required: [],
-      additionalProperties: undefined,
+      additionalProperties: false,
       definitions: {},
     })
     expect(target.getErrors()).toEqual([])
@@ -127,7 +127,7 @@ describe('SchemaNormalizer', () => {
   })
 
   test('additionalProperties', () => {
-    expect(target.normalize({ $id: 'Schema' })).toMatchObject({ additionalProperties: undefined })
+    expect(target.normalize({ $id: 'Schema' })).toMatchObject({ additionalProperties: false })
     expect(target.getErrors()).toEqual([])
     expect(target.normalize({ $id: 'Schema', additionalProperties: false })).toMatchObject({ additionalProperties: false })
     expect(target.getErrors()).toEqual([])

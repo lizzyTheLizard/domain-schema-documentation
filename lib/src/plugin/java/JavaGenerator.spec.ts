@@ -125,7 +125,7 @@ describe('JavaGenerator', () => {
   })
 
   test('SubSchema', async () => {
-    const schema2: Schema = { ...testInterfaceSchema(), oneOf: [{ $ref: '#/definitions/SubSchema' }], definitions: { SubSchema: { type: 'object', properties: {}, required: [] } } }
+    const schema2: Schema = { ...testInterfaceSchema(), oneOf: [{ $ref: '#/definitions/SubSchema' }], definitions: { SubSchema: { type: 'object', additionalProperties: false, properties: {}, required: [] } } }
 
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const model = { ...testModel(), schemas: [testSchema(), schema2] }
@@ -181,7 +181,7 @@ describe('JavaGenerator', () => {
 
   test('Links', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    const schema: Schema = { ...testSchema(), definitions: { definition1: { type: 'object', properties: {}, required: [] } } }
+    const schema: Schema = { ...testSchema(), definitions: { definition1: { type: 'object', properties: {}, additionalProperties: false, required: [] } } }
     const model = { ...testModel(), schemas: [schema] }
     await javaGenerator(model, tmpDir.name, options)
     expect(schema['x-links']).toEqual([{ text: 'Java-File', link: './java/Schema.java' }, { text: 'Java-File (definition1)', link: './java/SchemaDefinition1.java' }])

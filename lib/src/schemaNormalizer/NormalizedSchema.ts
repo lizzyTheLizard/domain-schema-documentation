@@ -41,7 +41,7 @@ export interface ObjectDefinition<PropertyExtension = unknown> extends Definitio
   properties: Record<string, Property<PropertyExtension> & PropertyExtension>
   /** The required properties of the object, as defined in JSON Schema */
   required: string[]
-  additionalProperties?: boolean | (Property<PropertyExtension> & PropertyExtension)
+  additionalProperties: boolean | (Property<PropertyExtension> & PropertyExtension)
   /** Maximum number of properties */
   maxProperties?: number
   /** Minimum number of properties */
@@ -52,6 +52,7 @@ export interface ObjectDefinition<PropertyExtension = unknown> extends Definitio
 export interface InterfaceDefinition<PropertyExtension = unknown> extends ObjectDefinition<PropertyExtension> {
   /** The implementing schemas, as defined in JSON Schema */
   oneOf: RefProperty[]
+  additionalProperties: true
 }
 
 /** A single property in an object schema */

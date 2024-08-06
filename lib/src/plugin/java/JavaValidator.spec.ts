@@ -143,7 +143,7 @@ describe('JavaValidator', () => {
     const filename = path.join(tmpDir.name, 'module', 'Schema.java')
     await fs.mkdir(path.join(tmpDir.name, 'module'))
     await fs.writeFile(filename, 'package module; public class Schema { }')
-    const schema: Schema = { ...testSchema(), properties: {}, definitions: { test: { type: 'object', required: [], properties: { p1: { $ref: '#' } } } } }
+    const schema: Schema = { ...testSchema(), properties: {}, definitions: { test: { type: 'object', required: [], properties: { p1: { $ref: '#' } }, additionalProperties: false } } }
     const model = { ...testModel(), schemas: [schema] }
     const options = { srcDir: tmpDir.name } as unknown as JavaPluginOptions
     await javaValidator(model, options)
@@ -159,7 +159,7 @@ describe('JavaValidator', () => {
     await fs.writeFile(filename, 'package module; public class Schema { }')
     const filename2 = path.join(tmpDir.name, 'module', 'SchemaTest.java')
     await fs.writeFile(filename2, 'package module; public class SchemaTest { private Schema p1; }')
-    const schema: Schema = { ...testSchema(), properties: {}, definitions: { test: { type: 'object', required: [], properties: { p1: { $ref: '#' } } } } }
+    const schema: Schema = { ...testSchema(), properties: {}, additionalProperties: false, definitions: { test: { type: 'object', required: [], properties: { p1: { $ref: '#' } }, additionalProperties: false } } }
     const model = { ...testModel(), schemas: [schema] }
     const options = { srcDir: tmpDir.name } as unknown as JavaPluginOptions
     await javaValidator(model, options)

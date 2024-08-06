@@ -6,7 +6,6 @@ import * as fs from 'fs'
 import * as yaml from 'yaml'
 import path from 'path'
 import { type JSONSchema7 } from 'json-schema'
-import { type Definition } from '../schemaNormalizer/NormalizedSchema'
 
 /**
  * Options for the InputValidator
@@ -17,16 +16,6 @@ export interface InputValidatorOptions {
    * @see {@link https://ajv.js.org/options.html}
    */
   ajvOptions: Options
-  /**
-   * If "additionalProperties" is not set on an schema, by default all additional properties are allowed
-   * {@link https://json-schema.org/draft/2020-12/json-schema-core#name-additionalproperties}
-   * This is not always what you want. With this option you can overwrite this behaviour:
-   * 'ALWAYS': When not explicitely set, additionalProperties is set to 'true' (JSON-Schema default)
-   * 'NEVER': When not explicitely set, additionalProperties is set to 'false' (not recommended, use INTERFACE instead)
-   * 'INTERFACE': When not explicitely set, additionalProperties is set to 'false' except if there is a 'oneOf'
-   * Reason for 'INTERFACE' is  that JSON Schema does not support validation in 'oneOf's {@link https://ajv.js.org/faq.html#additional-properties-inside-compound-keywords-anyof-oneof-etc}
-   */
-  allowAdditionalPropertiesInExamples: 'ALWAYS' | 'NEVER' | 'INTERFACE'
   /**
    * Discriminator is not an JSON-Schema but an OpenAPI keyword. By default, JSON-Schema does not support it.
    * Can either be 'AJV' (AJV default, see {@link https://ajv.js.org/json-schema.html#discriminator},
@@ -77,18 +66,7 @@ export class InputValidator {
   }
 
   public addSchemaToAjv(schema: Schema): void {
-    // Before we can add the schema to AJV, we need to set allowAdditionalProperties depending on the options
-    // This needs to be done for each definition and the schema itself
-    const definitions: Record<string, unknown> = {}
-    Object.entries(schema.definitions).forEach(([definitionName, definition]) => {
-      definitions[definitionName] = { ...definition, additionalProperties: this.allowAdditionalProperties(definition) }
-    })
-    const schemaToAdd = {
-      ...schema,
-      definitions,
-      additionalProperties: this.allowAdditionalProperties(schema),
-    }
-    this.#ajv.addSchema(schemaToAdd, schema.$id)
+    this.#ajv.addSchema(schema, schema.$id)
     this.#ids.push(schema.$id)
   }
 
@@ -113,19 +91,6 @@ export class InputValidator {
       .forEach(f => ajv.addKeyword(f))
     this.options.allowedFormats.forEach(f => ajv.addFormat(f.name, f.avjFormat))
     return ajv
-  }
-
-  private allowAdditionalProperties(d: Definition): unknown {
-    if ('additionalProperties' in d) {
-      return d.additionalProperties
-    } else if (d.type !== 'object') {
-      return undefined
-    }
-    switch (this.options.allowAdditionalPropertiesInExamples) {
-      case 'ALWAYS': return true
-      case 'NEVER': return false
-      case 'INTERFACE': return 'oneOf' in d
-    }
   }
 
   public validateExamples(s: Schema): void {
@@ -267,7 +232,6 @@ export interface NonNormalizedSubSchema {
   type?: string
   items?: NonNormalizedSubSchema
   enum?: string[]
-  additionalProperties?: NonNormalizedSubSchema | boolean
 }
 
 export interface NonNormalizedApplication {
