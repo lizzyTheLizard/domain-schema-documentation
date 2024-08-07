@@ -17,7 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-## [1.9.0] - 2023-08-04
+## [1.9.1] - 2023-08-07
+### Fixed
+- Fixed example project, no impact on library
+
+## [1.9.0] - 2023-08-07
 ### Added
 - Integrated Husky for pre-commit hooks incl. new check for version in package.json
 - Added ChangeLog file
