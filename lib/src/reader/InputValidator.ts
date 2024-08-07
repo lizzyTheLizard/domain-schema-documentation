@@ -1,11 +1,12 @@
 import Ajv, { type Format, type AnySchema, type Options, type Schema as AjvSchema } from 'ajv'
-import type { Schema, SchemaType, ImplementationError, Link, Tag } from './Reader'
+import type { Schema, SchemaType, ImplementationError, Link, Tag, PropertyExtension } from './Reader'
 import { resolveRelativeId } from './InputHelper'
 import betterAjvErrors from 'better-ajv-errors'
 import * as fs from 'fs'
 import * as yaml from 'yaml'
 import path from 'path'
 import { type JSONSchema7 } from 'json-schema'
+import { Definition } from '../schemaNormalizer'
 
 /**
  * Options for the InputValidator
@@ -66,7 +67,18 @@ export class InputValidator {
   }
 
   public addSchemaToAjv(schema: Schema): void {
-    this.#ajv.addSchema(schema, schema.$id)
+    // Interfaces must have additionalProperties: true. Otherwise no property of the implementing classes are allowed
+    // See https://ajv.js.org/faq.html#additional-properties-inside-compound-keywords-anyof-oneof-etc
+    const definitions: Record<string, Definition<PropertyExtension>> = {}
+    Object.entries(schema.definitions).forEach(([definitionName, definition]) => {
+      const definitionToAdd = 'oneOf' in definition ? { ...definition, additionalProperties: true } : definition
+      definitions[definitionName] = definitionToAdd
+    })
+    const schemaToAdd: Schema = { ...schema, definitions }
+    if ('oneOf ' in schemaToAdd && 'additionalProperties' in schemaToAdd) {
+      schemaToAdd.additionalProperties = true
+    }
+    this.#ajv.addSchema(schemaToAdd, schema.$id)
     this.#ids.push(schema.$id)
   }
 

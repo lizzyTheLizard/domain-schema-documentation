@@ -48,8 +48,8 @@ describe('SchemaNormalizer', () => {
       title: 'Schema',
       type: 'object',
       properties: {},
+      additionalProperties: false,
       required: [],
-      additionalProperties: true,
       oneOf: [{ $ref: './Schema.yaml' }],
       definitions: {},
     })
@@ -60,7 +60,6 @@ describe('SchemaNormalizer', () => {
     expect(target.normalize({ $id: 'Schema', oneOf: [{ $ref: './Schema.yaml' }], properties: { key: { type: 'string' } } })).toMatchObject({
       properties: { key: { type: 'string' } },
       required: [],
-      additionalProperties: true,
       oneOf: [{ $ref: './Schema.yaml' }],
       definitions: {},
     })
@@ -71,7 +70,6 @@ describe('SchemaNormalizer', () => {
     expect(target.normalize({ $id: 'Schema', oneOf: [{ properties: { key: { type: 'string' } } }] })).toMatchObject({
       properties: { },
       required: [],
-      additionalProperties: true,
       oneOf: [{ $ref: '#/definitions/OneOf1' }],
       definitions: { OneOf1: { type: 'object', properties: { key: { type: 'string' } }, required: [] } },
     })

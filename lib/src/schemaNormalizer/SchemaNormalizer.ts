@@ -121,12 +121,13 @@ export class SchemaNormalizer {
         this.#definitionsToProcess.push({ name, path: [...path, `oneOf[${index}]`], definition: o })
       }
     })
+    const additionalProperties = this.toAdditionalProperties(input.additionalProperties, [...path, 'additionalProperties'])
     return {
       ...this.keepProperties(input, 'interface', path),
       type: 'object',
       oneOf,
       properties,
-      additionalProperties: true,
+      additionalProperties,
       required: input.required ?? [],
       $comment: input.$comment,
       maxProperties: input.maxProperties,

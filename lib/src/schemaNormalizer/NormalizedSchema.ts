@@ -52,7 +52,6 @@ export interface ObjectDefinition<PropertyExtension = unknown> extends Definitio
 export interface InterfaceDefinition<PropertyExtension = unknown> extends ObjectDefinition<PropertyExtension> {
   /** The implementing schemas, as defined in JSON Schema */
   oneOf: RefProperty[]
-  additionalProperties: true
 }
 
 /** A single property in an object schema */

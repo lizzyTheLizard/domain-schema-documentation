@@ -56,6 +56,7 @@ components:
           type: string
       required:
         - kind
+      additionalProperties: false
       oneOf:
         - $ref: "#/components/schemas/ModuleInterfaceOneOf1"
         - $ref: "#/components/schemas/ModuleInterfaceOneOf2"
@@ -93,6 +94,7 @@ components:
           type: string
       required:
         - kind
+      additionalProperties: false
   securitySchemes:
     def_auth:
       type: apiKey
