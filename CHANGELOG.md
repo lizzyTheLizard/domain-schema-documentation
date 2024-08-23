@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.9.4] - 2024-08-23
+### Fixed
+- Fixed problem with additional properties in interfaces
+
 ## [1.9.3] - 2024-08-23
 ### Fixed
 - Ignore husky when installing as a dependency

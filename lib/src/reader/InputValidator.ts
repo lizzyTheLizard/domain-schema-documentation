@@ -75,7 +75,7 @@ export class InputValidator {
       definitions[definitionName] = definitionToAdd
     })
     const schemaToAdd: Schema = { ...schema, definitions }
-    if ('oneOf ' in schemaToAdd && 'additionalProperties' in schemaToAdd) {
+    if ('oneOf' in schemaToAdd && 'additionalProperties' in schemaToAdd) {
       schemaToAdd.additionalProperties = true
     }
     this.#ajv.addSchema(schemaToAdd, schema.$id)
