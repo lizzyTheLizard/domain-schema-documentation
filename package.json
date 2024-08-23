@@ -1,6 +1,6 @@
 {
   "name": "domain-schema-documentation",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "scripts": {
     "audit": "yarn npm audit",
     "build": "yarn workspaces foreach -A run build",
@@ -9,7 +9,7 @@
     "integration-tests": "yarn workspaces foreach -A run integration-tests",
     "lint": "eslint --fix .",
     "lint:nofix": "eslint .",
-    "postinstall": "husky",
+    "prepare": "husky",
     "syncpack": "syncpack format && syncpack fix-mismatches",
     "syncpack:nofix": " syncpack lint && syncpack format",
     "unit-tests": "yarn workspaces foreach -A run unit-tests"

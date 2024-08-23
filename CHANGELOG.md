@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.9.3] - 2024-08-23
+### Fixed
+- Ignore husky when installing as a dependency
+
 ## [1.9.2] - 2024-08-23
 ### Fixed
 - Fixed bug when generating type names: Wrong commas were introduced into the type name (e.g. Date,Time instead of DateTime)
