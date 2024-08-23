@@ -17,11 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-## [1.9.1] - 2023-08-07
+## [1.9.2] - 2024-08-23
+### Fixed
+- Fixed bug when generating type names: Wrong commas were introduced into the type name (e.g. Date,Time instead of DateTime)
+
+## [1.9.1] - 2024-08-07
 ### Fixed
 - Fixed example project, no impact on library
 
-## [1.9.0] - 2023-08-07
+## [1.9.0] - 2024-08-07
 ### Added
 - Integrated Husky for pre-commit hooks incl. new check for version in package.json
 - Added ChangeLog file

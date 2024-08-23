@@ -49,6 +49,6 @@ export function typeName(formatOrType: string): string {
     case 'int64':
       return 'Long'
     default:
-      return formatOrType.split('-').map(n => cleanName(n)).join()
+      return formatOrType.split('-').map(n => cleanName(n)).join('')
   }
 }
