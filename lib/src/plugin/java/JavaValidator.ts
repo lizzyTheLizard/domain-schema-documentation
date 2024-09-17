@@ -79,9 +79,9 @@ class JavaValidator {
   }
 
   private async checkDefinition(definition: Definition, definitionName: string | undefined): Promise<void> {
-    // File must exists, otherwise we cannot check anything anyway
-    const filename = path.join(this.getModuleDir(), getSimpleJavaClassName(this.currentSchema, definitionName) + '.java')
-    if (!await existAndAccessible(filename)) {
+    // Search for the file in the module directory and its subdirectories
+    const filename = await this.findFileInSubfolders(this.getModuleDir(), getSimpleJavaClassName(this.currentSchema, definitionName) + '.java')
+    if (!filename) {
       this.currentSchema['x-errors'].push({
         text: `'${getFullJavaClassName(this.currentSchema, this.options, definitionName)}' should exist but is missing in the implementation`,
         type: 'MISSING_IN_IMPLEMENTATION',
@@ -96,6 +96,30 @@ class JavaValidator {
     } else {
       this.checkObjectDefinition(fileContent, definition, definitionName)
     }
+  }
+
+  private async findFileInSubfolders(dir: string, targetFile: string): Promise<string | undefined> {
+    try {
+      const dirStat = await fs.stat(dir);
+      if (!dirStat.isDirectory()) {
+        return undefined;
+      }
+    } catch (err) {
+      // If the directory doesn't exist or there is an error, return undefined
+      return undefined;
+    }
+
+    const dirents = await fs.readdir(dir, { withFileTypes: true });
+    for (const dirent of dirents) {
+      const res = path.resolve(dir, dirent.name);
+      if (dirent.isDirectory()) {
+        const found = await this.findFileInSubfolders(res, targetFile);
+        if (found) return found;
+      } else if (dirent.isFile() && path.basename(res) === targetFile) {
+        return res;
+      }
+    }
+    return undefined;
   }
 
   private checkObjectDefinition(fileContent: string, definition: ObjectDefinition, definitionName: string | undefined): void {
@@ -212,8 +236,8 @@ async function existAndAccessible(file: string): Promise<boolean> {
   const exists = await fs.stat(file).then(_ => true).catch((_: unknown) => false)
   if (!exists) return false
   return await fs.access(file, fs.constants.F_OK)
-    .then(() => true)
-    .catch(() => false)
+      .then(() => true)
+      .catch(() => false)
 }
 
 function printType(type: JavaType): string {
