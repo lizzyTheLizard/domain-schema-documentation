@@ -250,7 +250,8 @@ function printType(type: JavaType): string {
 
 function typesEqual(type1: JavaType, type2: JavaType): boolean {
   switch (type1.type) {
-    case 'CLASS': return type2.type === 'CLASS' && type1.fullName === type2.fullName
+      // Fullname check (incl. package) clashes when the implemenation uses subpackages, e.g. in partner module
+    case 'CLASS': return type2.type === 'CLASS' && type1.fullName.split('.').pop() === type2.fullName.split('.').pop()
     case 'COLLECTION': return type2.type === 'COLLECTION' && typesEqual(type1.items, type2.items)
     case 'MAP': return type2.type === 'MAP' && typesEqual(type1.items, type2.items)
   }
