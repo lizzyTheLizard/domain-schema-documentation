@@ -100,26 +100,26 @@ class JavaValidator {
 
   private async findFileInSubfolders(dir: string, targetFile: string): Promise<string | undefined> {
     try {
-      const dirStat = await fs.stat(dir);
+      const dirStat = await fs.stat(dir)
       if (!dirStat.isDirectory()) {
-        return undefined;
+        return undefined
       }
-    } catch (err) {
+    } catch {
       // If the directory doesn't exist or there is an error, return undefined
-      return undefined;
+      return undefined
     }
 
-    const dirents = await fs.readdir(dir, { withFileTypes: true });
+    const dirents = await fs.readdir(dir, { withFileTypes: true })
     for (const dirent of dirents) {
-      const res = path.resolve(dir, dirent.name);
+      const res = path.resolve(dir, dirent.name)
       if (dirent.isDirectory()) {
-        const found = await this.findFileInSubfolders(res, targetFile);
-        if (found) return found;
+        const found = await this.findFileInSubfolders(res, targetFile)
+        if (found) return found
       } else if (dirent.isFile() && path.basename(res) === targetFile) {
-        return res;
+        return res
       }
     }
-    return undefined;
+    return undefined
   }
 
   private checkObjectDefinition(fileContent: string, definition: ObjectDefinition, definitionName: string | undefined): void {
@@ -236,8 +236,8 @@ async function existAndAccessible(file: string): Promise<boolean> {
   const exists = await fs.stat(file).then(_ => true).catch((_: unknown) => false)
   if (!exists) return false
   return await fs.access(file, fs.constants.F_OK)
-      .then(() => true)
-      .catch(() => false)
+    .then(() => true)
+    .catch(() => false)
 }
 
 function printType(type: JavaType): string {
