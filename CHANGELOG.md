@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.10.0] - 2024-09-26
+### Added
+- Support for Java-Classes in Sub-Packages
+- Less verbose openapi diff output
+
 ## [1.9.4] - 2024-08-23
 ### Fixed
 - Fixed problem with additional properties in interfaces
