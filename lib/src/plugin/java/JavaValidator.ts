@@ -249,10 +249,18 @@ function printType(type: JavaType): string {
 }
 
 function typesEqual(type1: JavaType, type2: JavaType): boolean {
-  switch (type1.type) {
-      // Fullname check (incl. package) clashes when the implemenation uses subpackages, e.g. in partner module
-    case 'CLASS': return type2.type === 'CLASS' && type1.fullName.split('.').pop() === type2.fullName.split('.').pop()
-    case 'COLLECTION': return type2.type === 'COLLECTION' && typesEqual(type1.items, type2.items)
-    case 'MAP': return type2.type === 'MAP' && typesEqual(type1.items, type2.items)
+  if (type1.type === 'CLASS') {
+    if (type2.type !== 'CLASS') return false
+    // We want to allow classes to be in sub-packages.
+    // Therefore we check if the package is a prefix of the other package and if the class name is the same
+    const type1Name = type1.fullName.split('.')
+    const type2Name = type2.fullName.split('.')
+    if (type1Name.pop() !== type2Name.pop()) return false
+    const type1Package = type1Name.join('.')
+    const type2Package = type2Name.join('.')
+    return type1Package.startsWith(type2Package) || type2Package.startsWith(type1Package)
   }
+  if (type2.type === 'CLASS') return false
+  if (type1.type !== type2.type) return false
+  return typesEqual(type1.items, type2.items)
 }
