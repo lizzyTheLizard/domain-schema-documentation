@@ -33,9 +33,8 @@ export class OpenApiComperator {
     // This will change the spec in place but we do not want to change the original spec. So let's clone it first
     const clone = structuredClone(expectedSpecInput)
     const expectedSpec = await this.#parser.dereference(clone, { dereference: { circular: 'ignore' } })
-    const errors = this.compareSpec(expectedSpec as OpenAPIV3.Document, implementedSpec as OpenAPIV3.Document)
-      .map(e => ({ ...e, text: e.text }))
-    module.errors.push(...errors)
+    const compareResult = this.compareSpec(expectedSpec as OpenAPIV3.Document, implementedSpec as OpenAPIV3.Document)
+    module.errors.push(...compareResult.map(e => ({ ...e, text: e.text })))
   }
 
   public async ensureNoSpec(module: Module): Promise<void> {
@@ -178,7 +177,13 @@ export class OpenApiComperator {
       const expectedSchema = expectedContent[expectedMediaType].schema
       const implementedSchema = implementedContent[expectedMediaType].schema
       const contextWithMT = expectedMediaTypes.length === 1 ? context : `${context} with media type '${expectedMediaType}'`
-      result.push(...jsonSchemaDiff(expectedSchema, implementedSchema).map(e => ({ ...e, text: `${contextWithMT} is wrong: ${e.text}` })))
+      const diffResult = jsonSchemaDiff(expectedSchema, implementedSchema)
+      if (diffResult.length > 0) {
+        result.push({
+          text: `${contextWithMT} differs: ${diffResult.join(', ')}`,
+          type: 'WRONG',
+        })
+      }
     })
     implementedMediaTypes.forEach((implementedMediaType) => {
       if (!expectedMediaTypes.includes(implementedMediaType)) {

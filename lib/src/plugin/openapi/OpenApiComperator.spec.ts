@@ -214,8 +214,8 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: 'Response body \'200\' in method \'GET /new\' is wrong: Enum must contain value "B"',
-      type: 'MISSING_IN_IMPLEMENTATION',
+      text: 'Response body \'200\' in method \'GET /new\' differs: Enum must contain value "B"',
+      type: 'WRONG',
     }])
   })
 
@@ -236,7 +236,7 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: 'Response body \'200\' in method \'GET /new\' is wrong: Type must be \'number\' but is \'string\'',
+      text: 'Response body \'200\' in method \'GET /new\' differs: Type must be \'number\' but is \'string\'',
       type: 'WRONG',
     }])
   })
@@ -258,11 +258,8 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: 'Response body \'200\' in method \'GET /new\' is wrong: Property \'key2\' must exist',
-      type: 'MISSING_IN_IMPLEMENTATION',
-    }, {
-      text: 'Response body \'200\' in method \'GET /new\' is wrong: Property \'key\' must not exist',
-      type: 'NOT_IN_DOMAIN_MODEL',
+      text: 'Response body \'200\' in method \'GET /new\' differs: Property \'key2\' must exist, Property \'key\' must not exist',
+      type: 'WRONG',
     }])
   })
 
@@ -283,11 +280,8 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: 'Request body in method \'PUT /new\' is wrong: Property \'key2\' must exist',
-      type: 'MISSING_IN_IMPLEMENTATION',
-    }, {
-      text: 'Request body in method \'PUT /new\' is wrong: Property \'key\' must not exist',
-      type: 'NOT_IN_DOMAIN_MODEL',
+      text: 'Request body in method \'PUT /new\' differs: Property \'key2\' must exist, Property \'key\' must not exist',
+      type: 'WRONG',
     }])
   })
 
@@ -308,8 +302,8 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: 'Response body \'200\' in method \'GET /new\' is wrong: Property \'key.key2\' must exist',
-      type: 'MISSING_IN_IMPLEMENTATION',
+      text: 'Response body \'200\' in method \'GET /new\' differs: Property \'key.key2\' must exist',
+      type: 'WRONG',
     }])
   })
 
@@ -330,7 +324,7 @@ describe('OpenApiComperator', () => {
     const module = testModule()
     await target.ensureEqual(module, expectedSpec)
     expect(module.errors).toEqual([{
-      text: 'Response body \'200\' in method \'GET /new\' is wrong: Type of \'key.key\' must be \'number\' but is \'string\'',
+      text: 'Response body \'200\' in method \'GET /new\' differs: Type of \'key.key\' must be \'number\' but is \'string\'',
       type: 'WRONG',
     }])
   })

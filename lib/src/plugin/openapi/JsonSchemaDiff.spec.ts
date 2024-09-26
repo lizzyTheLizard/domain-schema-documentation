@@ -13,21 +13,21 @@ describe('JsonSchemaDiff', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' }, key2: { type: 'string' } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Property \'key2\' must not exist', type: 'NOT_IN_DOMAIN_MODEL' }])
+    expect(result).toEqual(['Property \'key2\' must not exist'])
   })
 
   test('Property Removed', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' }, key2: { type: 'string' } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Property \'key2\' must exist', type: 'MISSING_IN_IMPLEMENTATION' }])
+    expect(result).toEqual(['Property \'key2\' must exist'])
   })
 
   test('Property type changed', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { key: { type: 'number' } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Type of \'key\' must be \'string\' but is \'number\'', type: 'WRONG' }])
+    expect(result).toEqual(['Type of \'key\' must be \'string\' but is \'number\''])
   })
 
   test('Enum value changed', () => {
@@ -35,8 +35,8 @@ describe('JsonSchemaDiff', () => {
     const dest: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string', enum: ['B'] } } }
     const result = jsonSchemaDiff(source, dest)
     expect(result).toEqual([
-      { text: 'Enum \'key\' must contain value "A"', type: 'MISSING_IN_IMPLEMENTATION' },
-      { text: 'Enum \'key\' must not contain value "B"', type: 'NOT_IN_DOMAIN_MODEL' },
+      'Enum \'key\' must contain value "A"',
+      'Enum \'key\' must not contain value "B"',
     ])
   })
 
@@ -44,14 +44,14 @@ describe('JsonSchemaDiff', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } }, required: ['key'] }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Property \'key\' must not be required', type: 'WRONG' }])
+    expect(result).toEqual(['Property \'key\' must not be required'])
   })
 
   test('Required removed', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } }, required: ['key'] }
     const dest: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Property \'key\' must be required', type: 'WRONG' }])
+    expect(result).toEqual(['Property \'key\' must be required'])
   })
 
   test('Ignore additions', () => {
@@ -65,111 +65,111 @@ describe('JsonSchemaDiff', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'object', properties: { key: { type: 'string' } } } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'object', properties: { key: { type: 'string' }, key2: { type: 'string' } } } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Property \'sub.key2\' must not exist', type: 'NOT_IN_DOMAIN_MODEL' }])
+    expect(result).toEqual(['Property \'sub.key2\' must not exist'])
   })
 
   test('Sub-Property Removed', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'object', properties: { key: { type: 'string' }, key2: { type: 'string' } } } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'object', properties: { key: { type: 'string' } } } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Property \'sub.key2\' must exist', type: 'MISSING_IN_IMPLEMENTATION' }])
+    expect(result).toEqual(['Property \'sub.key2\' must exist'])
   })
 
   test('Sub-Property type changed', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'object', properties: { key: { type: 'string' } } } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'object', properties: { key: { type: 'number' } } } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Type of \'sub.key\' must be \'string\' but is \'number\'', type: 'WRONG' }])
+    expect(result).toEqual(['Type of \'sub.key\' must be \'string\' but is \'number\''])
   })
 
   test('Array-Property Added', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'array', items: { type: 'object', properties: { key: { type: 'string' } } } } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'array', items: { type: 'object', properties: { key: { type: 'string' }, key2: { type: 'string' } } } } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Property \'sub[].key2\' must not exist', type: 'NOT_IN_DOMAIN_MODEL' }])
+    expect(result).toEqual(['Property \'sub[].key2\' must not exist'])
   })
 
   test('Array-Property Removed', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'array', items: { type: 'object', properties: { key: { type: 'string' }, key2: { type: 'string' } } } } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'array', items: { type: 'object', properties: { key: { type: 'string' } } } } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Property \'sub[].key2\' must exist', type: 'MISSING_IN_IMPLEMENTATION' }])
+    expect(result).toEqual(['Property \'sub[].key2\' must exist'])
   })
 
   test('Array-Property type changed', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'array', items: { type: 'object', properties: { key: { type: 'string' } } } } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'array', items: { type: 'object', properties: { key: { type: 'number' } } } } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Type of \'sub[].key\' must be \'string\' but is \'number\'', type: 'WRONG' }])
+    expect(result).toEqual(['Type of \'sub[].key\' must be \'string\' but is \'number\''])
   })
 
   test('Array type changed', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'array', items: { type: 'string' } } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { sub: { type: 'array', items: { type: 'number' } } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Type of \'sub[]\' must be \'string\' but is \'number\'', type: 'WRONG' }])
+    expect(result).toEqual(['Type of \'sub[]\' must be \'string\' but is \'number\''])
   })
 
   test('OneOf added', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } }, oneOf: [{ type: 'string' }] }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Type must not be OneOf', type: 'WRONG' }])
+    expect(result).toEqual(['Type must not be OneOf'])
   })
 
   test('OneOf removed', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } }, oneOf: [{ type: 'string' }] }
     const dest: OpenAPIV3.SchemaObject = { properties: { key: { type: 'string' } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Type must be OneOf', type: 'WRONG' }])
+    expect(result).toEqual(['Type must be OneOf'])
   })
 
   test('OneOf option added', () => {
     const source: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }] }
     const dest: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'boolean' }] }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Type must have 2 instead of 3 OneOf options', type: 'WRONG' }])
+    expect(result).toEqual(['Type must have 2 instead of 3 OneOf options'])
   })
 
   test('OneOf option removed', () => {
     const source: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'boolean' }] }
     const dest: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }] }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Type must have 3 instead of 2 OneOf options', type: 'WRONG' }])
+    expect(result).toEqual(['Type must have 3 instead of 2 OneOf options'])
   })
 
   test('OneOf option changed', () => {
     const source: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'boolean' }] }
     const dest: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'object' }] }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Type of \'OneOf[2]\' must be \'boolean\' but is \'object\'', type: 'WRONG' }])
+    expect(result).toEqual(['Type of \'OneOf[2]\' must be \'boolean\' but is \'object\''])
   })
 
   test('OneOf option property added', () => {
     const source: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'object', properties: { key: { type: 'string' } } }] }
     const dest: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'object', properties: { key: { type: 'string' }, key2: { type: 'string' } } }] }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Property \'OneOf[2].key2\' must not exist', type: 'NOT_IN_DOMAIN_MODEL' }])
+    expect(result).toEqual(['Property \'OneOf[2].key2\' must not exist'])
   })
 
   test('OneOf option property removed', () => {
     const source: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'object', properties: { key: { type: 'string' } } }] }
     const dest: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'object', properties: { key: { type: 'string' }, key2: { type: 'string' } } }] }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Property \'OneOf[2].key2\' must not exist', type: 'NOT_IN_DOMAIN_MODEL' }])
+    expect(result).toEqual(['Property \'OneOf[2].key2\' must not exist'])
   })
 
   test('OneOf option property changed', () => {
     const source: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'object', properties: { key: { type: 'string' } } }] }
     const dest: OpenAPIV3.SchemaObject = { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'object', properties: { key: { type: 'number' } } }] }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: 'Type of \'OneOf[2].key\' must be \'string\' but is \'number\'', type: 'WRONG' }])
+    expect(result).toEqual(['Type of \'OneOf[2].key\' must be \'string\' but is \'number\''])
   })
 
   test('Sub-OneOf removed', () => {
     const source: OpenAPIV3.SchemaObject = { properties: { key: { type: 'object', oneOf: [{ type: 'string' }] } } }
     const dest: OpenAPIV3.SchemaObject = { properties: { key: { type: 'object' } } }
     const result = jsonSchemaDiff(source, dest)
-    expect(result).toEqual([{ text: '\'key\' must be OneOf', type: 'WRONG' }])
+    expect(result).toEqual(['\'key\' must be OneOf'])
   })
 })
