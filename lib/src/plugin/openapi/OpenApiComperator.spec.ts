@@ -9,12 +9,12 @@ import { type OpenAPIV3 } from 'openapi-types'
 
 describe('OpenApiComperator', () => {
   let tmpDir: tmp.DirResult
-  let options: { srcSpec: string }
+  let options: { srcSpec: string, prefixDefinitions: boolean, ignoreProperties: string[] }
   let target: OpenApiComperator
 
   beforeEach(() => {
     tmpDir = tmp.dirSync({ unsafeCleanup: true })
-    options = { srcSpec: path.join(tmpDir.name, 'Module.openapi.yaml') }
+    options = { srcSpec: path.join(tmpDir.name, 'Module.openapi.yaml'), prefixDefinitions: true, ignoreProperties: [] }
     target = new OpenApiComperator(options)
   })
 

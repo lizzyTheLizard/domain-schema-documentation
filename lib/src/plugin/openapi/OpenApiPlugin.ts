@@ -14,6 +14,16 @@ export interface OpenApiPluginOptions {
    * Default is undefined.
    */
   srcSpec: string | ((module: Module) => string | undefined) | undefined
+  /**
+   * Whether open api definitions should be prefixed with the module name.
+   * If true, the definition name will be `ModuleNameDefinitionName`.
+   * Default is true.
+   */
+  prefixDefinitions: boolean
+  /**
+   * Properties to ignore when generating the OpenAPI specification.
+   */
+  ignoreProperties: string[]
 }
 
 /**
@@ -42,7 +52,7 @@ export function openApiPlugin(outputFolder: string, optionsOrUndefined?: Partial
       if (inputSpec === null) {
         throw new Error(`The OpenAPI-Specification must be an object but is null in module ${module.$id}`)
       }
-      const spec = await generator.generate(module, inputSpec)
+      const spec = await generator.generate(module, inputSpec, options)
       const yamlOutput = yaml.stringify(spec)
       const relativeFilename = path.join(module.$id, getFileName(module))
       await writeOutput(yamlOutput, relativeFilename, outputFolder)
@@ -59,5 +69,7 @@ function getFileName(module: Module): string {
 function applyDefaults(optionsOrUndefined?: Partial<OpenApiPluginOptions>): OpenApiPluginOptions {
   return {
     srcSpec: optionsOrUndefined?.srcSpec ?? undefined,
+    prefixDefinitions: optionsOrUndefined?.prefixDefinitions ?? true,
+    ignoreProperties: optionsOrUndefined?.ignoreProperties ?? [],
   }
 }

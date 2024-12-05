@@ -4,6 +4,11 @@ import { fullSpec, refSpec, refSpecInterface } from './testData'
 
 describe('OpenAPIGenerator', () => {
   const module = testModule()
+  const options = {
+    srcSpec: undefined,
+    prefixDefinitions: true,
+    ignoreProperties: [],
+  }
   let target: OpenApiGenerator
 
   beforeEach(() => {
@@ -11,12 +16,12 @@ describe('OpenAPIGenerator', () => {
   })
 
   test('reject invalid', async () => {
-    await expect(target.generate(module, { ...fullSpec(), wrong: 'value' })).rejects.toThrow()
-    await expect(target.generate(module, fullSpec())).resolves.not.toThrow()
+    await expect(target.generate(module, { ...fullSpec(), wrong: 'value' }, options)).rejects.toThrow()
+    await expect(target.generate(module, fullSpec(), options)).resolves.not.toThrow()
   })
 
   test('fill default values', async () => {
-    const result = await target.generate(module, {})
+    const result = await target.generate(module, {}, options)
     expect(result).toEqual({
       openapi: '3.0.3',
       info: { title: module.title, description: module.description, version: new Date().toDateString() },
@@ -28,13 +33,13 @@ describe('OpenAPIGenerator', () => {
 
   test('overwrite defaults if given', async () => {
     const openApi = fullSpec()
-    const result = await target.generate(module, openApi)
+    const result = await target.generate(module, openApi, options)
     expect(result).toEqual(openApi)
   })
 
   test('$ref in original', async () => {
     const openApi = refSpec()
-    const result = await target.generate(module, openApi)
+    const result = await target.generate(module, openApi, options)
     // eslint-disable-next-line
     expect(result.paths).toEqual((openApi as any).paths)
     expect(result.components?.schemas).toEqual({
@@ -66,7 +71,7 @@ describe('OpenAPIGenerator', () => {
     const model = { ...testModel(), schemas: [testSchema(), schema] }
     target = new OpenApiGenerator(model)
     // eslint-disable-next-line
-    const result = await target.generate(model.modules[0], openApi) as any
+    const result = await target.generate(model.modules[0], openApi, options) as any
     // eslint-disable-next-line
     expect(result.paths['/pet'].put.responses[200].content['application/json'].schema.$ref).toEqual('#/components/schemas/ModuleInterface')
     // eslint-disable-next-line

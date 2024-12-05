@@ -93,7 +93,7 @@ function htmlAdditionalPropertyType(model: Model, schema: Schema, definition: De
 
 async function writeSchemaFiles(model: Model, options: HtmlWriterOptions): Promise<void> {
   await Promise.all(model.schemas.map(async (schema) => {
-    const context = enhanceSchema(model, schema)
+    const context = enhanceSchema(model, schema, true)
     const output1 = options.schemaTemplate(context)
     const output2 = options.basicTemplate({ content: output1, title: schema.title })
     await options.write(output2, `${schema.$id}.html`)
@@ -102,7 +102,7 @@ async function writeSchemaFiles(model: Model, options: HtmlWriterOptions): Promi
 
 async function writeModuleFiles(model: Model, options: HtmlWriterOptions): Promise<void> {
   await Promise.all(model.modules.map(async (module) => {
-    const context = enhanceModule(model, module)
+    const context = enhanceModule(model, module, true)
     const output1 = options.moduleTemplate(context)
     const output2 = options.basicTemplate({ content: output1, title: module.title })
     await options.write(output2, path.join(module.$id, 'index.html'))

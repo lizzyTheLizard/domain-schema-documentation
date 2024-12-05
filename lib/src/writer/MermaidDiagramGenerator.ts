@@ -33,9 +33,10 @@ export function applicationDiagram(model: Model): string {
  * Get a dependency diagram for a single module
  * @param model The model to generate the diagram for
  * @param module The module to generate the diagram for
+ * @param diagramLinksEnabled Whether to enable links in the diagram
  * @returns The diagram for the module as mermaid code
  */
-export function moduleDiagram(model: Model, module: Module): string {
+export function moduleDiagram(model: Model, module: Module, diagramLinksEnabled: boolean): string {
   const dependenciesTo = model.schemas
     .filter(s => getModuleId(s) !== module.$id)
     .flatMap(s => getDependencies(model, s))
@@ -50,16 +51,17 @@ export function moduleDiagram(model: Model, module: Module): string {
     ...getEndpointsFromSchemas(getSchemasForModule(model, module)),
     ...getEndpointsFromDependencies(dependencies),
   ].filter(e => shouldIncludeInDiagram(e))
-  return toDiagram(dependencies, endpoints, model, module.$id)
+  return toDiagram(dependencies, endpoints, model, module.$id, diagramLinksEnabled)
 }
 
 /**
  * Get a dependency diagram for a single schema
  * @param model The model to generate the diagram for
  * @param schema The schema to generate the diagram for
+ * @param diagramLinksEnabled Whether to enable links in the diagram
  * @returns The diagram for the schema as mermaid code
  */
-export function schemaDiagramm(model: Model, schema: Schema): string {
+export function schemaDiagramm(model: Model, schema: Schema, diagramLinksEnabled: boolean): string {
   const dependenciesTo = model.schemas
     .filter(s => s !== schema)
     .flatMap(s => getDependencies(model, s))
@@ -73,7 +75,7 @@ export function schemaDiagramm(model: Model, schema: Schema): string {
     ...getEndpointsFromSchemas([schema]),
     ...getEndpointsFromDependencies(dependencies),
   ].filter(e => shouldIncludeInDiagram(e, schema))
-  return toDiagram(dependencies, endpoints, model, getModuleId(schema))
+  return toDiagram(dependencies, endpoints, model, getModuleId(schema), diagramLinksEnabled)
 }
 
 interface Endpoint { schema: Schema, name?: string }
@@ -112,7 +114,7 @@ function safeId(obj: string | Schema | Module): string {
   return id.replace(/\//g, '_').replace(/\./g, '_')
 }
 
-function toDiagram(dependencies: Dependency[], endpoints: Endpoint[], model: Model, moduleId: string): string {
+function toDiagram(dependencies: Dependency[], endpoints: Endpoint[], model: Model, moduleId: string, diagramLinksEnabled: boolean): string {
   const modules = unique(endpoints.map(s => getModuleForSchema(model, s.schema)))
   const namespaceStrs = modules.map((module) => {
     const endpointsForModule = endpoints.filter(e => getModuleId(e.schema) === module.$id)
@@ -132,14 +134,19 @@ function toDiagram(dependencies: Dependency[], endpoints: Endpoint[], model: Mod
     if (arrow === undefined) return []
     return [`${from} ${arrow}${d.array ? '" N"' : ''} ${to} ${d.dependencyName !== undefined ? ':' + d.dependencyName : ''}`]
   })
-  const links = unique(endpoints.map((e: Endpoint) => {
-    if (e.name === undefined) {
-      return `click ${safeId(e.schema)} href "${relativeLink(moduleId, e.schema.$id)}.html" "${e.schema.title}"`
-    } else {
-      return `click ${e.name} href "${relativeLink(moduleId, e.schema.$id)}.html" "${e.schema.title}"`
-    }
-  }))
-  const lines = ['classDiagram', ...namespaceStrs, ...dependenciesStr, ...links]
+
+  const lines = ['classDiagram', ...namespaceStrs, ...dependenciesStr]
+  if (diagramLinksEnabled) {
+    const links = unique(endpoints.map((e: Endpoint) => {
+      if (e.name === undefined) {
+        return `click ${safeId(e.schema)} href "${relativeLink(moduleId, e.schema.$id)}.html" "${e.schema.title}"`
+      } else {
+        return `click ${e.name} href "${relativeLink(moduleId, e.schema.$id)}.html" "${e.schema.title}"`
+      }
+    }))
+    lines.push(...links)
+  }
+
   return lines.join('\n')
 }
 
