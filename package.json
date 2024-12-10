@@ -68,7 +68,7 @@
   ],
   "license": "MIT",
   "main": "dist/index.js",
-  "packageManager": "yarn@4.3.1",
+  "packageManager": "yarn@4.5.3",
   "repository": "lizzyTheLizard/domain-schema-documentation",
   "types": "dist/index.d.ts",
   "workspaces": [
