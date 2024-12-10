@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.11.0] - 2024-12-10
+### Added
+- Added configuration option to disable clickable diagrams in markdown
+- Added configuration option to disable prefixing schema names in open api
+- Added configuration option to ignore certain properties in open api
+
 ## [1.10.0] - 2024-09-26
 ### Added
 - Support for Java-Classes in Sub-Packages

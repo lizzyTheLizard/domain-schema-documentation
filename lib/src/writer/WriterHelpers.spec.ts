@@ -64,7 +64,7 @@ describe('writerHelpers', () => {
   test('enhanceModule', () => {
     const model: Model = testModel()
 
-    const result = enhanceModule(model, model.modules[0])
+    const result = enhanceModule(model, model.modules[0], true)
 
     expect(result).toEqual({
       ...model.modules[0],
@@ -76,7 +76,7 @@ describe('writerHelpers', () => {
   test('enhanceSchema', () => {
     const model: Model = testModel()
 
-    const result = enhanceSchema(model, model.schemas[0])
+    const result = enhanceSchema(model, model.schemas[0], true)
 
     expect(result).toEqual({
       ...model.schemas[0],

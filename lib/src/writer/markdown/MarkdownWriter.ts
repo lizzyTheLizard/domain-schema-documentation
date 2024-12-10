@@ -17,6 +17,12 @@ export interface MarkdownWriterOptions extends WriterBaseOptions {
   schemaTemplate: Handlebars.TemplateDelegate
   /** Template for the subSchema documentation */
   subSchemaTemplate: Handlebars.TemplateDelegate
+
+  /**
+   * Whether elements in the mermaid diagrams should be clickable or not. Default is true.
+   * Can be disabled on platforms where linking doesn't work, e.g. GitLab.
+   */
+  diagramLinksEnabled: boolean
 }
 
 /**
@@ -42,6 +48,7 @@ function applyDefaults(outputFolder: string, options?: Partial<MarkdownWriterOpt
     moduleTemplate: options?.moduleTemplate ?? loadTemplate(path.join(__dirname, 'module.hbs')),
     applicationTemplate: options?.applicationTemplate ?? loadTemplate(path.join(__dirname, 'application.hbs')),
     subSchemaTemplate: options?.subSchemaTemplate ?? loadTemplate(path.join(__dirname, 'subSchema.hbs')),
+    diagramLinksEnabled: options?.diagramLinksEnabled ?? true,
   }
 }
 
@@ -95,7 +102,7 @@ function mdAdditionalPropertyType(model: Model, schema: Schema, definition: Defi
 
 async function writeSchemaFiles(model: Model, options: MarkdownWriterOptions): Promise<void> {
   await Promise.all(model.schemas.map(async (schema) => {
-    const context = enhanceSchema(model, schema)
+    const context = enhanceSchema(model, schema, options.diagramLinksEnabled)
     const output = options.schemaTemplate(context)
     await options.write(output, `${schema.$id}.md`)
   }))
@@ -103,7 +110,7 @@ async function writeSchemaFiles(model: Model, options: MarkdownWriterOptions): P
 
 async function writeModuleFiles(model: Model, options: MarkdownWriterOptions): Promise<void> {
   await Promise.all(model.modules.map(async (module) => {
-    const context = enhanceModule(model, module)
+    const context = enhanceModule(model, module, options.diagramLinksEnabled)
     const output = options.moduleTemplate(context)
     await options.write(output, path.join(module.$id, 'README.md'))
   }))

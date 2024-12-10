@@ -15,12 +15,13 @@ export type EnhancedSchema = Schema & {
  * Enhance a schema with additional information to be used in templates
  * @param model The model the schema belongs to
  * @param schema The schema to enhance
+ * @param diagramLinksEnabled Whether to enable links in the diagram
  * @returns The enhanced schema
  */
-export function enhanceSchema(model: Model, schema: Schema): EnhancedSchema {
+export function enhanceSchema(model: Model, schema: Schema, diagramLinksEnabled: boolean): EnhancedSchema {
   return {
     ...schema,
-    classDiagram: schemaDiagramm(model, schema),
+    classDiagram: schemaDiagramm(model, schema, diagramLinksEnabled),
     module: getModuleForSchema(model, schema),
   }
 }
@@ -34,12 +35,13 @@ export type EnhancedModule = Module & {
  * Enhance a module with additional information to be used in templates
  * @param model The model the module belongs to
  * @param module The module to enhance
+ * @param diagramLinksEnabled Whether to enable links in the diagram
  * @returns The enhanced module
  */
-export function enhanceModule(model: Model, module: Module): EnhancedModule {
+export function enhanceModule(model: Model, module: Module, diagramLinksEnabled: boolean): EnhancedModule {
   return {
     ...module,
-    classDiagram: moduleDiagram(model, module),
+    classDiagram: moduleDiagram(model, module, diagramLinksEnabled),
     schemas: getSchemasForModule(model, module),
   }
 }

@@ -4,10 +4,15 @@ import { fullSpec, refSpec, refSpecInterface } from './testData'
 
 describe('OpenAPIGenerator', () => {
   const module = testModule()
+  const options = {
+    srcSpec: undefined,
+    prefixDefinitions: true,
+    ignoreProperties: [],
+  }
   let target: OpenApiGenerator
 
   beforeEach(() => {
-    target = new OpenApiGenerator(testModel())
+    target = new OpenApiGenerator(testModel(), options)
   })
 
   test('reject invalid', async () => {
@@ -64,7 +69,7 @@ describe('OpenAPIGenerator', () => {
     const openApi = refSpecInterface()
     const schema = testInterfaceSchema()
     const model = { ...testModel(), schemas: [testSchema(), schema] }
-    target = new OpenApiGenerator(model)
+    target = new OpenApiGenerator(model, options)
     // eslint-disable-next-line
     const result = await target.generate(model.modules[0], openApi) as any
     // eslint-disable-next-line

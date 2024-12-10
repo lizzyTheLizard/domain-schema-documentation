@@ -4,6 +4,7 @@ import SwaggerParser from '@apidevtools/swagger-parser'
 import { type OpenAPIV3 } from 'openapi-types'
 import { type Definition, type Property } from '../../schemaNormalizer/NormalizedSchema'
 import { SchemaObject } from 'ajv'
+import { OpenApiPluginOptions } from './OpenApiPlugin'
 
 /**
  * Generates OpenApi-Specifications from module files
@@ -16,7 +17,7 @@ export class OpenApiGenerator {
   #processedSchemas: string[] = []
   #module!: Module
 
-  constructor(private readonly model: Model) {
+  constructor(private readonly model: Model, private readonly options: OpenApiPluginOptions) {
   }
 
   /**
@@ -112,7 +113,11 @@ export class OpenApiGenerator {
   private getDefinitionName(schemaOrschemaId: string | Schema, definitionName?: string): string {
     const moduleId = cleanName(getModuleId(schemaOrschemaId))
     const schemaName = cleanName(getSchemaName(schemaOrschemaId))
-    const result = moduleId + schemaName
+
+    let result = schemaName
+    if (this.options.prefixDefinitions) {
+      result = moduleId + schemaName
+    }
     if (definitionName === undefined) {
       return result
     }
@@ -140,7 +145,9 @@ export class OpenApiGenerator {
     }
     if ('properties' in definition) {
       const properites: Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject> = {}
-      Object.entries(definition.properties).forEach(([n, v]) => { properites[n] = this.cleanProperty(v) })
+      Object.entries(definition.properties)
+        .filter(([name]) => !this.options.ignoreProperties.includes(name))
+        .forEach(([n, v]) => { properites[n] = this.cleanProperty(v) })
       result.properties = properites
 
       if (definition.required.length > 0) {

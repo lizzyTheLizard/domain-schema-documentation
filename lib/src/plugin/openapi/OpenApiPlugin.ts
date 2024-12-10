@@ -14,6 +14,16 @@ export interface OpenApiPluginOptions {
    * Default is undefined.
    */
   srcSpec: string | ((module: Module) => string | undefined) | undefined
+  /**
+   * Whether open api definitions should be prefixed with the module name.
+   * If true, the definition name will be `ModuleNameDefinitionName`.
+   * Default is true.
+   */
+  prefixDefinitions: boolean
+  /**
+   * Properties to ignore when generating the OpenAPI specification.
+   */
+  ignoreProperties: string[]
 }
 
 /**
@@ -28,7 +38,7 @@ export interface OpenApiPluginOptions {
 export function openApiPlugin(outputFolder: string, optionsOrUndefined?: Partial<OpenApiPluginOptions>): Plugin {
   return async (model: Model) => {
     const options = applyDefaults(optionsOrUndefined)
-    const generator = new OpenApiGenerator(model)
+    const generator = new OpenApiGenerator(model, options)
     const comperator = new OpenApiComperator(options)
     for (const module of model.modules) {
       const inputSpec = 'openApi' in module ? module.openApi : undefined
@@ -59,5 +69,7 @@ function getFileName(module: Module): string {
 function applyDefaults(optionsOrUndefined?: Partial<OpenApiPluginOptions>): OpenApiPluginOptions {
   return {
     srcSpec: optionsOrUndefined?.srcSpec ?? undefined,
+    prefixDefinitions: optionsOrUndefined?.prefixDefinitions ?? true,
+    ignoreProperties: optionsOrUndefined?.ignoreProperties ?? [],
   }
 }
