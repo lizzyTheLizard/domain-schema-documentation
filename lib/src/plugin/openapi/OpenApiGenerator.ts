@@ -24,7 +24,6 @@ export class OpenApiGenerator {
    * Generates an OpenAPI specification from a module
    * @param module The module to generate the OpenAPI specification for
    * @param inputSpec The input specification
-   * @param options The options for the OpenAPI plugin
    * @returns An OpenAPI specification
    */
   public async generate(module: Module, inputSpec: object): Promise<OpenAPIV3.Document> {

@@ -38,7 +38,7 @@ export interface OpenApiPluginOptions {
 export function openApiPlugin(outputFolder: string, optionsOrUndefined?: Partial<OpenApiPluginOptions>): Plugin {
   return async (model: Model) => {
     const options = applyDefaults(optionsOrUndefined)
-    const generator = new OpenApiGenerator(model)
+    const generator = new OpenApiGenerator(model, options)
     const comperator = new OpenApiComperator(options)
     for (const module of model.modules) {
       const inputSpec = 'openApi' in module ? module.openApi : undefined
@@ -52,7 +52,7 @@ export function openApiPlugin(outputFolder: string, optionsOrUndefined?: Partial
       if (inputSpec === null) {
         throw new Error(`The OpenAPI-Specification must be an object but is null in module ${module.$id}`)
       }
-      const spec = await generator.generate(module, inputSpec, options)
+      const spec = await generator.generate(module, inputSpec)
       const yamlOutput = yaml.stringify(spec)
       const relativeFilename = path.join(module.$id, getFileName(module))
       await writeOutput(yamlOutput, relativeFilename, outputFolder)
