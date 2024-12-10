@@ -16,9 +16,8 @@ export class OpenApiGenerator {
   #schemasToProcess: string[] = []
   #processedSchemas: string[] = []
   #module!: Module
-  #options!: OpenApiPluginOptions
 
-  constructor(private readonly model: Model) {
+  constructor(private readonly model: Model, private readonly options: OpenApiPluginOptions) {
   }
 
   /**
@@ -28,21 +27,20 @@ export class OpenApiGenerator {
    * @param options The options for the OpenAPI plugin
    * @returns An OpenAPI specification
    */
-  public async generate(module: Module, inputSpec: object, options: OpenApiPluginOptions): Promise<OpenAPIV3.Document> {
+  public async generate(module: Module, inputSpec: object): Promise<OpenAPIV3.Document> {
     this.#module = module
     this.#schemasToProcess = []
     this.#processedSchemas = []
-    this.#options = options
     const currentSpec = this.createInitialOpenApiSpec(inputSpec)
     this.replaceRefs(currentSpec)
     let currentSchemaId: string | undefined
     while ((currentSchemaId = this.#schemasToProcess.pop()) !== undefined) {
       const s = getSchema(this.model, currentSchemaId)
-      const schemaCopy = this.cleanSchema(s, options)
+      const schemaCopy = this.cleanSchema(s)
       this.replaceRefs(schemaCopy, s.$id)
       currentSpec.components.schemas[this.getDefinitionName(s)] = schemaCopy
       Object.entries(s.definitions).forEach(([definitionName, originalDefinition]) => {
-        const definitionCopy = this.cleanDefinition(originalDefinition, options)
+        const definitionCopy = this.cleanDefinition(originalDefinition)
         this.replaceRefs(definitionCopy, s.$id)
         currentSpec.components.schemas[this.getDefinitionName(s, definitionName)] = definitionCopy
       })
@@ -118,7 +116,7 @@ export class OpenApiGenerator {
     const schemaName = cleanName(getSchemaName(schemaOrschemaId))
 
     let result = schemaName
-    if (this.#options.prefixDefinitions) {
+    if (this.options.prefixDefinitions) {
       result = moduleId + schemaName
     }
     if (definitionName === undefined) {
@@ -127,9 +125,9 @@ export class OpenApiGenerator {
     return result + cleanName(definitionName)
   }
 
-  private cleanSchema(schema: Schema, options: OpenApiPluginOptions): OpenAPIV3.SchemaObject {
+  private cleanSchema(schema: Schema): OpenAPIV3.SchemaObject {
     const result: OpenAPIV3.SchemaObject = {
-      ...this.cleanDefinition(schema, options),
+      ...this.cleanDefinition(schema),
       title: schema.title,
     }
     if (schema.examples !== undefined && schema.examples.length !== 0) {
@@ -138,7 +136,7 @@ export class OpenApiGenerator {
     return result
   }
 
-  private cleanDefinition(definition: Definition, options: OpenApiPluginOptions): OpenAPIV3.SchemaObject {
+  private cleanDefinition(definition: Definition): OpenAPIV3.SchemaObject {
     const result: OpenAPIV3.SchemaObject = {
       description: definition.description,
       type: definition.type,
@@ -149,7 +147,7 @@ export class OpenApiGenerator {
     if ('properties' in definition) {
       const properites: Record<string, OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject> = {}
       Object.entries(definition.properties)
-        .filter(([name]) => !options.ignoreProperties.includes(name))
+        .filter(([name]) => !this.options.ignoreProperties.includes(name))
         .forEach(([n, v]) => { properites[n] = this.cleanProperty(v) })
       result.properties = properites
 
