@@ -47,8 +47,8 @@ export async function compareOutput(outputFolder: string, expectedFolder?: strin
         console.error('Path %s should be present', path.join(dif.relativePath, dif.name2 ?? ''))
         break
       case 'distinct': {
-        const actualContents = (await fs.readFile(actualFile)).toString()
-        const expectedContents = (await fs.readFile(expectedFile)).toString()
+        const actualContents = (await fs.readFile(actualFile)).toString().replace(/\r?\n/g, '\r\n')
+        const expectedContents = (await fs.readFile(expectedFile)).toString().replace(/\r?\n/g, '\r\n')
         const patch = createTwoFilesPatch(expectedFile, actualFile, expectedContents, actualContents)
         console.error('Path %s is different', path.join(dif.relativePath, dif.name1 ?? ''))
         console.error(patch)

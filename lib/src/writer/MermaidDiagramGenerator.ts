@@ -154,6 +154,8 @@ function toMermaidType(type: DependencyType): string | undefined {
   switch (type) {
     case 'IS_IMPLEMENTED_BY': return '<|--'
     case 'CONTAINS': return 'o--'
+    case 'AGGREGATES': return '*--'
+    case 'ASSOCIATES': return '-->'
     case 'REFERENCES': return '..>'
     case 'ENUM': return '..>'
   }

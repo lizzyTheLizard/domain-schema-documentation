@@ -151,4 +151,17 @@ describe('GetDependencies', () => {
       array: true,
     }])
   })
+
+  test('property ref overwrite', () => {
+    const schema1: Schema = { ...testSchema(), 'x-schema-type': 'Entity' }
+    const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { '$ref': './Schema.yaml', 'x-reference-type': 'AGGREGATES' } } }
+    const model: Model = { ...testModel(), schemas: [schema1, schema2] }
+    expect(getDependencies(model, schema2)).toEqual([{
+      fromSchema: schema2,
+      toSchema: schema1,
+      type: 'AGGREGATES',
+      dependencyName: 'reference',
+      array: false,
+    }])
+  })
 })

@@ -93,6 +93,7 @@ export class InputValidator {
       .addSchema(readYamlFile(path.join(__dirname, './inputDefinition', '_Tag.yaml')))
       .addKeyword('x-schema-type')
       .addKeyword('x-references')
+      .addKeyword('x-reference-type')
       .addKeyword('x-enum-description')
       .addKeyword('x-todos')
       .addKeyword('x-links')

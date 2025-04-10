@@ -75,6 +75,7 @@ By default, the input model is read from the folder `./input`. It consists of th
   * Each Schema must have an `x-schema-type` of  `Aggregate`, `Entity`, `ValueObject`, `ReferenceData`, or `Other`.
   * A Schema can define `x-links`(a list of links to other parts of the documentation) and `x-todos` (a list of todos that are still open in the domain model).
   * An enum schema can define a property `x-enum-description` documenting the enum values
+  * A property referencing another type using `$ref` can define the type of association using `x-reference-type`. Supported are `CONTAINS`, `AGGREGATES`, `REFERENCES`, `ASSOCIATES`. If not defined an heuristic is used to determine the type of association. 
   * Each basic property can define a `x-references` property that contains a list of references to other types in the domain model. This is usefull, if you store an ID of another type in a property and want to describe the referenced type.
   * The following JSON Schema Parts are not supported: `additionalItems`, `maxProperties`, `minProperties`, `patternProperties`, `propertyNames`, `allOf`, and `anyOf`.
   * For `type` and `enum` only string values are supported.

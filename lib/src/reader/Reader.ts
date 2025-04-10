@@ -1,4 +1,5 @@
 import type { NormalizedSchema } from '../schemaNormalizer/NormalizedSchema'
+import { DependencyType } from './GetDependencies'
 
 /**
  * A reader is a function that reads a model from a source.
@@ -49,7 +50,7 @@ export interface Module {
   tags: Tag[]
 }
 
-export interface PropertyExtension { 'x-references'?: string | string[], 'x-enum-descriptions'?: Record<string, string> }
+export interface PropertyExtension { 'x-references'?: string | string[], 'x-enum-description'?: Record<string, string>, 'x-reference-type'?: DependencyType }
 
 export type Schema = NormalizedSchema<unknown, PropertyExtension> & {
   /** The type of the schema, used for documentation */

@@ -16,6 +16,8 @@ public class Object2 {
   private Object2Type type;
   private Object reference1;
   private UUID reference2;
+  private Object reference3;
+  private Object reference4;
   private Map<String, Object2AdditionalProperties> additionalProperties;
 }
 

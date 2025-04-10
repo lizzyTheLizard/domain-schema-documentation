@@ -27,6 +27,14 @@ properties:
     type: string
     format: uuid
     x-references: '../Module/Object.yaml'
+  reference3:
+    type: object
+    $ref: '../Module/Object.yaml'
+    x-reference-type: AGGREGATES
+  reference4:
+    type: object
+    $ref: '../Module/Object.yaml'
+    x-reference-type: ASSOCIATES
 additionalProperties: 
   type: object
   properties:

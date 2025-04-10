@@ -22,7 +22,7 @@ export interface Dependency {
   array: boolean
 }
 
-export type DependencyType = 'IS_IMPLEMENTED_BY' | 'CONTAINS' | 'REFERENCES' | 'ENUM'
+export type DependencyType = 'IS_IMPLEMENTED_BY' | 'CONTAINS' | 'REFERENCES' | 'ENUM' | 'AGGREGATES' | 'ASSOCIATES'
 
 /**
  * Get all dependencies for a schema
@@ -76,7 +76,7 @@ function getDependenciesForProperty(model: Model, fromSchema: Schema, p: Propert
   if ('$ref' in p) {
     const { toSchema, toDefinitionName } = getTo(model, fromSchema, p.$ref)
     const toDefinition: Definition = toDefinitionName !== undefined ? toSchema.definitions[toDefinitionName] : toSchema
-    const type = getDependencyType(fromSchema, toSchema, toDefinition)
+    const type = p['x-reference-type'] ?? getDependencyType(fromSchema, toSchema, toDefinition)
     const dependency: Dependency = { toSchema, fromSchema, type, array: false }
     if (toDefinitionName !== undefined) { dependency.toDefinitionName = toDefinitionName }
     if (fromDefinitionName !== undefined) { dependency.fromDefinitionName = fromDefinitionName }

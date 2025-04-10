@@ -26,6 +26,8 @@ namespace Module 2 {
 }
 _Module2_Object2_yaml o-- _Module_Object_yaml :reference1
 _Module2_Object2_yaml ..> _Module_Object_yaml :reference2
+_Module2_Object2_yaml *-- _Module_Object_yaml :reference3
+_Module2_Object2_yaml --> _Module_Object_yaml :reference4
 _Module_Interface_yml <|-- OneOf1 
 _Module_Interface_yml <|-- OneOf2 
 _Module_Object_yaml o-- SubObject :subObject
