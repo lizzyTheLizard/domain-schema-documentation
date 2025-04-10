@@ -12,7 +12,7 @@ describe('mermaidDiagramGenerator', () => {
     const model: Model = { ...testModel(), modules: [module1, module2], schemas: [schema1, schema2] }
     const result = applicationDiagram(model)
     expect(result).toEqual(
-`classDiagram
+      `classDiagram
 class _Module["Module"]
 class _Module2["Test 2"]
 _Module2 ..> _Module
@@ -24,7 +24,7 @@ click _Module2 href "./Module2/index.html" "Test 2"`)
     const model: Model = { ...testModel(), modules: [module1, module2], schemas: [schema1, schema2] }
     const result = moduleDiagram(model, module1, true)
     expect(result).toEqual(
-        `classDiagram
+      `classDiagram
 namespace Module {
   class _Module_Schema_yaml["Schema"]
 }
@@ -40,7 +40,7 @@ click _Module2_Schema_yaml href "../Module2/Schema.yaml.html" "Test Schema 2"`)
     const model: Model = { ...testModel(), modules: [module1, module2], schemas: [schema1, schema2] }
     const result = schemaDiagramm(model, schema1, true)
     expect(result).toEqual(
-        `classDiagram
+      `classDiagram
 namespace Module {
   class _Module_Schema_yaml["Schema"]
 }
