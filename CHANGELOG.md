@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added x-reference-type property to deine the type of the reference
+- Added x-reference-type property to define the type of the reference
+- Static properties are ignored in java validation
 
 ### Changed
 

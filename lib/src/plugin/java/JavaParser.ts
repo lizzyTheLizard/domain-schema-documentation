@@ -86,6 +86,10 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   }
 
   public override fieldDeclaration(ctx: FieldDeclarationCtx): void {
+    if (this.isStatic(ctx)) {
+      // Ignore static fields
+      return
+    }
     const names = this.getFieldNames(ctx)
     const type = this.getType(ctx)
     names.forEach((name) => { this.properties[name] = type })
@@ -156,6 +160,21 @@ class JavaParser extends BaseJavaCstVisitorWithDefaults {
   // Getting the name of the component is staighforward, we just take the identifier
   private getComponentName(ctx: RecordComponentCtx): string {
     return getSub(ctx, 'Identifier').image
+  }
+
+  private isStatic(ctx: FieldDeclarationCtx): boolean {
+    if (!ctx.fieldModifier) {
+      // No modifiers, so it is not static
+      return false
+    }
+    // Check if any of the modifiers is static
+    const modifiers = ctx.fieldModifier
+    for (const modifier of modifiers) {
+      if (modifier.children.Static !== undefined) {
+        return true
+      }
+    }
+    return false
   }
 
   private getFieldNames(ctx: FieldDeclarationCtx): string[] {
