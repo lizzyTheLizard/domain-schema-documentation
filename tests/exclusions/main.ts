@@ -3,11 +3,10 @@ import { compareOutput, handleError } from 'test-shared'
 import { promises as fs } from 'fs'
 import * as path from 'path'
 
-
 const input: string = path.join(__dirname, 'input')
 const output: string = path.join(__dirname, 'out')
 const expected: string = path.join(__dirname, 'expected')
-const src: string = path.join(__dirname, '..','java','src')
+const src: string = path.join(__dirname, '..', 'java', 'src')
 
 fs.rm(output, { recursive: true, force: true })
   .then(async () => {

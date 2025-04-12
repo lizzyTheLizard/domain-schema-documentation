@@ -1,7 +1,7 @@
 # Module
 ![Static Badge](https://img.shields.io/badge/Color--Tag-Blue-blue)
 ![Static Badge](https://img.shields.io/badge/Without%20Value-green)
-![Static Badge](https://img.shields.io/badge/Validator%20Errors-3-red)
+![Static Badge](https://img.shields.io/badge/Validator%20Errors-2-red)
 
 > - A Todo
 
@@ -58,8 +58,7 @@ click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
 | Type | Description |
 |------|-------------|
 | WRONG | An error |
-| WRONG | Schema &#x27;Interface&#x27; has 1 validation error |
-| WRONG | Schema &#x27;Tags&#x27; has 2 validation errors |
+| WRONG | Schema &#x27;Tags&#x27; has 1 validation error |
 
 ## Links
 1. [Link](http://www.google.com)

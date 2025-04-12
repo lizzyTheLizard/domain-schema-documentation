@@ -1,7 +1,7 @@
 # Tags
 ![Static Badge](https://img.shields.io/badge/Color--Tag-Blue-blue)
 ![Static Badge](https://img.shields.io/badge/Without%20Value-green)
-![Static Badge](https://img.shields.io/badge/Validator%20Errors-2-red)
+![Static Badge](https://img.shields.io/badge/Validator%20Errors-1-red)
 
 > - A Todo
 
@@ -28,7 +28,6 @@ click _Module_Tags_yaml href "./Tags.yaml.html" "Tags"
 | Type | Description |
 |------|-------------|
 | WRONG | An error |
-| MISSING_IN_IMPLEMENTATION | &#x27;com.example.module.model.Tags&#x27; should exist but is missing in the implementation |
 
 ## Links
 1. [Link](http://www.google.com)

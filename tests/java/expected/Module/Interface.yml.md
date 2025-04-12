@@ -55,7 +55,7 @@ click SubInterfaceOneOf3 href "./Object.yaml.html" "Object"
 ## Verification Errors
 | Type | Description |
 |------|-------------|
-| WRONG | Interface &#x27;com.example.module.model.Interface&#x27; is invalid: This is suppose to be an interface but is a &#x27;class&#x27;&#x27; |
+| WRONG | Interface &#x27;com.example.module.model.Interface&#x27; is invalid: This is suppose to be an interface but is a &#x27;class&#x27; |
 
 ## Links
 1. [Java-File](./java/Interface.java)

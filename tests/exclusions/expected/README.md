@@ -25,7 +25,7 @@ click _Module2 href "./Module2/index.html" "Module 2"
 | Type | Description |
 |------|-------------|
 | WRONG | An error |
-| WRONG | Module &#x27;Module&#x27; has 3 validation errors |
+| WRONG | Module &#x27;Module&#x27; has 2 validation errors |
 
 ## Links
 1. [Link](http://www.google.com)

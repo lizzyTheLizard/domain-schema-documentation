@@ -59,16 +59,16 @@ function applyDefaults(options?: Partial<RunOptions>): RunOptions {
 
 function finalize(model: Model): void {
   // Schema errors
-  // model.schemas.forEach(s => s['x-errors'] = s['x-errors'].filter(e => !isExcluded(s.$id, e, model.application.exclusions)))
+  model.schemas.forEach(s => s['x-errors'] = s['x-errors'].filter(e => !isExcluded(s.$id, e, model.application.exclusions)))
   model.schemas.forEach(s => s['x-tags'].push(...getErrorTags(s['x-errors'])))
 
   // Module errors
   model.modules.forEach(m => m.errors.push(...getSchemaErrors(model, m)))
-  // model.modules.forEach(m => m.errors = m.errors.filter(e => !isExcluded(m.$id, e, model.application.exclusions)))
+  model.modules.forEach(m => m.errors = m.errors.filter(e => !isExcluded(m.$id, e, model.application.exclusions)))
   model.modules.forEach(m => m.tags.push(...getErrorTags(m.errors)))
 
   // Application errors
-  // model.application.errors = model.application.errors.filter(e => !isExcluded('', e, model.application.exclusions))
+  model.application.errors = model.application.errors.filter(e => !isExcluded('', e, model.application.exclusions))
   model.application.errors.push(...getModuleErrors(model))
   model.application.tags.push(...getErrorTags(model.application.errors))
 }
@@ -80,7 +80,6 @@ function isExcluded(id: string, error: ImplementationError, exclusions: Exclusio
     if (!idPatter.test(id)) continue
     const textPattern = new RegExp(e.textPattern)
     if (!textPattern.test(error.text)) continue
-    console.log(JSON.stringify(error) + ' is excluded due to ' + JSON.stringify(e))
     return true
   }
   return false

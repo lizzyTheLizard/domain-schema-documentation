@@ -16,3 +16,10 @@ links:
 errors:
   - text: "An error"
     type: "WRONG"
+exclusions:
+  - type: "MISSING_IN_IMPLEMENTATION"
+    textPattern: ".*"
+    idPattern: "/Module/Tags.yaml"
+  - type: "WRONG"
+    textPattern: "Interface 'com.example.module.model.Interface' is invalid: This is suppose to be an interface but is a 'class'"
+    idPattern: ".*"
