@@ -1,5 +1,4 @@
 import { type Schema, type Model, type Link } from '../../reader/Reader'
-import path from 'path'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { getSimpleJavaClassName, getModuleDir, findSchemaFileInDir } from './JavaHelper'
 import { getSchemasForModule } from '../../reader/InputHelper'
