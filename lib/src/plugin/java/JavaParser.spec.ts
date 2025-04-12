@@ -13,7 +13,7 @@ describe('JavaParser', () => {
 
   test('Static Property', () => {
     const result = parseClass('public class ExampleClass {private static String name = "test";}')
-    expect(result).toEqual({})
+    expect(result).toEqual({ name: { type: 'CLASS', fullName: 'String' } })
   })
 
   test('Array Property', () => {
