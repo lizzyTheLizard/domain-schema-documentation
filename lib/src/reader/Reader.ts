@@ -30,6 +30,8 @@ export interface Application {
   errors: ImplementationError[]
   /** Tags for this application */
   tags: Tag[]
+  /** Exclusions for errors in the application */
+  exclusions: Exclusion[]
 }
 
 /** A module in the application */
@@ -84,6 +86,15 @@ export interface Tag {
   value?: string
   /** The color of the tag */
   color: string
+}
+
+export interface Exclusion {
+  /** The type of error to be excluded */
+  type: ImplementationErrorType
+  /** A pattern of error text to be excluded */
+  textPattern: string
+  /** A pattern of ids for which those are excluded */
+  idPattern: string
 }
 
 /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */

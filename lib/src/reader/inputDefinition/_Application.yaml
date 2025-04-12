@@ -23,6 +23,10 @@ properties:
     type: array
     items:    
       $ref: './_Error.yaml'
+  exclusions:
+    type: array
+    items:
+      $ref: './_Exclusion.yaml'
 required:
 - title
 - description

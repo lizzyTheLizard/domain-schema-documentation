@@ -34,6 +34,7 @@ export class InputNormalizer {
       todos: nonNormalizedApplication.todos ?? [],
       links: nonNormalizedApplication.links ?? [],
       tags: nonNormalizedApplication.tags ?? [],
+      exclusions: nonNormalizedApplication.exclusions ?? [],
     }
     this.#applications.push(application)
   }

@@ -1,0 +1,14 @@
+{
+  "name": "test-exclusions",
+  "scripts": {
+    "integration-tests": "tsx main.ts"
+  },
+  "dependencies": {
+    "domain-schema-documentation": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "test-shared": "workspace:*",
+    "tsx": "^4.19.3"
+  }
+}

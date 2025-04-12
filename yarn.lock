@@ -5489,6 +5489,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"test-exclusions@workspace:tests/exclusions":
+  version: 0.0.0-use.local
+  resolution: "test-exclusions@workspace:tests/exclusions"
+  dependencies:
+    "@types/node": "npm:^22.14.0"
+    domain-schema-documentation: "workspace:*"
+    test-shared: "workspace:*"
+    tsx: "npm:^4.19.3"
+  languageName: unknown
+  linkType: soft
+
 "test-java@workspace:tests/java":
   version: 0.0.0-use.local
   resolution: "test-java@workspace:tests/java"

@@ -10,6 +10,7 @@ export function testApplication(): Application {
     todos: [],
     errors: [],
     tags: [],
+    exclusions: [],
   }
 }
 

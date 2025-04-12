@@ -27,6 +27,10 @@ const RAW_RUNTIME_STATE =
       "reference": "workspace:tests/bin"\
     },\
     {\
+      "name": "test-exclusions",\
+      "reference": "workspace:tests/exclusions"\
+    },\
+    {\
       "name": "test-java",\
       "reference": "workspace:tests/java"\
     },\
@@ -66,6 +70,7 @@ const RAW_RUNTIME_STATE =
     ["example", ["workspace:example"]],\
     ["lib", ["workspace:lib"]],\
     ["test-bin", ["workspace:tests/bin"]],\
+    ["test-exclusions", ["workspace:tests/exclusions"]],\
     ["test-java", ["workspace:tests/java"]],\
     ["test-js-commonjs", ["workspace:tests/js-commonjs"]],\
     ["test-js-module", ["workspace:tests/js-module"]],\
@@ -6868,6 +6873,19 @@ const RAW_RUNTIME_STATE =
           ["minimatch", "npm:3.1.2"]\
         ],\
         "linkType": "HARD"\
+      }]\
+    ]],\
+    ["test-exclusions", [\
+      ["workspace:tests/exclusions", {\
+        "packageLocation": "./tests/exclusions/",\
+        "packageDependencies": [\
+          ["test-exclusions", "workspace:tests/exclusions"],\
+          ["@types/node", "npm:22.14.0"],\
+          ["domain-schema-documentation", "workspace:."],\
+          ["test-shared", "workspace:tests/shared"],\
+          ["tsx", "npm:4.19.3"]\
+        ],\
+        "linkType": "SOFT"\
       }]\
     ]],\
     ["test-java", [\

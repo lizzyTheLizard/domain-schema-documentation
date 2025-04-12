@@ -1,5 +1,5 @@
 import Ajv, { type Format, type AnySchema, type Options, type Schema as AjvSchema } from 'ajv'
-import type { Schema, SchemaType, ImplementationError, Link, Tag, PropertyExtension } from './Reader'
+import type { Schema, SchemaType, ImplementationError, Link, Tag, PropertyExtension, Exclusion } from './Reader'
 import { resolveRelativeId } from './InputHelper'
 import betterAjvErrors from 'better-ajv-errors'
 import * as fs from 'fs'
@@ -87,6 +87,7 @@ export class InputValidator {
       .addSchema(readYamlFile(path.join(__dirname, './inputDefinition', '_Application.yaml')))
       .addSchema(readYamlFile(path.join(__dirname, './inputDefinition', '_Definition.yaml')))
       .addSchema(readYamlFile(path.join(__dirname, './inputDefinition', '_Error.yaml')))
+      .addSchema(readYamlFile(path.join(__dirname, './inputDefinition', '_Exclusion.yaml')))
       .addSchema(readYamlFile(path.join(__dirname, './inputDefinition', '_Link.yaml')))
       .addSchema(readYamlFile(path.join(__dirname, './inputDefinition', '_Module.yaml')))
       .addSchema(readYamlFile(path.join(__dirname, './inputDefinition', '_Schema.yaml')))
@@ -254,6 +255,7 @@ export interface NonNormalizedApplication {
   links?: Link[]
   errors?: ImplementationError[]
   tags?: Tag[]
+  exclusions?: Exclusion[]
 }
 
 export interface NonNormalizedModule {

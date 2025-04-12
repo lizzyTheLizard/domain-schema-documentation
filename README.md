@@ -87,6 +87,16 @@ run({ reader: yourreader}).catch(console.error)
 
 By default, the [DefaultReader](./lib/src/reader/DefaultReader.ts) is used.
 
+## Exclusions
+Sometimes, validation errors are not relevant. In such cases you can exclude them fro the documentation. Therefore you have to add a `exclusions` list to you application properties, e.g. like the following:
+```yaml
+exclusions:
+  - type: "WRONG"
+    textPattern: "Wrong type for property A*"
+    idPattern: "/Module/Schema1.yaml*"
+```
+The `type` must be the type of the error you want to exclude. The `textPattern` is a regex that is used to match the error message. The `idPattern` is a regex that is used to match the schema id. If the error matches all three patterns, it will be excluded from the documentation.
+
 ## Writers
 Writers are used to generate the documentation. An HTML and a Markdown writer is already included, but you can also define your own writers.
 You can use multiple writers at the same time.
