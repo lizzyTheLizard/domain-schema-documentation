@@ -28,4 +28,4 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 
 
 ## Links
-1. [Java-Files](./java)
+1. [Generated Java-Files](./java)

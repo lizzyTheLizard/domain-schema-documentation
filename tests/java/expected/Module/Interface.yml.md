@@ -58,6 +58,9 @@ click SubInterfaceOneOf3 href "./Object.yaml.html" "Object"
 | WRONG | Interface &#x27;com.example.module.model.Interface&#x27; is invalid: This is suppose to be an interface but is a &#x27;class&#x27; |
 
 ## Links
-1. [Java-File](./java/Interface.java)
-1. [Java-File (OneOf2)](./java/InterfaceOneOf2.java)
-1. [Java-File (OneOf1)](./java/InterfaceOneOf1.java)
+1. [Generated Java-File](./java/Interface.java)
+1. [Generated Java-File (OneOf2)](./java/InterfaceOneOf2.java)
+1. [Generated Java-File (OneOf1)](./java/InterfaceOneOf1.java)
+1. [Actual Java Implementation](../../src/com/example/module/model/Interface.java)
+1. [Actual Java Implementation(OneOf2)](../../src/com/example/module/model/InterfaceOneOf2.java)
+1. [Actual Java Implementation(OneOf1)](../../src/com/example/module/model/InterfaceOneOf1.java)

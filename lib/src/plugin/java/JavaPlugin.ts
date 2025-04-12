@@ -5,6 +5,7 @@ import path from 'path'
 import { type FormatName } from 'ajv-formats'
 import { type Module } from '../../reader/Reader'
 import { javaGenerator } from './JavaGenerator'
+import { javaImplementationLinks } from './JavaImplementationLinks'
 
 /**
  * Options for the Java plugin.
@@ -47,13 +48,21 @@ export interface JavaPluginOptions {
    * You can also provide a function that takes a module and returns the source directory if the source directory is different for each module.
    * Default is undefined.
    */
-  srcDir: string | ((module: Module) => string) | undefined
+  srcDir: SrcDirDefinition | undefined
   /**
    * If true, files in the source directory that do not match a domain model schema will be ignored. If false they will be considered as errors
    * Default is true.
    */
   ignoreAdditionalFiles: boolean
+  /**
+   * Link to the implemenation file used for documentation. Default is undefined, then only the generated file is linked.
+   * If this is set, the link to the generated file is replaced with a link to the implementation file.
+   * Similar to {@link JavaPluginOptions.srcDir} but not used to read the file, but to generate a link
+   */
+  linkSrcDir: SrcDirDefinition | undefined
 }
+
+export type SrcDirDefinition = string | ((module: Module) => string)
 
 /**
  * A plugin that generates Java classes and validate existing Java classes.
@@ -66,6 +75,7 @@ export function javaPlugin(outputFolder: string, optionsOrUndefined?: Partial<Ja
   return async (model) => {
     await javaValidator(model, options)
     await javaGenerator(model, outputFolder, options)
+    await javaImplementationLinks(model, options)
   }
 }
 
@@ -80,6 +90,7 @@ function applyDefaults(optionsOrUndefined?: Partial<JavaPluginOptions>): JavaPlu
     interfaceTemplate: optionsOrUndefined?.interfaceTemplate ?? loadTemplate(path.join(__dirname, 'interface.hbs')),
     srcDir: optionsOrUndefined?.srcDir,
     ignoreAdditionalFiles: optionsOrUndefined?.ignoreAdditionalFiles ?? true,
+    linkSrcDir: optionsOrUndefined?.linkSrcDir,
   }
 }
 

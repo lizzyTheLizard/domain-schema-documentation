@@ -33,4 +33,4 @@ click _Module_Tags_yaml href "./Tags.yaml.html" "Tags"
 ## Links
 1. [Link](http://www.google.com)
 1. [Local-Link](./Module/index.yaml)
-1. [Java-File](./java/Tags.java)
+1. [Generated Java-File](./java/Tags.java)

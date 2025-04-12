@@ -70,6 +70,9 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 
 
 ## Links
-1. [Java-File](./java/Object2.java)
-1. [Java-File (AdditionalProperties)](./java/Object2AdditionalProperties.java)
-1. [Java-File (Type)](./java/Object2Type.java)
+1. [Generated Java-File](./java/Object2.java)
+1. [Generated Java-File (AdditionalProperties)](./java/Object2AdditionalProperties.java)
+1. [Generated Java-File (Type)](./java/Object2Type.java)
+1. [Actual Java Implementation](../../src/com/example/module2/model/Object2.java)
+1. [Actual Java Implementation(AdditionalProperties)](../../src/com/example/module2/model/Object2AdditionalProperties.java)
+1. [Actual Java Implementation(Type)](../../src/com/example/module2/model/Object2Type.java)

@@ -106,9 +106,15 @@ Implemented by
 
 
 ## Links
-1. [Java-File](./java/Object.java)
-1. [Java-File (SubInterface)](./java/ObjectSubInterface.java)
-1. [Java-File (SubInterfaceOneOf3)](./java/ObjectSubInterfaceOneOf3.java)
-1. [Java-File (SubInterfaceOneOf2)](./java/ObjectSubInterfaceOneOf2.java)
-1. [Java-File (SubEnum)](./java/ObjectSubEnum.java)
-1. [Java-File (SubObject)](./java/ObjectSubObject.java)
+1. [Generated Java-File](./java/Object.java)
+1. [Generated Java-File (SubInterface)](./java/ObjectSubInterface.java)
+1. [Generated Java-File (SubInterfaceOneOf3)](./java/ObjectSubInterfaceOneOf3.java)
+1. [Generated Java-File (SubInterfaceOneOf2)](./java/ObjectSubInterfaceOneOf2.java)
+1. [Generated Java-File (SubEnum)](./java/ObjectSubEnum.java)
+1. [Generated Java-File (SubObject)](./java/ObjectSubObject.java)
+1. [Actual Java Implementation](../../src/com/example/module/model/Object.java)
+1. [Actual Java Implementation(SubInterface)](../../src/com/example/module/model/ObjectSubInterface.java)
+1. [Actual Java Implementation(SubInterfaceOneOf3)](../../src/com/example/module/model/ObjectSubInterfaceOneOf3.java)
+1. [Actual Java Implementation(SubInterfaceOneOf2)](../../src/com/example/module/model/ObjectSubInterfaceOneOf2.java)
+1. [Actual Java Implementation(SubEnum)](../../src/com/example/module/model/ObjectSubEnum.java)
+1. [Actual Java Implementation(SubObject)](../../src/com/example/module/model/ObjectSubObject.java)

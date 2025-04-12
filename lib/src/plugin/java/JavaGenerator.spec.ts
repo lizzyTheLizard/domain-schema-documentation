@@ -18,6 +18,7 @@ describe('JavaGenerator', () => {
     enumTemplate: loadTemplate(path.join(__dirname, 'enum.hbs')),
     interfaceTemplate: loadTemplate(path.join(__dirname, 'interface.hbs')),
     ignoreAdditionalFiles: false,
+    linkSrcDir: undefined,
   }
 
   test('empty model', async () => {

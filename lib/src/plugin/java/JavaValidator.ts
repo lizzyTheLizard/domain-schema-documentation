@@ -2,7 +2,7 @@ import { type Module, type Schema, type Model } from '../../reader/Reader'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { type JavaPluginOptions } from './JavaPlugin'
-import { type JavaType, getJavaPropertyType, getSimpleJavaClassName, getJavaPackageNameForModule, getFullJavaClassName, getJavaAdditionalPropertyType } from './JavaHelper'
+import { type JavaType, getJavaPropertyType, getSimpleJavaClassName, getFullJavaClassName, getJavaAdditionalPropertyType, getModuleDir, findSchemaFileInDir } from './JavaHelper'
 import { getSchemaName, getSchemasForModule } from '../../reader/InputHelper'
 import { parseClass, parseEnum, parseInterface } from './JavaParser'
 import { type Definition, type ObjectDefinition, type EnumDefinition } from '../../schemaNormalizer/NormalizedSchema'
@@ -38,7 +38,8 @@ class JavaValidator {
   private async checkForAdditionalFiles(): Promise<void> {
     // Check if the module directory exists and should be checked. Otherwise there is no error...
     if (this.options.ignoreAdditionalFiles) return
-    const dir = this.getModuleDir()
+    if (this.options.srcDir === undefined) return
+    const dir = getModuleDir(this.currentModule, this.options.srcDir, this.options)
     if (!await existAndAccessible(dir)) return
 
     // Get the list of expected files. One for each definition including the schema itself
@@ -62,13 +63,6 @@ class JavaValidator {
     }
   }
 
-  private getModuleDir(): string {
-    const packageName = getJavaPackageNameForModule(this.currentModule, this.options)
-    if (this.options.srcDir === undefined) throw new Error('This is not allowed here, scrDir must be set!')
-    const baseDir = typeof this.options.srcDir === 'string' ? this.options.srcDir : this.options.srcDir(this.currentModule)
-    return baseDir + (baseDir.endsWith('/') ? '' : '/') + packageName.replaceAll('.', '/')
-  }
-
   private async checkSchema(schema: Schema): Promise<void> {
     this.currentSchema = schema
     await this.checkDefinition(schema, undefined)
@@ -79,8 +73,9 @@ class JavaValidator {
   }
 
   private async checkDefinition(definition: Definition, definitionName: string | undefined): Promise<void> {
-    // Search for the file in the module directory and its subdirectories
-    const filename = await this.findFileInSubfolders(this.getModuleDir(), getSimpleJavaClassName(this.currentSchema, definitionName) + '.java')
+    if (this.options.srcDir === undefined) throw new Error('This is not allowed here, scrDir must be set!')
+    const moduleDir = getModuleDir(this.currentModule, this.options.srcDir, this.options)
+    const filename = await findSchemaFileInDir(moduleDir, this.currentSchema, definitionName)
     if (!filename) {
       this.currentSchema['x-errors'].push({
         text: `'${getFullJavaClassName(this.currentSchema, this.options, definitionName)}' should exist but is missing in the implementation`,
@@ -96,30 +91,6 @@ class JavaValidator {
     } else {
       this.checkObjectDefinition(fileContent, definition, definitionName)
     }
-  }
-
-  private async findFileInSubfolders(dir: string, targetFile: string): Promise<string | undefined> {
-    try {
-      const dirStat = await fs.stat(dir)
-      if (!dirStat.isDirectory()) {
-        return undefined
-      }
-    } catch {
-      // If the directory doesn't exist or there is an error, return undefined
-      return undefined
-    }
-
-    const dirents = await fs.readdir(dir, { withFileTypes: true })
-    for (const dirent of dirents) {
-      const res = path.resolve(dir, dirent.name)
-      if (dirent.isDirectory()) {
-        const found = await this.findFileInSubfolders(res, targetFile)
-        if (found) return found
-      } else if (dirent.isFile() && path.basename(res) === targetFile) {
-        return res
-      }
-    }
-    return undefined
   }
 
   private checkObjectDefinition(fileContent: string, definition: ObjectDefinition, definitionName: string | undefined): void {

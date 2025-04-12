@@ -64,4 +64,4 @@ click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
 ## Links
 1. [Link](http://www.google.com)
 1. [Local-Link](./Module/index.yaml)
-1. [Java-Files](./java)
+1. [Generated Java-Files](./java)

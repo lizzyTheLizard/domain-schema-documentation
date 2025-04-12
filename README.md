@@ -144,7 +144,7 @@ It will then do two things:
 
 You can configure the Java Plugin by passing an [JavaPluginOptions](./lib/src/plugin/java/JavaPlugin.ts) object to the plugin. 
 ### OpenAPI Plugin
-[comment]: # (TODO: Document Java Plugin when finished)
+[comment]: # (TODO: Document OpenAPI Plugin when finished)
 TBD
 ### Custom Plugins
 You can define your own plugin by implementing the [Plugin](./lib/src/plugin/Plugin.ts) interface. You can then use this writer as following
