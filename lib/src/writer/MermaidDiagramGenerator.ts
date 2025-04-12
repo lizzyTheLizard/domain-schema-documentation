@@ -158,8 +158,14 @@ function toMermaidType(type: DependencyType): string | undefined {
     case 'ASSOCIATES': return '-->'
     case 'REFERENCES': return '..>'
     case 'ENUM': return '..>'
+    case 'IS-CONTAINED-BY': return '--o'
+    case 'IS-AGGREGATED-BY': return '--*'
+    case 'IS-REFERENCED-BY': return '<..'
+    case 'IS-ASSOCIATED-BY': return '-->'
+    case 'BIDIRECTIONAL-ASSOCIATION': return '-->'
   }
 }
+
 function unique<T>(arr: T[]): T[] {
   return Array.from(new Set(arr))
 }

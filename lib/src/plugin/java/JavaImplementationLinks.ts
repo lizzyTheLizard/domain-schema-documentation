@@ -33,7 +33,7 @@ function renameExistingLinks(l: Link): Link {
 async function addImplementationLink(moduleDir: string, moduleLinkDir: string, schema: Schema, definitionName: string | undefined): Promise<void> {
   const filename = await findSchemaFileInDir(moduleDir, schema, definitionName)
   if (!filename) return
-  const implementationLink = path.join(moduleLinkDir, getSimpleJavaClassName(schema, definitionName) + '.java').replaceAll('\\', '/')
+  const implementationLink = moduleLinkDir + '/' + getSimpleJavaClassName(schema, definitionName) + '.java'
   if (definitionName === undefined) {
     schema['x-links'].push({ text: 'Actual Java Implementation', link: implementationLink })
   } else {

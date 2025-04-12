@@ -22,7 +22,7 @@ export interface Dependency {
   array: boolean
 }
 
-export type DependencyType = 'IS_IMPLEMENTED_BY' | 'CONTAINS' | 'REFERENCES' | 'ENUM' | 'AGGREGATES' | 'ASSOCIATES'
+export type DependencyType = 'IS_IMPLEMENTED_BY' | 'CONTAINS' | 'REFERENCES' | 'ENUM' | 'AGGREGATES' | 'ASSOCIATES' | 'IS-CONTAINED-BY' | 'IS-AGGREGATED-BY' | 'IS-REFERENCED-BY' | 'IS-ASSOCIATED-BY' | 'BIDIRECTIONAL-ASSOCIATION'
 
 /**
  * Get all dependencies for a schema
