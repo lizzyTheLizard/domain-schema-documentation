@@ -1,0 +1,35 @@
+$id: /Module/Interface.yml
+title: Interface
+description: An interface
+type: object
+x-schema-type: Other
+discriminator:
+  propertyName: kind
+properties:
+  kind:
+    type: string
+required:
+  - kind
+oneOf:
+  - type: object
+    properties:
+      kind:
+        type: string
+        const: 'INSIDE1'
+      name:
+        type: string
+    required:
+      - kind
+  - type: object
+    properties:
+      kind:
+        type: string
+        const: 'INSIDE2'
+      key:
+        type: string
+      value:
+        type: string
+    required:
+      - kind
+    additionalProperties:
+      type: integer

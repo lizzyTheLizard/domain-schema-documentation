@@ -1,6 +1,6 @@
 import { type Plugin } from './plugin/Plugin'
 import { type Writer } from './writer/Writer'
-import { type Model, type ImplementationError, type Reader, type Module, type Tag } from './reader/Reader'
+import { type Model, type ImplementationError, type Reader, type Module, type Tag, Exclusion } from './reader/Reader'
 import { defaultReader } from './reader/DefaultReader'
 import { htmlWriter } from './writer/html/HtmlWriter'
 import { getSchemasForModule } from './reader/InputHelper'
@@ -58,11 +58,31 @@ function applyDefaults(options?: Partial<RunOptions>): RunOptions {
 }
 
 function finalize(model: Model): void {
+  // Schema errors
+  model.schemas.forEach(s => s['x-errors'] = s['x-errors'].filter(e => !isExcluded(s.$id, e, model.application.exclusions)))
   model.schemas.forEach(s => s['x-tags'].push(...getErrorTags(s['x-errors'])))
+
+  // Module errors
   model.modules.forEach(m => m.errors.push(...getSchemaErrors(model, m)))
+  model.modules.forEach(m => m.errors = m.errors.filter(e => !isExcluded(m.$id, e, model.application.exclusions)))
   model.modules.forEach(m => m.tags.push(...getErrorTags(m.errors)))
+
+  // Application errors
+  model.application.errors = model.application.errors.filter(e => !isExcluded('', e, model.application.exclusions))
   model.application.errors.push(...getModuleErrors(model))
   model.application.tags.push(...getErrorTags(model.application.errors))
+}
+
+function isExcluded(id: string, error: ImplementationError, exclusions: Exclusion[]): boolean {
+  for (const e of exclusions) {
+    if (e.type !== error.type) continue
+    const idPatter = new RegExp(e.idPattern)
+    if (!idPatter.test(id)) continue
+    const textPattern = new RegExp(e.textPattern)
+    if (!textPattern.test(error.text)) continue
+    return true
+  }
+  return false
 }
 
 function getModuleErrors(model: Model): ImplementationError[] {

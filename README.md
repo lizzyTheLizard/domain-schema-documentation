@@ -75,6 +75,7 @@ By default, the input model is read from the folder `./input`. It consists of th
   * Each Schema must have an `x-schema-type` of  `Aggregate`, `Entity`, `ValueObject`, `ReferenceData`, or `Other`.
   * A Schema can define `x-links`(a list of links to other parts of the documentation) and `x-todos` (a list of todos that are still open in the domain model).
   * An enum schema can define a property `x-enum-description` documenting the enum values
+  * A property referencing another type using `$ref` can define the type of association using `x-reference-type`. Supported are `CONTAINS`, `AGGREGATES`, `REFERENCES`, `ASSOCIATES`, `IS-CONTAINED-BY`, `IS-AGGREGATED-BY`, `IS-REFERENCED-BY`, `IS-ASSOCIATED-BY`, and `BIDIRECTIONAL-ASSOCIATION` . If not defined an heuristic is used to determine the type of association. 
   * Each basic property can define a `x-references` property that contains a list of references to other types in the domain model. This is usefull, if you store an ID of another type in a property and want to describe the referenced type.
   * The following JSON Schema Parts are not supported: `additionalItems`, `maxProperties`, `minProperties`, `patternProperties`, `propertyNames`, `allOf`, and `anyOf`.
   * For `type` and `enum` only string values are supported.
@@ -85,6 +86,16 @@ run({ reader: yourreader}).catch(console.error)
 ```
 
 By default, the [DefaultReader](./lib/src/reader/DefaultReader.ts) is used.
+
+## Exclusions
+Sometimes, validation errors are not relevant. In such cases you can exclude them fro the documentation. Therefore you have to add a `exclusions` list to you application properties, e.g. like the following:
+```yaml
+exclusions:
+  - type: "WRONG"
+    textPattern: "Wrong type for property A*"
+    idPattern: "/Module/Schema1.yaml*"
+```
+The `type` must be the type of the error you want to exclude. The `textPattern` is a regex that is used to match the error message. The `idPattern` is a regex that is used to match the schema id. If the error matches all three patterns, it will be excluded from the documentation.
 
 ## Writers
 Writers are used to generate the documentation. An HTML and a Markdown writer is already included, but you can also define your own writers.
@@ -133,7 +144,7 @@ It will then do two things:
 
 You can configure the Java Plugin by passing an [JavaPluginOptions](./lib/src/plugin/java/JavaPlugin.ts) object to the plugin. 
 ### OpenAPI Plugin
-[comment]: # (TODO: Document Java Plugin when finished)
+[comment]: # (TODO: Document OpenAPI Plugin when finished)
 TBD
 ### Custom Plugins
 You can define your own plugin by implementing the [Plugin](./lib/src/plugin/Plugin.ts) interface. You can then use this writer as following

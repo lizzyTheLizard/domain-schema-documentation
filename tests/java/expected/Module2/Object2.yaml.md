@@ -15,6 +15,8 @@ namespace Module {
 _Module2_Object2_yaml ..> Type :type
 _Module2_Object2_yaml o-- _Module_Object_yaml :reference1
 _Module2_Object2_yaml ..> _Module_Object_yaml :reference2
+_Module2_Object2_yaml *-- _Module_Object_yaml :reference3
+_Module2_Object2_yaml --> _Module_Object_yaml :reference4
 _Module2_Object2_yaml o--" N" AdditionalProperties 
 click _Module2_Object2_yaml href "./Object2.yaml.html" "Object 2"
 click AdditionalProperties href "./Object2.yaml.html" "Object 2"
@@ -31,6 +33,8 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 | type | [Type](#Type) |  |
 | reference1 | [Object](../Module/Object.yaml.md) |  |
 | reference2 | References [Object](../Module/Object.yaml.md) |  |
+| reference3 | [Object](../Module/Object.yaml.md) |  |
+| reference4 | [Object](../Module/Object.yaml.md) |  |
 | (other) | [AdditionalProperties](#AdditionalProperties) | Additional Properties |
 
 ## Examples
@@ -66,6 +70,9 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 
 
 ## Links
-1. [Java-File](./java/Object2.java)
-1. [Java-File (AdditionalProperties)](./java/Object2AdditionalProperties.java)
-1. [Java-File (Type)](./java/Object2Type.java)
+1. [Generated Java-File](./java/Object2.java)
+1. [Generated Java-File (AdditionalProperties)](./java/Object2AdditionalProperties.java)
+1. [Generated Java-File (Type)](./java/Object2Type.java)
+1. [Actual Java Implementation](../../src/com/example/module2/model/Object2.java)
+1. [Actual Java Implementation(AdditionalProperties)](../../src/com/example/module2/model/Object2AdditionalProperties.java)
+1. [Actual Java Implementation(Type)](../../src/com/example/module2/model/Object2Type.java)

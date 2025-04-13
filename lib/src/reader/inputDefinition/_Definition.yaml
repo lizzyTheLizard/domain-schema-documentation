@@ -11,6 +11,18 @@ allOf:
   - properties:
       $ref:
         type: 'string'
+      x-reference-type:
+        type: 'string'
+        enum:
+        - 'CONTAINS'
+        - 'IS-CONTAINED-BY'
+        - 'AGGREGATES'
+        - 'IS-AGGREGATED-BY'
+        - 'REFERENCES'
+        - 'IS-REFERENCED-BY'
+        - 'ASSOCIATES'
+        - 'IS-ASSOCIATED-BY'
+        - 'BIDIRECTIONAL-ASSOCIATION'
       type:
         const: 'object'
     required:

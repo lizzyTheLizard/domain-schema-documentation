@@ -15,6 +15,8 @@ namespace Module {
 }
 _Module2_Object2_yaml o-- _Module_Object_yaml :reference1
 _Module2_Object2_yaml ..> _Module_Object_yaml :reference2
+_Module2_Object2_yaml *-- _Module_Object_yaml :reference3
+_Module2_Object2_yaml --> _Module_Object_yaml :reference4
 _Module2_Object2_yaml o--" N" AdditionalProperties 
 click _Module2_Object2_yaml href "./Object2.yaml.html" "Object 2"
 click AdditionalProperties href "./Object2.yaml.html" "Object 2"
@@ -26,4 +28,4 @@ click _Module_Object_yaml href "../Module/Object.yaml.html" "Object"
 
 
 ## Links
-1. [Java-Files](./java)
+1. [Generated Java-Files](./java)

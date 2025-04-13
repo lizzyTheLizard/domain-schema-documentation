@@ -47,7 +47,7 @@ export function parseInterface(fileContent: string): undefined | string {
   const visitor = new JavaParser()
   visitor.visit(cst)
   if (visitor.error !== undefined) return visitor.error
-  if (visitor.type !== 'interface') return `This is suppose to be an interface but is a '${visitor.type}''`
+  if (visitor.type !== 'interface') return `This is suppose to be an interface but is a '${visitor.type}'`
 }
 
 /**

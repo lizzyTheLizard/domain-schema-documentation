@@ -17,6 +17,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.12.0] - 2025-04-13
+
+### Added
+- Exclusions of validation errors
+- x-reference-type property to define the type of the reference
+- Support for links to java implementations using linkSrcDir property
+
+### Removed
+- test-real as it is not needed any more
+
+### Fixed
+
 ## [1.11.0] - 2024-12-10
 ### Added
 - Added configuration option to disable clickable diagrams in markdown

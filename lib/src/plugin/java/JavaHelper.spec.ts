@@ -1,8 +1,11 @@
 import { type Schema, type Module, type Model } from '../../reader/Reader'
-import { getFullJavaClassName, getJavaPackageName, getJavaPropertyType, getSimpleJavaClassName } from './JavaHelper'
+import { findSchemaFileInDir, getFullJavaClassName, getJavaPackageName, getJavaPropertyType, getModuleDir, getSimpleJavaClassName } from './JavaHelper'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { testModule, testSchema, testModel } from '../../testData'
 import { type ArrayProperty, type RefProperty, type StringProperty } from '../../schemaNormalizer/NormalizedSchema'
+import * as tmp from 'tmp'
+import { promises as fs } from 'fs'
+import path from 'path'
 
 describe('JavaHelper', () => {
   test('getJavaPropertyType', () => {
@@ -54,5 +57,27 @@ describe('JavaHelper', () => {
     expect(getSimpleJavaClassName(schema)).toEqual('Schema')
     expect(getSimpleJavaClassName(schema, 'Definition')).toEqual('SchemaDefinition')
     expect(getSimpleJavaClassName(schema.$id, 'Definition')).toEqual('SchemaDefinition')
+  })
+
+  test('getModuleDir', () => {
+    const module = testModule()
+    expect(getModuleDir(module, '../java', { } as unknown as JavaPluginOptions)).toEqual('../java/module')
+    expect(getModuleDir(module, m => '../java' + m.$id + '/src/main/java', { } as unknown as JavaPluginOptions)).toEqual('../java/Module/src/main/java/module')
+    expect(getModuleDir(module, '../java', { mainPackageName: 'com.example' } as unknown as JavaPluginOptions)).toEqual('../java/com/example/module')
+    expect(getModuleDir(module, m => '../java' + m.$id + '/src/main/java', { mainPackageName: 'com.example', modelPackageName: 'domain' } as unknown as JavaPluginOptions)).toEqual('../java/Module/src/main/java/com/example/module/domain')
+  })
+
+  test('findSchemaFileInDir', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const schema = testSchema()
+
+    expect(await findSchemaFileInDir(tmpDir.name, schema, undefined)).toEqual(undefined)
+    await fs.writeFile(path.join(tmpDir.name, 'Schema.java'), 'package module; public class Schema {}')
+    expect(await findSchemaFileInDir(tmpDir.name, schema, undefined)).toEqual(path.join(tmpDir.name, '/Schema.java'))
+
+    expect(await findSchemaFileInDir(tmpDir.name, schema, 'Definition')).toEqual(undefined)
+    await fs.mkdir(path.join(tmpDir.name, 'subdir'))
+    await fs.writeFile(path.join(tmpDir.name, 'subdir', 'SchemaDefinition.java'), 'package module; public class SchemaDefinition {}')
+    expect(await findSchemaFileInDir(tmpDir.name, schema, 'Definition')).toEqual(path.join(tmpDir.name, 'subdir', '/SchemaDefinition.java'))
   })
 })

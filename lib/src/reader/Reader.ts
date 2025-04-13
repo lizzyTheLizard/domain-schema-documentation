@@ -1,4 +1,5 @@
 import type { NormalizedSchema } from '../schemaNormalizer/NormalizedSchema'
+import { DependencyType } from './GetDependencies'
 
 /**
  * A reader is a function that reads a model from a source.
@@ -29,6 +30,8 @@ export interface Application {
   errors: ImplementationError[]
   /** Tags for this application */
   tags: Tag[]
+  /** Exclusions for errors in the application */
+  exclusions: Exclusion[]
 }
 
 /** A module in the application */
@@ -49,7 +52,7 @@ export interface Module {
   tags: Tag[]
 }
 
-export interface PropertyExtension { 'x-references'?: string | string[], 'x-enum-descriptions'?: Record<string, string> }
+export interface PropertyExtension { 'x-references'?: string | string[], 'x-enum-description'?: Record<string, string>, 'x-reference-type'?: DependencyType }
 
 export type Schema = NormalizedSchema<unknown, PropertyExtension> & {
   /** The type of the schema, used for documentation */
@@ -83,6 +86,15 @@ export interface Tag {
   value?: string
   /** The color of the tag */
   color: string
+}
+
+export interface Exclusion {
+  /** The type of error to be excluded */
+  type: ImplementationErrorType
+  /** A pattern of error text to be excluded */
+  textPattern: string
+  /** A pattern of ids for which those are excluded */
+  idPattern: string
 }
 
 /** Errors while verifing this input. Usually filed by the plugins, but could be given by the input as well */

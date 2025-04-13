@@ -1,8 +1,10 @@
 import { type Model, type Module, type Schema } from '../../reader/Reader'
 import { cleanName, getModuleId, getSchemaName } from '../../reader/InputHelper'
-import { type JavaPluginOptions } from './JavaPlugin'
+import { SrcDirDefinition, type JavaPluginOptions } from './JavaPlugin'
 import { getType, type PropertyType } from '../../reader/GetType'
 import { type Property } from '../../schemaNormalizer/NormalizedSchema'
+import { promises as fs } from 'fs'
+import path from 'path'
 
 export type JavaType = JavaClassType | JavaCollectionType | JavaMapType
 interface JavaClassType { type: 'CLASS', fullName: string }
@@ -96,4 +98,53 @@ export function getFullJavaClassName(schemaOrSchemaId: Schema | string, options:
 export function getSimpleJavaClassName(schemaOrSchemaId: Schema | string, definitionName?: string): string {
   const cleanedSchemaId = cleanName(getSchemaName(schemaOrSchemaId))
   return definitionName === undefined ? cleanedSchemaId : cleanedSchemaId + cleanName(definitionName)
+}
+
+/**
+ * Gets the module directory for a given module.
+ * @param module The given module
+ * @param srcDir The kind of source directory to use.
+ * @param options The plugin options
+ * @returns The module directory for this module
+ */
+export function getModuleDir(module: Module, srcDir: SrcDirDefinition, options: JavaPluginOptions): string {
+  const packageName = getJavaPackageNameForModule(module, options)
+  const baseDir = typeof srcDir === 'string' ? srcDir : srcDir(module)
+  return baseDir + (baseDir.endsWith('/') ? '' : '/') + packageName.replaceAll('.', '/')
+}
+
+/**
+ * Finds a schema implementation in the subfolders of a given directory and returns the full path to the file.
+ * @param dir The directory to start search in
+ * @param schema The schema to search for
+ * @param definitionName The definition name to search for. If undefined, the schema itself will be used
+ * @returns The full path to the file or undefined if not found
+ */
+export async function findSchemaFileInDir(dir: string, schema: Schema, definitionName: string | undefined): Promise<string | undefined> {
+  const targetFile = getSimpleJavaClassName(schema, definitionName) + '.java'
+  return findFileInSubfolders(dir, targetFile)
+}
+
+async function findFileInSubfolders(dir: string, targetFile: string): Promise<string | undefined> {
+  try {
+    const dirStat = await fs.stat(dir)
+    if (!dirStat.isDirectory()) {
+      return undefined
+    }
+  } catch {
+    // If the directory doesn't exist or there is an error, return undefined
+    return undefined
+  }
+
+  const dirents = await fs.readdir(dir, { withFileTypes: true })
+  for (const dirent of dirents) {
+    const res = path.resolve(dir, dirent.name)
+    if (dirent.isDirectory()) {
+      const found = await findFileInSubfolders(res, targetFile)
+      if (found) return found
+    } else if (dirent.isFile() && path.basename(res) === targetFile) {
+      return res
+    }
+  }
+  return undefined
 }

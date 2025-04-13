@@ -18,6 +18,8 @@ namespace Module 2 {
 }
 _Module2_Object2_yaml o-- _Module_Object_yaml :reference1
 _Module2_Object2_yaml ..> _Module_Object_yaml :reference2
+_Module2_Object2_yaml *-- _Module_Object_yaml :reference3
+_Module2_Object2_yaml --> _Module_Object_yaml :reference4
 _Module_Object_yaml o-- SubObject :subObject
 _Module_Object_yaml ..> SubEnum :subEnum
 _Module_Object_yaml o-- SubInterface :subInterface
@@ -104,9 +106,15 @@ Implemented by
 
 
 ## Links
-1. [Java-File](./java/Object.java)
-1. [Java-File (SubInterface)](./java/ObjectSubInterface.java)
-1. [Java-File (SubInterfaceOneOf3)](./java/ObjectSubInterfaceOneOf3.java)
-1. [Java-File (SubInterfaceOneOf2)](./java/ObjectSubInterfaceOneOf2.java)
-1. [Java-File (SubEnum)](./java/ObjectSubEnum.java)
-1. [Java-File (SubObject)](./java/ObjectSubObject.java)
+1. [Generated Java-File](./java/Object.java)
+1. [Generated Java-File (SubInterface)](./java/ObjectSubInterface.java)
+1. [Generated Java-File (SubInterfaceOneOf3)](./java/ObjectSubInterfaceOneOf3.java)
+1. [Generated Java-File (SubInterfaceOneOf2)](./java/ObjectSubInterfaceOneOf2.java)
+1. [Generated Java-File (SubEnum)](./java/ObjectSubEnum.java)
+1. [Generated Java-File (SubObject)](./java/ObjectSubObject.java)
+1. [Actual Java Implementation](../../src/com/example/module/model/Object.java)
+1. [Actual Java Implementation(SubInterface)](../../src/com/example/module/model/ObjectSubInterface.java)
+1. [Actual Java Implementation(SubInterfaceOneOf3)](../../src/com/example/module/model/ObjectSubInterfaceOneOf3.java)
+1. [Actual Java Implementation(SubInterfaceOneOf2)](../../src/com/example/module/model/ObjectSubInterfaceOneOf2.java)
+1. [Actual Java Implementation(SubEnum)](../../src/com/example/module/model/ObjectSubEnum.java)
+1. [Actual Java Implementation(SubObject)](../../src/com/example/module/model/ObjectSubObject.java)
