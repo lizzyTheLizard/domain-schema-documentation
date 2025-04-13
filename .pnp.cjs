@@ -51,10 +51,6 @@ const RAW_RUNTIME_STATE =
       "reference": "workspace:tests/openapi"\
     },\
     {\
-      "name": "test-real",\
-      "reference": "workspace:tests/real"\
-    },\
-    {\
       "name": "test-shared",\
       "reference": "workspace:tests/shared"\
     },\
@@ -76,7 +72,6 @@ const RAW_RUNTIME_STATE =
     ["test-js-module", ["workspace:tests/js-module"]],\
     ["test-markdown", ["workspace:tests/markdown"]],\
     ["test-openapi", ["workspace:tests/openapi"]],\
-    ["test-real", ["workspace:tests/real"]],\
     ["test-shared", ["workspace:tests/shared"]],\
     ["test-ts", ["workspace:tests/ts"]]\
   ],\
@@ -6941,19 +6936,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./tests/openapi/",\
         "packageDependencies": [\
           ["test-openapi", "workspace:tests/openapi"],\
-          ["@types/node", "npm:22.14.0"],\
-          ["domain-schema-documentation", "workspace:."],\
-          ["test-shared", "workspace:tests/shared"],\
-          ["tsx", "npm:4.19.3"]\
-        ],\
-        "linkType": "SOFT"\
-      }]\
-    ]],\
-    ["test-real", [\
-      ["workspace:tests/real", {\
-        "packageLocation": "./tests/real/",\
-        "packageDependencies": [\
-          ["test-real", "workspace:tests/real"],\
           ["@types/node", "npm:22.14.0"],\
           ["domain-schema-documentation", "workspace:."],\
           ["test-shared", "workspace:tests/shared"],\

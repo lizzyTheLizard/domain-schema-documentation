@@ -5551,17 +5551,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"test-real@workspace:tests/real":
-  version: 0.0.0-use.local
-  resolution: "test-real@workspace:tests/real"
-  dependencies:
-    "@types/node": "npm:^22.14.0"
-    domain-schema-documentation: "workspace:*"
-    test-shared: "workspace:*"
-    tsx: "npm:^4.19.3"
-  languageName: unknown
-  linkType: soft
-
 "test-shared@workspace:*, test-shared@workspace:tests/shared":
   version: 0.0.0-use.local
   resolution: "test-shared@workspace:tests/shared"
