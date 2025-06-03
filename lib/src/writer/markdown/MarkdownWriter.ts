@@ -80,6 +80,7 @@ function mdGetType(model: Model, schema: Schema, property: Property, options: Ma
 function mdGetTypeInternal(schema: Schema, type: PropertyType, options: MarkdownWriterOptions): string {
   switch (type.type) {
     case 'array': return `[${mdGetTypeInternal(schema, type.array, options)}]`
+    case 'map': return `{${mdGetTypeInternal(schema, type.items, options)}}`
     case 'reference': return `[${type.name}](${relativeLink(getModuleId(schema), type.$id)}.md)`
     case 'self': return `[${type.name}](./)`
     case 'definition': return `[${type.name}](#${type.name})`

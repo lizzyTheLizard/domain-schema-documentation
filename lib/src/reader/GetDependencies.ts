@@ -46,10 +46,10 @@ function getDependenciesForDefinition(model: Model, s: Schema, fromDefinitionNam
     )
   }
   if ('properties' in d) {
-    results.push(...Object.entries(d.properties)
+    const forProperties = Object.entries(d.properties)
       .flatMap(([name, p]) => getDependenciesForProperty(model, s, p, fromDefinitionName)
-        .map(d => ({ ...d, dependencyName: name }))),
-    )
+        .map(d => ({ ...d, dependencyName: name })))
+    results.push(...forProperties)
   }
   if ('additionalProperties' in d && typeof d.additionalProperties !== 'boolean') {
     const additionalPropertyDependencies = getDependenciesForProperty(model, s, d.additionalProperties, fromDefinitionName)
@@ -62,6 +62,9 @@ function getDependenciesForDefinition(model: Model, s: Schema, fromDefinitionNam
 function getDependenciesForProperty(model: Model, fromSchema: Schema, p: Property & PropertyExtension, fromDefinitionName?: string): Dependency[] {
   if ('items' in p) {
     return getDependenciesForProperty(model, fromSchema, p.items, fromDefinitionName).map(d => ({ ...d, array: true }))
+  }
+  if ('additionalProperties' in p && typeof p.additionalProperties !== 'boolean') {
+    return getDependenciesForProperty(model, fromSchema, p.additionalProperties, fromDefinitionName).map(d => ({ ...d, array: true }))
   }
   if ('x-references' in p) {
     const references = (typeof p['x-references'] === 'string') ? [p['x-references']] : p['x-references'] ?? []

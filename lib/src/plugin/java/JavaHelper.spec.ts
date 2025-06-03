@@ -2,7 +2,7 @@ import { type Schema, type Module, type Model } from '../../reader/Reader'
 import { findSchemaFileInDir, getFullJavaClassName, getJavaPackageName, getJavaPropertyType, getModuleDir, getSimpleJavaClassName } from './JavaHelper'
 import { type JavaPluginOptions } from './JavaPlugin'
 import { testModule, testSchema, testModel } from '../../testData'
-import { type ArrayProperty, type RefProperty, type StringProperty } from '../../schemaNormalizer/NormalizedSchema'
+import { MapProperty, type ArrayProperty, type RefProperty, type StringProperty } from '../../schemaNormalizer/NormalizedSchema'
 import * as tmp from 'tmp'
 import { promises as fs } from 'fs'
 import path from 'path'
@@ -30,6 +30,9 @@ describe('JavaHelper', () => {
     const basicProperty: StringProperty = { type: 'string' }
     expect(getJavaPropertyType(model, schema, basicProperty, options)).toEqual({ type: 'CLASS', fullName: 'String' })
     expect(getJavaPropertyType(model, schema, basicProperty, options2)).toEqual({ type: 'CLASS', fullName: 'com.example.CustomString' })
+    const mapProperty: MapProperty = { type: 'object', additionalProperties: basicProperty }
+    expect(getJavaPropertyType(model, schema, mapProperty, options)).toEqual({ type: 'MAP', items: { type: 'CLASS', fullName: 'String' } })
+    expect(getJavaPropertyType(model, schema, mapProperty, options2)).toEqual({ type: 'MAP', items: { type: 'CLASS', fullName: 'com.example.CustomString' } })
   })
 
   test('getJavaPackageName', () => {

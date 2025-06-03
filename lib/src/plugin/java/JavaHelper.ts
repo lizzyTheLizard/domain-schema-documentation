@@ -46,6 +46,7 @@ function getJavaPropertyTypeInternal(propertyType: PropertyType, schema: Schema,
     case 'reference': return { type: 'CLASS', fullName: getFullJavaClassName(propertyType.$id, options) }
     case 'self': return { type: 'CLASS', fullName: getFullJavaClassName(schema.$id, options) }
     case 'definition': return { type: 'CLASS', fullName: getFullJavaClassName(schema.$id, options, propertyType.name) }
+    case 'map': return { type: 'MAP', items: getJavaPropertyTypeInternal(propertyType.items, schema, options) }
     case 'local':
       if (!(propertyType.name in options.basicTypeMap)) throw new Error(`Unknown basic type: ${propertyType.name}`)
       return { type: 'CLASS', fullName: options.basicTypeMap[propertyType.name] }

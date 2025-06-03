@@ -55,7 +55,7 @@ export interface InterfaceDefinition<PropertyExtension = unknown> extends Object
 }
 
 /** A single property in an object schema */
-export type Property<PropertyExtension = unknown> = ArrayProperty<PropertyExtension> | RefProperty | BooleanProperty | StringProperty | NumberProperty | ObjectProperty
+export type Property<PropertyExtension = unknown> = ArrayProperty<PropertyExtension> | RefProperty | BooleanProperty | StringProperty | NumberProperty | ObjectProperty | MapProperty<PropertyExtension>
 
 /** An array property */
 export interface PropertyBase {
@@ -88,6 +88,12 @@ export interface RefProperty extends PropertyBase {
 /** A reference property */
 export interface ObjectProperty extends PropertyBase {
   type: 'object'
+}
+
+/** A reference property */
+export interface MapProperty<PropertyExtension = unknown> extends PropertyBase {
+  type: 'object'
+  additionalProperties: boolean | (Property<PropertyExtension> & PropertyExtension)
 }
 
 /** A basic property */

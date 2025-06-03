@@ -1,5 +1,5 @@
 import * as tmp from 'tmp'
-import { type Module, type Schema } from '../../reader/Reader'
+import { Model, type Module, type Schema } from '../../reader/Reader'
 import { javaGenerator } from './JavaGenerator'
 import { defaultJavaBasicTypeMap, defaultJavaFormatMap, type JavaPluginOptions } from './JavaPlugin'
 import { loadTemplate } from '../../writer/WriterHelpers'
@@ -60,6 +60,23 @@ describe('JavaGenerator', () => {
     const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
     expect(content).toContain('import java.util.Map;')
     expect(content).toContain('  private Map<String, Integer> additionalProperties;')
+  })
+
+  test('map', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const schema: Schema = { ...testSchema(), properties: { map: { type: 'object', additionalProperties: { type: 'number', format: 'int32' } } } }
+    const model: Model = { ...testModel(), schemas: [schema] }
+    await javaGenerator(model, tmpDir.name, options)
+
+    const baseFiles = await fs.readdir(tmpDir.name)
+    expect(baseFiles).toEqual(['Module'])
+    const moduleFiles = await fs.readdir(path.join(tmpDir.name, 'Module'))
+    expect(moduleFiles).toEqual(['java'])
+    const javaFiles = await fs.readdir(path.join(tmpDir.name, 'Module', 'java'))
+    expect(javaFiles).toEqual(['Schema.java'])
+    const content = (await fs.readFile(tmpDir.name + '/Module/java/Schema.java', 'utf-8')).toString()
+    expect(content).toContain('import java.util.Map;')
+    expect(content).toContain('  private Map<String, Integer> map;')
   })
 
   test('additionalProperties false', async () => {

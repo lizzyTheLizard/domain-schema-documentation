@@ -144,4 +144,37 @@ describe('SchemaNormalizer', () => {
     })
     expect(target.getErrors()).toEqual([])
   })
+
+  test('map', () => {
+    expect(target.normalize({ $id: 'Schema', properties: { map: { additionalProperties: true } } })).toEqual({
+      $id: 'Schema',
+      title: 'Schema',
+      type: 'object',
+      properties: { map: { type: 'object', additionalProperties: true } },
+      required: [],
+      additionalProperties: false,
+      definitions: {},
+    })
+    expect(target.getErrors()).toEqual([])
+    expect(target.normalize({ $id: 'Schema', properties: { map: { additionalProperties: { type: 'string' } } } })).toEqual({
+      $id: 'Schema',
+      title: 'Schema',
+      type: 'object',
+      properties: { map: { type: 'object', additionalProperties: { type: 'string' } } },
+      required: [],
+      additionalProperties: false,
+      definitions: {},
+    })
+    expect(target.getErrors()).toEqual([])
+    expect(target.normalize({ $id: 'Schema', properties: { map: { additionalProperties: { type: 'object', properties: { key: { type: 'string' } } } } } })).toEqual({
+      $id: 'Schema',
+      title: 'Schema',
+      type: 'object',
+      properties: { map: { type: 'object', additionalProperties: { $ref: '#/definitions/MapAdditionalProperties' } } },
+      required: [],
+      additionalProperties: false,
+      definitions: { MapAdditionalProperties: { type: 'object', properties: { key: { type: 'string' } }, required: [], additionalProperties: false } },
+    })
+    expect(target.getErrors()).toEqual([])
+  })
 })

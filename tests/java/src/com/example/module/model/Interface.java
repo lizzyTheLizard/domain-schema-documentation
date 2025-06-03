@@ -1,6 +1,6 @@
 package com.example.module.model;
 
-public abstract class Interface extends Object {
+public abstract class Interface {
   String getKind();
   void setKind(String value);
 }

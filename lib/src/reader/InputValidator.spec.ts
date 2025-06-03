@@ -61,6 +61,12 @@ describe('InputValidator', () => {
     expect(() => { target.validateSchemaFile({ ...schema, additionalProperties: 'string' }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. See logs for details'))
   })
 
+  test('validate Map', () => {
+    const schema = testSchema()
+    expect(() => { target.validateSchemaFile({ ...schema, properties: { map: { type: 'object', additionalProperties: true } } }, 'file.yaml') }).not.toThrow()
+    expect(() => { target.validateSchemaFile({ ...schema, properties: { map: { type: 'object', additionalProperties: { type: 'number', format: 'int32' } } } }, 'file.yaml') }).not.toThrow()
+  })
+
   test('validateRequired', () => {
     const schema = testSchema()
     expect(() => { target.validateSchemaFile({ ...schema, required: ['other'] }, 'file.yaml') }).toThrow(new Error('Invalid file file.yaml. It has a required property \'other\' that is not defined'))
