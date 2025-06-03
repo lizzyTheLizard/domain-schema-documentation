@@ -12,6 +12,8 @@ import java.util.Map;
 public class Object implements Object, Object {
   private String id;
   private String name;
+  private Map<String, Float> intMap;
+  private Map<String, ObjectObjectMapAdditionalProperties> objectMap;
   private ObjectSubObject subObject;
   private ObjectSubEnum subEnum;
   private ObjectSubInterface subInterface;
