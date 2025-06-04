@@ -17,6 +17,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.13.0] - 2025-06-04
+
+### Added
+- Support for Maps as a property
+
+### Fixed
+- The java generator used wrong interface names for interfaces defined in the same yaml file
+
 ## [1.12.0] - 2025-04-13
 
 ### Added
