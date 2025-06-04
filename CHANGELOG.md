@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.14.0] - 2025-06-04
+
+### Changed
+- Ignoring non yaml files in the input directory instead of throwing an error
+
 ## [1.13.0] - 2025-06-04
 
 ### Added
