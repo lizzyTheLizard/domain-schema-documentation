@@ -74,7 +74,7 @@ async function readFolderRecursive(baseFolder: string, folder: string, depth: nu
       const expectedId = getExpectedId(baseFolder, filePath)
       inputNormalizer.addSchema(schema, filePath, expectedId)
     } else {
-      throw new Error(`Unexpected file ${filePath}. Not a valid input file`)
+      console.log(`Skipping file ${filePath} as it is not a valid input file`)
     }
   }
 }
