@@ -21,7 +21,7 @@ export async function javaGenerator(model: Model, outputFolder: string, options:
   Handlebars.registerHelper('javaComment', (text: string, indentation: number) => comment(text, indentation))
   Handlebars.registerHelper('javaClassName', (ctx: HandlebarsContext) => getSimpleJavaClassName(ctx.schema, ctx.definitionName))
   Handlebars.registerHelper('javaEnumDoc', (ctx: HandlebarsContext, key: string) => enumDoc(ctx as EnumDefinition, key))
-  Handlebars.registerHelper('javaImplementedInterfaces', (ctx: HandlebarsContext) => implementedInterfaces(model, ctx.schema, ctx.definitionName).map(s => getSimpleJavaClassName(s)))
+  Handlebars.registerHelper('javaImplementedInterfaces', (ctx: HandlebarsContext) => implementedInterfaces(model, ctx.schema, ctx.definitionName).map(s => getSimpleJavaClassName(s.schema, s.definitionName)))
   Handlebars.registerHelper('javaPropertyType', (ctx: HandlebarsContext, propertyName: string) => propertyType(model, ctx.schema, ctx as ObjectDefinition, propertyName, options))
   Handlebars.registerHelper('javaAdditionalPropertiesType', (ctx: HandlebarsContext) => additionalPropertiesType(model, ctx.schema, ctx as Definition, options))
   Handlebars.registerHelper('javaImports', (ctx: HandlebarsContext) => collectImports(model, ctx.schema, options, ctx.definitionName))
@@ -56,12 +56,12 @@ function generate(schema: Schema, options: JavaPluginOptions, definitionName?: s
   }
 }
 
-function implementedInterfaces(model: Model, schema: Schema, definitionName?: string): Schema[] {
+function implementedInterfaces(model: Model, schema: Schema, definitionName?: string): { schema: Schema, definitionName?: string }[] {
   return model.schemas.flatMap(s => getDependencies(model, s))
     .filter(d => d.type === 'IS_IMPLEMENTED_BY')
     .filter(d => d.toSchema === schema)
     .filter(d => d.toDefinitionName === definitionName)
-    .map(d => d.fromSchema)
+    .map(d => ({ schema: d.fromSchema, definitionName: d.fromDefinitionName }))
 }
 
 function collectImports(model: Model, schema: Schema, options: JavaPluginOptions, definitionName?: string): string[] {
@@ -78,7 +78,7 @@ function collectImports(model: Model, schema: Schema, options: JavaPluginOptions
     const type = getJavaAdditionalPropertyType(model, schema, definition.additionalProperties, options)
     collectImportsFromType(type).forEach(i => result.push(i))
   }
-  implementedInterfaces(model, schema, definitionName).forEach(i => result.push(getFullJavaClassName(i, options)))
+  implementedInterfaces(model, schema, definitionName).forEach(i => result.push(getFullJavaClassName(i.schema, options, i.definitionName)))
   const packageName = getJavaPackageName(schema, options)
   function isInPackage(fullClassName: string, packageName: string): boolean {
     return fullClassName.split('.').slice(0, -1).join('.') === packageName

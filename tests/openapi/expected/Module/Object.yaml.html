@@ -60,6 +60,7 @@
         class SubInterfaceOneOf2["SubInterfaceOneOf2"]
         class SubEnum["SubEnum"]
         class SubObject["SubObject"]
+        class ObjectMapAdditionalProperties["ObjectMapAdditionalProperties"]
         class _Module_Interface_yml["Interface"]
       }
       namespace Module 2 {
@@ -69,6 +70,7 @@
       _Module2_Object2_yaml ..> _Module_Object_yaml :reference2
       _Module2_Object2_yaml *-- _Module_Object_yaml :reference3
       _Module2_Object2_yaml --> _Module_Object_yaml :reference4
+      _Module_Object_yaml o--" N" ObjectMapAdditionalProperties :objectMap
       _Module_Object_yaml o-- SubObject :subObject
       _Module_Object_yaml ..> SubEnum :subEnum
       _Module_Object_yaml o-- SubInterface :subInterface
@@ -83,6 +85,7 @@
       click SubInterfaceOneOf2 href "./Object.yaml.html" "Object"
       click SubEnum href "./Object.yaml.html" "Object"
       click SubObject href "./Object.yaml.html" "Object"
+      click ObjectMapAdditionalProperties href "./Object.yaml.html" "Object"
       click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
       click _Module_Interface_yml href "./Interface.yml.html" "Interface"
           </pre>
@@ -110,6 +113,16 @@
             <tr>
               <td>name*</td>
               <td>String</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>intMap</td>
+              <td>{Float}</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>objectMap</td>
+              <td>{<a href="#ObjectMapAdditionalProperties">ObjectMapAdditionalProperties</a>}</td>
               <td></td>
             </tr>
             <tr>
@@ -242,6 +255,33 @@
       
       
       <a id="SubObject"></a><h3>Class SubObject</h3>
+      
+      
+      <section>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>key</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>value</td>
+              <td>String</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      
+      <a id="ObjectMapAdditionalProperties"></a><h3>Class ObjectMapAdditionalProperties</h3>
       
       
       <section>

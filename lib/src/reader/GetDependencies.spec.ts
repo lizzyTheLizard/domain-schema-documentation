@@ -152,6 +152,19 @@ describe('GetDependencies', () => {
     }])
   })
 
+  test('map', () => {
+    const schema: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { map: { type: 'object', additionalProperties: { $ref: '#/definitions/MapAdditionalProperties' } } }, definitions: { MapAdditionalProperties: { type: 'object', properties: { key: { type: 'string' } }, required: [], additionalProperties: false } } }
+    const model: Model = { ...testModel(), schemas: [schema] }
+    expect(getDependencies(model, schema)).toEqual([{
+      fromSchema: schema,
+      toSchema: schema,
+      toDefinitionName: 'MapAdditionalProperties',
+      type: 'CONTAINS',
+      dependencyName: 'map',
+      array: true,
+    }])
+  })
+
   test('property ref overwrite', () => {
     const schema1: Schema = { ...testSchema(), 'x-schema-type': 'Entity' }
     const schema2: Schema = { ...testSchema(), $id: '/Module/Schema2.yaml', properties: { reference: { '$ref': './Schema.yaml', 'x-reference-type': 'AGGREGATES' } } }

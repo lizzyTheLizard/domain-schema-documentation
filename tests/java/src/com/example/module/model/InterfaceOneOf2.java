@@ -8,7 +8,7 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InterfaceOneOf2 implements Interface {
+public class InterfaceOneOf2 extends Interface {
   private final static String kind = "INSIDE2";
   private String key;
   private String value;

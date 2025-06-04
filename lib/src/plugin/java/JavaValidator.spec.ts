@@ -110,6 +110,48 @@ describe('JavaValidator', () => {
     expect(model.schemas[0]['x-errors']).toEqual([{ text: 'Additional Properties should not exist in class \'module.Schema\'', type: 'NOT_IN_DOMAIN_MODEL' }])
   })
 
+  test('MissingMap', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const filename = path.join(tmpDir.name, 'module', 'Schema.java')
+    await fs.mkdir(path.join(tmpDir.name, 'module'))
+    await fs.writeFile(filename, 'package module; public class Schema {}')
+    const schema: Schema = { ...testSchema(), properties: { map: { type: 'object', additionalProperties: { type: 'number', format: 'int32' } } } }
+    const model = { ...testModel(), schemas: [schema] }
+    const options = { srcDir: tmpDir.name, basicTypeMap: defaultJavaBasicTypeMap } as unknown as JavaPluginOptions
+    await javaValidator(model, options)
+    expect(model.application.errors).toEqual([])
+    expect(model.modules[0].errors).toEqual([])
+    expect(model.schemas[0]['x-errors']).toEqual([{ text: 'Property \'map\' is missing in class \'module.Schema\'', type: 'MISSING_IN_IMPLEMENTATION' }])
+  })
+
+  test('WrongMap', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const filename = path.join(tmpDir.name, 'module', 'Schema.java')
+    await fs.mkdir(path.join(tmpDir.name, 'module'))
+    await fs.writeFile(filename, 'package module; import java.util.Map; public class Schema { private Map<String, Integer> map; }')
+    const schema: Schema = { ...testSchema(), properties: { map: { type: 'object', additionalProperties: { type: 'string' } } } }
+    const model = { ...testModel(), schemas: [schema] }
+    const options = { srcDir: tmpDir.name, basicTypeMap: defaultJavaBasicTypeMap } as unknown as JavaPluginOptions
+    await javaValidator(model, options)
+    expect(model.application.errors).toEqual([])
+    expect(model.modules[0].errors).toEqual([])
+    expect(model.schemas[0]['x-errors']).toEqual([{ text: 'Property \'map\' has type \'Map<String, Integer>\' in class \'module.Schema\' but should have type \'Map<String, String>\'', type: 'WRONG' }])
+  })
+
+  test('Correct Map', async () => {
+    const tmpDir = tmp.dirSync({ unsafeCleanup: true })
+    const filename = path.join(tmpDir.name, 'module', 'Schema.java')
+    await fs.mkdir(path.join(tmpDir.name, 'module'))
+    await fs.writeFile(filename, 'package module; import java.util.Map; public class Schema { private Map<String, String> map; }')
+    const schema: Schema = { ...testSchema(), properties: { map: { type: 'object', additionalProperties: { type: 'string' } } } }
+    const model = { ...testModel(), schemas: [schema] }
+    const options = { srcDir: tmpDir.name, basicTypeMap: defaultJavaBasicTypeMap } as unknown as JavaPluginOptions
+    await javaValidator(model, options)
+    expect(model.application.errors).toEqual([])
+    expect(model.modules[0].errors).toEqual([])
+    expect(model.schemas[0]['x-errors']).toEqual([])
+  })
+
   test('Excess Property', async () => {
     const tmpDir = tmp.dirSync({ unsafeCleanup: true })
     const filename = path.join(tmpDir.name, 'module', 'Schema.java')

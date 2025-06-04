@@ -11,6 +11,7 @@ namespace Module {
   class SubInterfaceOneOf2["SubInterfaceOneOf2"]
   class SubEnum["SubEnum"]
   class SubObject["SubObject"]
+  class ObjectMapAdditionalProperties["ObjectMapAdditionalProperties"]
   class _Module_Interface_yml["Interface"]
 }
 namespace Module 2 {
@@ -20,6 +21,7 @@ _Module2_Object2_yaml o-- _Module_Object_yaml :reference1
 _Module2_Object2_yaml ..> _Module_Object_yaml :reference2
 _Module2_Object2_yaml *-- _Module_Object_yaml :reference3
 _Module2_Object2_yaml --> _Module_Object_yaml :reference4
+_Module_Object_yaml o--" N" ObjectMapAdditionalProperties :objectMap
 _Module_Object_yaml o-- SubObject :subObject
 _Module_Object_yaml ..> SubEnum :subEnum
 _Module_Object_yaml o-- SubInterface :subInterface
@@ -34,6 +36,7 @@ click SubInterfaceOneOf3 href "./Object.yaml.html" "Object"
 click SubInterfaceOneOf2 href "./Object.yaml.html" "Object"
 click SubEnum href "./Object.yaml.html" "Object"
 click SubObject href "./Object.yaml.html" "Object"
+click ObjectMapAdditionalProperties href "./Object.yaml.html" "Object"
 click _Module2_Object2_yaml href "../Module2/Object2.yaml.html" "Object 2"
 click _Module_Interface_yml href "./Interface.yml.html" "Interface"
 ```
@@ -45,6 +48,8 @@ click _Module_Interface_yml href "./Interface.yml.html" "Interface"
 |------|------|-------------|
 | id* | String |  |
 | name* | String |  |
+| intMap | {Float} |  |
+| objectMap | {[ObjectMapAdditionalProperties](#ObjectMapAdditionalProperties)} |  |
 | subObject | [SubObject](#SubObject) |  |
 | subEnum | [SubEnum](#SubEnum) |  |
 | subInterface | [SubInterface](#SubInterface) |  |
@@ -103,6 +108,14 @@ Implemented by
 | key | String |  |
 | value | String |  |
 
+### Class ObjectMapAdditionalProperties
+
+
+| Property | Type | Description |
+|------|------|-------------|
+| key | String |  |
+| value | String |  |
+
 
 
 ## Links
@@ -112,9 +125,11 @@ Implemented by
 1. [Generated Java-File (SubInterfaceOneOf2)](./java/ObjectSubInterfaceOneOf2.java)
 1. [Generated Java-File (SubEnum)](./java/ObjectSubEnum.java)
 1. [Generated Java-File (SubObject)](./java/ObjectSubObject.java)
+1. [Generated Java-File (ObjectMapAdditionalProperties)](./java/ObjectObjectMapAdditionalProperties.java)
 1. [Actual Java Implementation](../../src/com/example/module/model/Object.java)
 1. [Actual Java Implementation(SubInterface)](../../src/com/example/module/model/ObjectSubInterface.java)
 1. [Actual Java Implementation(SubInterfaceOneOf3)](../../src/com/example/module/model/ObjectSubInterfaceOneOf3.java)
 1. [Actual Java Implementation(SubInterfaceOneOf2)](../../src/com/example/module/model/ObjectSubInterfaceOneOf2.java)
 1. [Actual Java Implementation(SubEnum)](../../src/com/example/module/model/ObjectSubEnum.java)
 1. [Actual Java Implementation(SubObject)](../../src/com/example/module/model/ObjectSubObject.java)
+1. [Actual Java Implementation(ObjectMapAdditionalProperties)](../../src/com/example/module/model/ObjectObjectMapAdditionalProperties.java)

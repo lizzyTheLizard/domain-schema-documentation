@@ -11,6 +11,20 @@ properties:
     type: string
   name:
     type: string
+  intMap:
+    type: object
+    additionalProperties:
+      type: number
+      format: float
+  objectMap:
+    type: object
+    additionalProperties:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
   subObject:
     type: object
     properties:

@@ -9,9 +9,11 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Object implements Object, Object {
+public class Object implements ObjectSubInterface, ObjectSubInterfaceOneOf3 {
   private String id;
   private String name;
+  private Map<String, Float> intMap;
+  private Map<String, ObjectObjectMapAdditionalProperties> objectMap;
   private ObjectSubObject subObject;
   private ObjectSubEnum subEnum;
   private ObjectSubInterface subInterface;

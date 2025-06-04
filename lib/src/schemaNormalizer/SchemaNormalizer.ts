@@ -1,5 +1,5 @@
 import { cleanName } from '../reader/InputHelper'
-import type { EnumDefinition, InterfaceDefinition, ObjectDefinition, RefProperty, Property, NormalizedSchema, StringProperty, BooleanProperty, ArrayProperty, NumberProperty, Definition } from './NormalizedSchema'
+import type { EnumDefinition, InterfaceDefinition, ObjectDefinition, RefProperty, Property, NormalizedSchema, StringProperty, BooleanProperty, ArrayProperty, NumberProperty, Definition, MapProperty } from './NormalizedSchema'
 import { type JSONSchema7Definition, type JSONSchema7 } from 'json-schema'
 import { type SchemaNormalizerError } from './SchemaNormalizerError'
 import { type SchemaNormalizerOptions } from './SchemaNormalizerOptions'
@@ -166,6 +166,7 @@ export class SchemaNormalizer {
     if (input.properties !== undefined) return this.toDefinitionRefProperty(input, path)
     if (input.oneOf !== undefined) return this.toDefinitionRefProperty(input, path)
     if (input.enum !== undefined) return this.toDefinitionRefProperty(input, path)
+    if (input.additionalProperties) return this.toMapProperty(input, path)
     if (type === 'object') return this.toDefinitionRefProperty(input, path)
     if (type === 'array') return this.toArrayProperty(input, path)
     if (type === 'string') return this.toStringProperty(input, path)
@@ -192,6 +193,17 @@ export class SchemaNormalizer {
     const name = path.map(p => cleanName(p)).join('')
     this.#definitionsToProcess.push({ name, path, definition: input })
     return { $ref: `#/definitions/${name}` }
+  }
+
+  private toMapProperty(input: JSONSchema7, path: string[]): MapProperty {
+    const additionalProperties = this.toAdditionalProperties(input.additionalProperties, [...path, 'additionalProperties'])
+    return {
+      ...this.keepProperties(input, 'object', path),
+      type: 'object',
+      additionalProperties,
+      readOnly: input.readOnly,
+      writeOnly: input.writeOnly,
+    }
   }
 
   private toArrayProperty(input: JSONSchema7, path: string[]): ArrayProperty {

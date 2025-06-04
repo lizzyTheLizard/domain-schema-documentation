@@ -71,6 +71,7 @@ function htmlGetType(model: Model, schema: Schema, property: Property, options: 
 function htmlGetTypeInternal(schema: Schema, type: PropertyType, options: HtmlWriterOptions): string {
   switch (type.type) {
     case 'array': return `[${htmlGetTypeInternal(schema, type.array, options)}]`
+    case 'map': return `{${htmlGetTypeInternal(schema, type.items, options)}}`
     case 'reference': return `<a href="${relativeLink(getModuleId(schema), type.$id)}.html">${type.name}</a>`
     case 'self': return `<a href="">${type.name}</a>`
     case 'definition': return `<a href="#${type.name}">${type.name}</a>`

@@ -7,9 +7,9 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InterfaceOneOf1 extends Interface {
-  private final static String kind = "INSIDE1";
-  private String name;
+public class ObjectObjectMapAdditionalProperties {
+  private String key;
+  private String value;
 }
 
 
