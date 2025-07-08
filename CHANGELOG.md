@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.15.0] - 2025-08-07
+
+### Added
+- JavaPluginOptions.getPackageName: Optimal parameter to fine tune java package name
+
 ## [1.14.0] - 2025-06-04
 
 ### Changed
