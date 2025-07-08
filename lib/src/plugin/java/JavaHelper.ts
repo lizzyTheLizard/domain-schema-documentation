@@ -65,6 +65,7 @@ export function getJavaPackageName(schemaOrSchemaId: Schema | string, options: J
   const moduleId = getModuleId(schemaOrSchemaId)
   return getJavaPackageNameForModule(moduleId, options)
 }
+
 /**
  * Gets the java package name for a given module.
  * @param moduleOrModuleId The module or module id to get the package name for
@@ -73,7 +74,9 @@ export function getJavaPackageName(schemaOrSchemaId: Schema | string, options: J
  */
 export function getJavaPackageNameForModule(moduleOrModuleId: Module | string, options: JavaPluginOptions): string {
   const moduleId = typeof moduleOrModuleId === 'string' ? moduleOrModuleId : moduleOrModuleId.$id
-  let packageName = moduleId.split('/').map(s => cleanName(s)).filter(x => x.length > 0).join('.')
+  const names = moduleId.split('/').map(s => cleanName(s)).filter(x => x.length > 0)
+  if (options.getPackageName !== undefined) return options.getPackageName(names)
+  let packageName = names.join('.')
   if (options.mainPackageName !== undefined) packageName = options.mainPackageName + '.' + packageName
   if (options.modelPackageName !== undefined) packageName = packageName + '.' + options.modelPackageName
   return packageName.toLowerCase()

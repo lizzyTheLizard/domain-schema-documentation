@@ -11,6 +11,7 @@ describe('JavaGenerator', () => {
   const options: JavaPluginOptions = {
     mainPackageName: 'com.example',
     modelPackageName: 'model',
+    getPackageName: undefined,
     useLombok: true,
     srcDir: undefined,
     basicTypeMap: { ...defaultJavaBasicTypeMap, ...defaultJavaFormatMap },

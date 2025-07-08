@@ -24,6 +24,11 @@ export interface JavaPluginOptions {
    */
   modelPackageName: string | undefined
   /**
+   * Get the package name for a given module name. If defined,  mainPackageName and modelPackageName are not used.
+   * By default the package name will be ${mainPackageName}.#{moduleNames.join(".")}.${modelPackageName}
+   */
+  getPackageName: ((moduleNames: string[]) => string) | undefined
+  /**
    * Should Lombok annotations be used in the generated Java classes. Default is true.
    */
   useLombok: boolean
@@ -83,6 +88,7 @@ function applyDefaults(optionsOrUndefined?: Partial<JavaPluginOptions>): JavaPlu
   return {
     mainPackageName: optionsOrUndefined?.mainPackageName ?? 'com.example',
     modelPackageName: optionsOrUndefined?.modelPackageName ?? 'model',
+    getPackageName: undefined,
     useLombok: optionsOrUndefined?.useLombok ?? true,
     basicTypeMap: optionsOrUndefined?.basicTypeMap ?? { ...defaultJavaBasicTypeMap, ...defaultJavaFormatMap },
     classTemplate: optionsOrUndefined?.classTemplate ?? loadTemplate(path.join(__dirname, 'class.hbs')),
