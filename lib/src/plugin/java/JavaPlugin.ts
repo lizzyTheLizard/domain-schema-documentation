@@ -88,7 +88,7 @@ function applyDefaults(optionsOrUndefined?: Partial<JavaPluginOptions>): JavaPlu
   return {
     mainPackageName: optionsOrUndefined?.mainPackageName ?? 'com.example',
     modelPackageName: optionsOrUndefined?.modelPackageName ?? 'model',
-    getPackageName: undefined,
+    getPackageName: optionsOrUndefined?.getPackageName,
     useLombok: optionsOrUndefined?.useLombok ?? true,
     basicTypeMap: optionsOrUndefined?.basicTypeMap ?? { ...defaultJavaBasicTypeMap, ...defaultJavaFormatMap },
     classTemplate: optionsOrUndefined?.classTemplate ?? loadTemplate(path.join(__dirname, 'class.hbs')),
